@@ -24,6 +24,7 @@
     },
     "scripts": {
         "prebuild": "npm --prefix ../connector-core run build",
+        "pretest": "npm --prefix ../connector-core run build",
         "build": "node scripts/build.js && tsc",
         "watch": "tsc -w",
         "dev": "tsx src/index.ts",

@@ -2,7 +2,6 @@
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import BundlePage from '../components/BundlePage.vue'
-import BundlePanel from '../components/BundlePanel.vue'
 import BundleState from '../components/BundleState.vue'
 import { useRemoteTaskUserRuntime } from '../facade'
 
