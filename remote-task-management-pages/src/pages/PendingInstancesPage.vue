@@ -8,11 +8,13 @@ import { useRemoteTaskManagementRuntime } from '../facade'
 const runtime = useRemoteTaskManagementRuntime()
 const loading = ref(true)
 const error = ref('')
-const instances = ref<Awaited<ReturnType<typeof runtime.facade.listInstances>>>([])
+type RemoteTaskInstance = Awaited<ReturnType<typeof runtime.facade.listInstances>>[number]
+
+const instances = ref<RemoteTaskInstance[]>([])
 const selectedId = ref('')
 const reason = ref('')
 
-const selected = computed(() => instances.value.find((item) => String(item.id) === selectedId.value) ?? null)
+const selected = computed<RemoteTaskInstance | null>(() => instances.value.find((item) => String(item.id ?? '') === selectedId.value) ?? null)
 
 async function load() {
   loading.value = true
