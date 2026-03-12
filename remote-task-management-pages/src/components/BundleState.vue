@@ -13,11 +13,11 @@ const emit = defineEmits<{
 function paletteOf(variant: typeof props.variant) {
   switch (variant) {
     case 'error':
-      return 'border-rose-200 bg-rose-50 text-rose-700'
+      return 'border-rose-500/30 bg-rose-500/10 text-rose-100'
     case 'empty':
-      return 'border-slate-200 border-dashed bg-slate-50 text-slate-500'
+      return 'border-white/12 border-dashed bg-white/[0.02] text-slate-300'
     default:
-      return 'border-slate-200 bg-slate-50 text-slate-500'
+      return 'border-white/10 bg-white/[0.03] text-slate-300'
   }
 }
 </script>
@@ -33,7 +33,7 @@ function paletteOf(variant: typeof props.variant) {
       <button
         v-if="actionLabel"
         type="button"
-        class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+        class="inline-flex items-center justify-center rounded-xl border border-white/12 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-white/20 hover:bg-white/[0.08]"
         @click="emit('action')"
       >
         {{ actionLabel }}

@@ -13,7 +13,6 @@ const loading = ref(true)
 const error = ref('')
 const packages = ref<Awaited<ReturnType<typeof runtime.facade.listPackages>>>([])
 const cliHintOpen = ref(false)
-const hostBaseUrl = 'http://localhost:7001'
 
 function nameOf(suffix: string) {
   return `${runtime.routePrefix}-${suffix}`
@@ -24,20 +23,28 @@ const teamId = computed(() => {
   return typeof value === 'string' ? value.trim() : ''
 })
 
+const loginUrl = computed(() => {
+  const origin = typeof window === 'undefined' ? '' : window.location.origin
+  if (!origin) return ''
+  if (runtime.scope === 'team' && teamId.value) {
+    return `${origin}/team/${teamId.value}/linktool-login`
+  }
+  if (runtime.scope === 'tenant') {
+    return `${origin}/dashboard/linktool-login/tenant`
+  }
+  return `${origin}/linktool-login/platform`
+})
+
+const loginCommand = computed(() => {
+  return `bw-linktool login --login-url ${loginUrl.value || '<login-url>'}`
+})
+
 const publishCommand = computed(() => {
-  const segments = ['bw-linktool', 'publish', `--scope ${runtime.scope}`]
-  if (runtime.scope === 'team' && teamId.value) segments.push(`--team-id ${teamId.value}`)
-  segments.push(`--base-url ${hostBaseUrl}`)
-  segments.push(`--payload '{\"name\":\"your_connector\"}'`)
-  return segments.join(' ')
+  return `bw-linktool publish --payload '{\"name\":\"your_connector\"}'`
 })
 
 const deployCommand = computed(() => {
-  const segments = ['bw-linktool', 'deploy', `--scope ${runtime.scope}`]
-  if (runtime.scope === 'team' && teamId.value) segments.push(`--team-id ${teamId.value}`)
-  segments.push(`--base-url ${hostBaseUrl}`)
-  segments.push(`--payload '{\"name\":\"your_connector\",\"version\":\"latest\"}'`)
-  return segments.join(' ')
+  return `bw-linktool deploy --payload '{\"name\":\"your_connector\",\"version\":\"latest\"}'`
 })
 
 async function load() {
@@ -73,13 +80,13 @@ onMounted(load)
     borderless
   >
     <template #actions>
-      <button class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100" @click="load">Refresh</button>
-      <button class="inline-flex items-center justify-center rounded-xl bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800" @click="router.push({ name: nameOf('publish') })">Publish</button>
-      <button class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100" @click="router.push({ name: nameOf('deploy') })">Deploy</button>
-      <button class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100" @click="router.push({ name: nameOf('config') })">Config</button>
+      <button class="inline-flex items-center justify-center rounded-xl border border-white/12 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-white/20 hover:bg-white/[0.08]" @click="load">Refresh</button>
+      <button class="inline-flex items-center justify-center rounded-xl border border-emerald-400/30 bg-emerald-500/14 px-4 py-2 text-sm font-medium text-emerald-100 transition hover:border-emerald-300/40 hover:bg-emerald-500/22" @click="router.push({ name: nameOf('publish') })">Publish</button>
+      <button class="inline-flex items-center justify-center rounded-xl border border-white/12 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-white/20 hover:bg-white/[0.08]" @click="router.push({ name: nameOf('deploy') })">Deploy</button>
+      <button class="inline-flex items-center justify-center rounded-xl border border-white/12 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-white/20 hover:bg-white/[0.08]" @click="router.push({ name: nameOf('config') })">Config</button>
       <button
         data-test-id="remote-task-management.packages.cli-hint-toggle"
-        class="inline-flex items-center justify-center rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-950 transition hover:bg-emerald-100 dark:border-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-100 dark:hover:bg-emerald-900/60"
+        class="inline-flex items-center justify-center rounded-xl border border-cyan-400/30 bg-cyan-500/12 px-4 py-2 text-sm font-medium text-cyan-100 transition hover:border-cyan-300/40 hover:bg-cyan-500/20"
         @click="toggleCliHint"
       >
         {{ cliHintOpen ? 'Hide CLI Hint' : 'CLI Hint' }}
@@ -92,36 +99,39 @@ onMounted(load)
       class="space-y-4"
     >
       <div class="space-y-1">
-        <h2 class="text-base font-semibold text-slate-950">CLI Quickstart</h2>
-        <p class="text-sm leading-6 text-slate-600">
-          Use <code class="rounded bg-white px-1.5 py-0.5 text-[13px] text-slate-900">bw-linktool</code> to publish or deploy a connector directly into the current
-          <span class="font-medium text-slate-900">{{ runtime.scope }}</span> scope.
+        <h2 class="text-base font-semibold text-white">CLI Quickstart</h2>
+        <p class="text-sm leading-6 text-slate-300">
+          Start by logging <code class="rounded border border-white/10 bg-black/30 px-1.5 py-0.5 text-[13px] text-white">bw-linktool</code> into the current
+          <span class="font-medium text-cyan-100">{{ runtime.scope }}</span> scope. After that, publish and deploy commands reuse the stored profile automatically.
         </p>
       </div>
 
-      <div class="grid gap-3 lg:grid-cols-2">
+      <div class="grid gap-3 lg:grid-cols-3">
         <div class="space-y-2">
-          <div class="text-sm font-medium text-slate-700">Publish to current scope</div>
-          <pre class="overflow-x-auto rounded-2xl border border-slate-200 bg-white p-3 text-xs leading-6 text-slate-900"><code>{{ publishCommand }}</code></pre>
+          <div class="text-sm font-medium text-slate-200">1. Login once</div>
+          <pre class="overflow-x-auto rounded-2xl border border-white/10 bg-black/30 p-3 text-xs leading-6 text-slate-100"><code>{{ loginCommand }}</code></pre>
         </div>
         <div class="space-y-2">
-          <div class="text-sm font-medium text-slate-700">Deploy inside current scope</div>
-          <pre class="overflow-x-auto rounded-2xl border border-slate-200 bg-white p-3 text-xs leading-6 text-slate-900"><code>{{ deployCommand }}</code></pre>
+          <div class="text-sm font-medium text-slate-200">2. Publish into current scope</div>
+          <pre class="overflow-x-auto rounded-2xl border border-white/10 bg-black/30 p-3 text-xs leading-6 text-slate-100"><code>{{ publishCommand }}</code></pre>
+        </div>
+        <div class="space-y-2">
+          <div class="text-sm font-medium text-slate-200">3. Deploy inside current scope</div>
+          <pre class="overflow-x-auto rounded-2xl border border-white/10 bg-black/30 p-3 text-xs leading-6 text-slate-100"><code>{{ deployCommand }}</code></pre>
         </div>
       </div>
 
-      <p class="text-xs leading-5 text-slate-500">
-        Local dev API base is <code class="rounded bg-white px-1.5 py-0.5 text-[12px] text-slate-900">{{ hostBaseUrl }}</code>.
-        Team scope commands include the current <code class="rounded bg-white px-1.5 py-0.5 text-[12px] text-slate-900">teamId</code> automatically.
+      <p class="text-xs leading-5 text-slate-400">
+        The login URL above is generated from the current page origin and route, so Portal/Admin hosts will each show their own correct entry address.
       </p>
     </BundlePanel>
 
     <BundleState v-if="loading" variant="loading" message="Loading..." />
     <BundleState v-else-if="error" variant="error" :message="error" action-label="Refresh" @action="load" />
     <BundleState v-else-if="!packages.length" variant="empty" message="No packages." />
-    <div v-else class="overflow-hidden rounded-2xl border border-slate-200">
-      <table data-test-id="remote-task-management.packages.table" class="min-w-full bg-white">
-        <thead class="bg-slate-50 text-left text-sm text-slate-500">
+    <div v-else class="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+      <table data-test-id="remote-task-management.packages.table" class="min-w-full bg-transparent">
+        <thead class="bg-white/[0.02] text-left text-sm text-slate-400">
           <tr>
             <th class="px-4 py-3 font-medium">Package</th>
             <th class="px-4 py-3 font-medium">Author</th>
@@ -130,17 +140,17 @@ onMounted(load)
           </tr>
         </thead>
         <tbody>
-          <tr v-for="pkg in packages" :key="pkg.hashID || pkg.id" :data-test-id="`remote-task-management.packages.row.${pkg.hashID || pkg.id}`" class="border-t border-slate-200">
+          <tr v-for="pkg in packages" :key="pkg.hashID || pkg.id" :data-test-id="`remote-task-management.packages.row.${pkg.hashID || pkg.id}`" class="border-t border-white/10">
             <td class="px-4 py-4">
-              <div class="font-medium text-slate-950">{{ pkg.name || pkg.hashID || pkg.id }}</div>
-              <div class="text-sm leading-6 text-slate-500">{{ pkg.package_description || '-' }}</div>
+              <div class="font-medium text-white">{{ pkg.name || pkg.hashID || pkg.id }}</div>
+              <div class="text-sm leading-6 text-slate-400">{{ pkg.package_description || '-' }}</div>
             </td>
-            <td class="px-4 py-4 text-slate-600">{{ pkg.author?.email || '-' }}</td>
-            <td class="px-4 py-4 text-slate-600">{{ pkg.versions?.length || 0 }}</td>
+            <td class="px-4 py-4 text-slate-300">{{ pkg.author?.email || '-' }}</td>
+            <td class="px-4 py-4 text-slate-300">{{ pkg.versions?.length || 0 }}</td>
             <td class="px-4 py-4">
               <div class="flex flex-wrap gap-2">
-                <button class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100" @click="openDetail(pkg.hashID || String(pkg.id || ''))">Details</button>
-                <button class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100" @click="router.push({ name: nameOf('pending-instances') })">Pending</button>
+                <button class="inline-flex items-center justify-center rounded-xl border border-white/12 bg-white/[0.04] px-3 py-2 text-sm font-medium text-slate-100 transition hover:border-white/20 hover:bg-white/[0.08]" @click="openDetail(pkg.hashID || String(pkg.id || ''))">Details</button>
+                <button class="inline-flex items-center justify-center rounded-xl border border-amber-400/25 bg-amber-500/10 px-3 py-2 text-sm font-medium text-amber-100 transition hover:border-amber-300/35 hover:bg-amber-500/16" @click="router.push({ name: nameOf('pending-instances') })">Pending</button>
               </div>
             </td>
           </tr>
