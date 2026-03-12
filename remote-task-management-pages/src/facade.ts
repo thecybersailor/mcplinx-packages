@@ -1,0 +1,81 @@
+import { inject, type InjectionKey } from 'vue'
+import type {
+  AdminReviewInstanceRequest,
+  VoAdminConnectorInstanceResponse,
+  VoAdminConnectorPkgResponse,
+  VoAdminConnectorPkgVersionResponse,
+} from '@mcplinx/api-client-admin'
+import type {
+  DeveloperDeployRequest,
+  DeveloperDeployResponse,
+  DeveloperPublishRequest,
+  DeveloperUploadURLRequest,
+  DeveloperUploadURLResponse,
+} from '@mcplinx/api-client-developer'
+
+export type RemoteTaskManagementPackage = VoAdminConnectorPkgResponse
+export type RemoteTaskManagementPackageVersion = VoAdminConnectorPkgVersionResponse
+export type RemoteTaskManagementInstance = VoAdminConnectorInstanceResponse
+export type RemoteTaskManagementConfigRecord = {
+  id?: string
+  name?: string
+  status?: string
+  description?: string
+  version?: string
+  visibility?: string
+  env_config?: Record<string, unknown>
+  secret_config?: Record<string, boolean>
+}
+export type RemoteTaskManagementReviewRequest = AdminReviewInstanceRequest
+export type RemoteTaskManagementUploadURLRequest = DeveloperUploadURLRequest
+export type RemoteTaskManagementUploadURLResponse = DeveloperUploadURLResponse
+export type RemoteTaskManagementPublishRequest = DeveloperPublishRequest
+export type RemoteTaskManagementDeployRequest = DeveloperDeployRequest
+export type RemoteTaskManagementDeployResponse = DeveloperDeployResponse
+export type RemoteTaskManagementScope = 'platform' | 'tenant' | 'team'
+
+export type RemoteTaskManagementTranslate = (
+  key: string,
+  fallback: string,
+  params?: Record<string, unknown>,
+) => string
+
+export interface RemoteTaskManagementFacade {
+  listPackages(query?: { status?: string; visibility?: string; author_id?: string }): Promise<RemoteTaskManagementPackage[]>
+  getPackage(pkgId: string): Promise<RemoteTaskManagementPackage>
+  listPackageVersions(pkgId: string): Promise<RemoteTaskManagementPackageVersion[]>
+  listPackageInstances(pkgId: string): Promise<RemoteTaskManagementInstance[]>
+  listInstances(query?: { status?: string }): Promise<RemoteTaskManagementInstance[]>
+  getInstance(instanceId: string): Promise<RemoteTaskManagementInstance>
+  reviewInstance?: (instanceId: string, request: RemoteTaskManagementReviewRequest) => Promise<Record<string, unknown>>
+  createUploadUrls(request: RemoteTaskManagementUploadURLRequest): Promise<RemoteTaskManagementUploadURLResponse>
+  publish(request: RemoteTaskManagementPublishRequest): Promise<Record<string, unknown>>
+  deploy(request: RemoteTaskManagementDeployRequest): Promise<RemoteTaskManagementDeployResponse>
+  rollback(request: RemoteTaskManagementDeployRequest): Promise<RemoteTaskManagementDeployResponse>
+  listConfigs(): Promise<RemoteTaskManagementConfigRecord[]>
+  getConfig(connectorId: string): Promise<RemoteTaskManagementConfigRecord>
+  updateConfig(connectorId: string, request: Record<string, unknown>): Promise<RemoteTaskManagementConfigRecord>
+}
+
+export interface RemoteTaskManagementRuntime {
+  facade: RemoteTaskManagementFacade
+  scope: RemoteTaskManagementScope
+  routePrefix: string
+  sharedConnectionRoutePrefix?: string
+  t: RemoteTaskManagementTranslate
+}
+
+export const remoteTaskManagementRuntimeKey: InjectionKey<RemoteTaskManagementRuntime> = Symbol('remote-task-management-runtime')
+
+export function defaultTranslate(_key: string, fallback: string, params?: Record<string, unknown>): string {
+  if (!params) return fallback
+  return Object.entries(params).reduce((text, [name, value]) => {
+    return text.split(`{${name}}`).join(String(value))
+  }, fallback)
+}
+
+export function useRemoteTaskManagementRuntime(): RemoteTaskManagementRuntime {
+  const runtime = inject(remoteTaskManagementRuntimeKey)
+  if (!runtime) throw new Error('Remote task management runtime is missing')
+  return runtime
+}

@@ -1,0 +1,83 @@
+<script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import BundlePage from '../components/BundlePage.vue'
+import BundlePanel from '../components/BundlePanel.vue'
+import BundleState from '../components/BundleState.vue'
+import { useRemoteTaskUserRuntime } from '../facade'
+
+const runtime = useRemoteTaskUserRuntime()
+const route = useRoute()
+const router = useRouter()
+const loading = ref(true)
+const error = ref('')
+const connector = ref<Awaited<ReturnType<typeof runtime.facade.getConnector>> | null>(null)
+const connectorId = computed(() => String(route.params.id ?? ''))
+
+function nameOf(suffix: string) {
+  return `${runtime.routePrefix}-${suffix}`
+}
+
+async function load() {
+  if (!connectorId.value) return
+  loading.value = true
+  error.value = ''
+  try {
+    connector.value = await runtime.facade.getConnector(connectorId.value)
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : runtime.t('remoteTaskUser.common.errorPrefix', 'Request failed')
+    connector.value = null
+  } finally {
+    loading.value = false
+  }
+}
+
+function connect() {
+  void router.push({ name: nameOf('connect'), params: { id: connectorId.value } })
+}
+
+onMounted(load)
+</script>
+
+<template>
+  <BundlePage
+    data-test-id="remote-task-user.connector-detail.page"
+    :title="connector?.package?.name || connector?.id || runtime.t('remoteTaskUser.connectors.title', 'Connectors')"
+    :description="connector?.package?.package_description || ''"
+  >
+    <template #actions>
+      <button class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100" @click="router.back()">
+        {{ runtime.t('remoteTaskUser.connectorDetail.back', 'Back') }}
+      </button>
+    </template>
+
+    <BundleState v-if="loading" variant="loading" :message="runtime.t('remoteTaskUser.common.loading', 'Loading...')" />
+    <BundleState v-else-if="error" variant="error" :message="error" />
+    <div v-else-if="connector" class="space-y-4">
+      <BundlePanel>
+        <dl class="grid gap-3 md:grid-cols-2">
+          <div>
+            <dt class="text-xs uppercase tracking-wide text-slate-400">{{ runtime.t('remoteTaskUser.connectorDetail.version', 'Version') }}</dt>
+            <dd class="mt-1 text-sm text-slate-800">{{ connector.version || '-' }}</dd>
+          </div>
+          <div>
+            <dt class="text-xs uppercase tracking-wide text-slate-400">{{ runtime.t('remoteTaskUser.connectorDetail.createdAt', 'Created') }}</dt>
+            <dd class="mt-1 text-sm text-slate-800">{{ connector.created_at || '-' }}</dd>
+          </div>
+          <div>
+            <dt class="text-xs uppercase tracking-wide text-slate-400">{{ runtime.t('remoteTaskUser.connectorDetail.updatedAt', 'Updated') }}</dt>
+            <dd class="mt-1 text-sm text-slate-800">{{ connector.updated_at || '-' }}</dd>
+          </div>
+          <div>
+            <dt class="text-xs uppercase tracking-wide text-slate-400">Connector ID</dt>
+            <dd class="mt-1 text-sm text-slate-800">{{ connector.id || '-' }}</dd>
+          </div>
+        </dl>
+      </BundlePanel>
+
+      <button data-test-id="remote-task-user.connector-detail.connect" class="inline-flex items-center justify-center rounded-xl bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800" @click="connect">
+        {{ runtime.t('remoteTaskUser.connectors.connect', 'Connect') }}
+      </button>
+    </div>
+  </BundlePage>
+</template>

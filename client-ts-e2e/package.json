@@ -1,0 +1,17 @@
+{
+  "name": "@mcplinx/client-ts-e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:e2e:user-code": "vitest run"
+  },
+  "dependencies": {
+    "@mcplinx/api-client-user": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.27",
+    "typescript": "^5.3.3",
+    "vitest": "^3.2.4"
+  }
+}
+

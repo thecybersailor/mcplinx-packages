@@ -1,0 +1,40 @@
+import { Connector, Tool, RuntimeContext, Bundle, SyncResult } from '@mcplinx/connector-core';
+
+// Example tool: Hello World
+const helloPerform = async (ctx: RuntimeContext, bundle: Bundle): Promise<SyncResult> => {
+    const { name } = bundle.inputData;
+    return {
+        message: `Hello, ${name}!`,
+    };
+};
+
+const helloTool: Tool = {
+    key: 'hello',
+    name: 'Hello World',
+    description: 'A simple hello world tool',
+    kind: 'sync',
+    perform: helloPerform,
+    inputFields: [
+        {
+            key: 'name',
+            label: 'Name',
+            type: 'string',
+            required: true,
+            helpText: 'Name to greet'
+        }
+    ],
+    outputFields: [
+        { key: 'message', label: 'Message' }
+    ]
+};
+
+const connector: Connector = {
+    name: 'my-connector',
+    version: '1.0.0',
+    description: 'A mcplinx connector',
+    tools: {
+        hello: helloTool,
+    },
+};
+
+export default connector;

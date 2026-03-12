@@ -1,0 +1,88 @@
+<script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import BundlePage from '../components/BundlePage.vue'
+import BundlePanel from '../components/BundlePanel.vue'
+import BundleState from '../components/BundleState.vue'
+import { useRemoteTaskUserRuntime } from '../facade'
+
+const runtime = useRemoteTaskUserRuntime()
+const route = useRoute()
+const router = useRouter()
+const loading = ref(true)
+const canceling = ref(false)
+const error = ref('')
+const task = ref<Awaited<ReturnType<typeof runtime.facade.getTask>> | null>(null)
+const taskId = computed(() => String(route.params.id ?? ''))
+
+async function load() {
+  if (!taskId.value) return
+  loading.value = true
+  error.value = ''
+  try {
+    task.value = await runtime.facade.getTask(taskId.value)
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : runtime.t('remoteTaskUser.common.errorPrefix', 'Request failed')
+    task.value = null
+  } finally {
+    loading.value = false
+  }
+}
+
+async function cancelTask() {
+  if (!taskId.value) return
+  canceling.value = true
+  try {
+    await runtime.facade.cancelTask(taskId.value)
+    await load()
+  } finally {
+    canceling.value = false
+  }
+}
+
+onMounted(load)
+</script>
+
+<template>
+  <BundlePage
+    data-test-id="remote-task-user.task-detail.page"
+    :title="runtime.t('remoteTaskUser.tasks.detail', 'Task detail')"
+    :description="task?.action_name || task?.action_key || task?.id || ''"
+  >
+    <template #actions>
+      <button
+        data-test-id="remote-task-user.task-detail.back"
+        class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+        @click="router.push({ name: `${runtime.routePrefix}-tasks` })"
+      >
+        {{ runtime.t('remoteTaskUser.common.backToList', 'Back to list') }}
+      </button>
+    </template>
+
+    <BundleState v-if="loading" variant="loading" :message="runtime.t('remoteTaskUser.common.loading', 'Loading...')" />
+    <BundleState v-else-if="error" variant="error" :message="error" />
+    <div v-else-if="task" class="space-y-4">
+      <BundlePanel>
+        <dl class="grid gap-3 md:grid-cols-2">
+          <div><dt class="text-xs uppercase tracking-wide text-slate-400">ID</dt><dd class="mt-1 text-sm text-slate-800">{{ task.id || '-' }}</dd></div>
+          <div><dt class="text-xs uppercase tracking-wide text-slate-400">Status</dt><dd class="mt-1 text-sm text-slate-800">{{ task.status || '-' }}</dd></div>
+          <div><dt class="text-xs uppercase tracking-wide text-slate-400">Action</dt><dd class="mt-1 text-sm text-slate-800">{{ task.action_name || task.action_key || '-' }}</dd></div>
+          <div><dt class="text-xs uppercase tracking-wide text-slate-400">Created</dt><dd class="mt-1 text-sm text-slate-800">{{ task.created_at || '-' }}</dd></div>
+        </dl>
+      </BundlePanel>
+
+      <BundlePanel>
+        <pre data-test-id="remote-task-user.task-detail.json" class="overflow-auto rounded-xl bg-slate-950 p-4 text-xs text-slate-100">{{ JSON.stringify(task, null, 2) }}</pre>
+      </BundlePanel>
+
+      <button
+        data-test-id="remote-task-user.task-detail.cancel"
+        class="inline-flex items-center justify-center rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-medium text-rose-700 transition hover:bg-rose-100"
+        :disabled="canceling"
+        @click="cancelTask"
+      >
+        {{ canceling ? runtime.t('remoteTaskUser.tasks.canceling', 'Canceling...') : runtime.t('remoteTaskUser.tasks.cancel', 'Cancel') }}
+      </button>
+    </div>
+  </BundlePage>
+</template>
