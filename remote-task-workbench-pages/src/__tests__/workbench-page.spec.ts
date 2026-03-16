@@ -24,11 +24,17 @@ const facade: ConnectorWorkbenchFacade = {
 async function mountAt(path: string) {
   const router = createRouter({
     history: createMemoryHistory(),
-    routes: createConnectorWorkbenchRoutes({
-      basePath: '/connectors',
-      routePrefix: 'team-connectors',
-      facade,
-    }),
+    routes: [
+      {
+        path: '/team/:teamId',
+        component: defineComponent({ components: { RouterView }, template: '<RouterView />' }),
+        children: createConnectorWorkbenchRoutes({
+          basePath: 'connectors',
+          routePrefix: 'team-connectors',
+          facade,
+        }),
+      },
+    ],
   })
   await router.push(path)
   await router.isReady()
@@ -41,7 +47,7 @@ async function mountAt(path: string) {
 
 describe('team connector workbench pages', () => {
   it('shows available and discoverable connectors and supports more/detail/connect flows', async () => {
-    const { wrapper, router } = await mountAt('/connectors')
+    const { wrapper, router } = await mountAt('/team/team_1/connectors')
     expect(wrapper.find('[data-test-id="team-connectors.available.card.gmail"]').exists()).toBe(true)
     expect(wrapper.find('[data-test-id="team-connectors.discoverable.card.notion"]').exists()).toBe(true)
 
@@ -50,11 +56,11 @@ describe('team connector workbench pages', () => {
     expect(router.currentRoute.value.name).toBe('team-connectors-catalog')
     expect(wrapper.find('[data-test-id="team-connectors.catalog.card.slack"]').exists()).toBe(true)
 
-    await router.push('/connectors/notion')
+    await router.push('/team/team_1/connectors/notion')
     await flushPromises()
     expect(wrapper.find('[data-test-id="team-connectors.detail.page"]').exists()).toBe(true)
 
-    await router.push('/connectors/gmail/connect')
+    await router.push('/team/team_1/connectors/gmail/connect')
     await flushPromises()
     await wrapper.get('[data-test-id="team-connectors.connect.label"]').setValue('Team Gmail')
     await wrapper.get('[data-test-id="team-connectors.connect.submit"]').trigger('click')
@@ -63,5 +69,21 @@ describe('team connector workbench pages', () => {
       connector_id: 'gmail',
       label: 'Team Gmail',
     })
+  })
+
+  it('keeps cli hint collapsed by default and expands profile-driven cli commands on demand', async () => {
+    const { wrapper } = await mountAt('/team/team_1/connectors')
+
+    expect(wrapper.find('[data-test-id="team-connectors.cli-hint.panel"]').exists()).toBe(false)
+
+    await wrapper.get('[data-test-id="team-connectors.cli-hint.toggle"]').trigger('click')
+    await flushPromises()
+
+    const hint = wrapper.get('[data-test-id="team-connectors.cli-hint.panel"]').text()
+    expect(hint).toContain('bw-linktool login --login-url')
+    expect(hint).toContain('/team/team_1/linktool-login')
+    expect(hint).toContain('bw-linktool build')
+    expect(hint).toContain('bw-linktool deploy')
+    expect(hint).not.toContain('--payload')
   })
 })

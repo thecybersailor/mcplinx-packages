@@ -1,17 +1,42 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useConnectorWorkbenchRuntime, type ConnectorWorkbenchResponse } from '../facade'
 
 const runtime = useConnectorWorkbenchRuntime()
+const route = useRoute()
 const router = useRouter()
 const loading = ref(true)
 const error = ref('')
 const workbench = ref<ConnectorWorkbenchResponse>({})
+const cliHintOpen = ref(false)
 
 function nameOf(suffix: string) {
   return `${runtime.routePrefix}-${suffix}`
 }
+
+const teamId = computed(() => {
+  const value = route.params.teamId
+  return typeof value === 'string' ? value.trim() : ''
+})
+
+const loginUrl = computed(() => {
+  const origin = typeof window === 'undefined' ? '' : window.location.origin
+  if (!origin || !teamId.value) return ''
+  return `${origin}/team/${teamId.value}/linktool-login`
+})
+
+const loginCommand = computed(() => {
+  return `bw-linktool login --login-url ${loginUrl.value || '<login-url>'}`
+})
+
+const buildCommand = computed(() => {
+  return 'bw-linktool build'
+})
+
+const deployCommand = computed(() => {
+  return 'bw-linktool deploy'
+})
 
 async function load() {
   loading.value = true
@@ -115,6 +140,42 @@ onMounted(load)
           {{ runtime.t('teamConnectors.more', '显示更多') }}
         </button>
       </div>
+
+      <section data-test-id="team-connectors.cli-hint.section" class="rounded-3xl border border-border bg-background p-5">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div class="space-y-1">
+            <h2 class="text-base font-semibold text-foreground">{{ runtime.t('teamConnectors.cli.title', 'CLI Hint') }}</h2>
+            <p class="text-sm text-muted-foreground">{{ runtime.t('teamConnectors.cli.description', 'Only login needs an explicit URL. After that, bw-linktool reuses the stored profile for build and deploy.') }}</p>
+          </div>
+          <button
+            data-test-id="team-connectors.cli-hint.toggle"
+            class="inline-flex items-center justify-center rounded-2xl border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted/40"
+            @click="cliHintOpen = !cliHintOpen"
+          >
+            {{ cliHintOpen ? runtime.t('teamConnectors.cli.hide', '收起 CLI 用法') : runtime.t('teamConnectors.cli.show', '展开 CLI 用法') }}
+          </button>
+        </div>
+
+        <div v-if="cliHintOpen" data-test-id="team-connectors.cli-hint.panel" class="mt-4 space-y-4">
+          <div class="space-y-4">
+            <div class="space-y-2">
+              <div class="text-sm font-medium text-foreground">{{ runtime.t('teamConnectors.cli.step1', '1. Login once') }}</div>
+              <pre class="overflow-x-auto rounded-2xl border border-border bg-muted/30 p-3 text-xs leading-6 text-foreground"><code>{{ loginCommand }}</code></pre>
+            </div>
+            <div class="space-y-2">
+              <div class="text-sm font-medium text-foreground">{{ runtime.t('teamConnectors.cli.step2', '2. Build locally') }}</div>
+              <pre class="overflow-x-auto rounded-2xl border border-border bg-muted/30 p-3 text-xs leading-6 text-foreground"><code>{{ buildCommand }}</code></pre>
+            </div>
+            <div class="space-y-2">
+              <div class="text-sm font-medium text-foreground">{{ runtime.t('teamConnectors.cli.step3', '3. Deploy with saved profile') }}</div>
+              <pre class="overflow-x-auto rounded-2xl border border-border bg-muted/30 p-3 text-xs leading-6 text-foreground"><code>{{ deployCommand }}</code></pre>
+            </div>
+          </div>
+          <p class="text-xs leading-5 text-muted-foreground">
+            {{ runtime.t('teamConnectors.cli.footnote', 'The login URL is derived from the current portal origin and team route. Build and deploy reuse the locally stored profile; deploy only needs extra flags for exceptional cases like manual instance selection.') }}
+          </p>
+        </div>
+      </section>
     </template>
   </section>
 </template>
