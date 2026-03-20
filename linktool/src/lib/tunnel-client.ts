@@ -146,9 +146,11 @@ export class TunnelClient extends EventEmitter {
 
         const { host, packageName, sessionId: providedSessionId } = this.options;
         
-        // If sessionId is provided, use it; otherwise create new session
+        // If sessionId is provided, or we already created one, reuse it on reconnect.
         if (providedSessionId) {
             this.sessionId = providedSessionId;
+        } else if (this.sessionId) {
+            // Reconnect path: keep the existing tunnel session binding stable.
         } else {
             // Create new session by calling tun system
             try {

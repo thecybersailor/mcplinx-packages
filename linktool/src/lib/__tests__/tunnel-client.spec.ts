@@ -67,6 +67,7 @@ describe('TunnelClient', () => {
 
     afterEach(() => {
         vi.unstubAllGlobals();
+        vi.useRealTimers();
         (globalThis as any).__TEST_CREDS__ = undefined;
     });
 
@@ -171,5 +172,47 @@ describe('TunnelClient', () => {
                 url: 'https://tun.dev.autostaff.cn/opaque-prefix/pkg/callback?code=abc123&state=xyz',
             }),
         );
+    });
+
+    it('reuses existing session id on reconnect instead of creating a new session', async () => {
+        vi.useFakeTimers();
+
+        const fetchMock = vi.fn(async () => {
+            return new Response(JSON.stringify({ sessionId: 'sid-reconnect-1' }), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+            });
+        });
+        vi.stubGlobal('fetch', fetchMock);
+
+        const c = new TunnelClient({
+            host: 'tun.dev.autostaff.cn',
+            packageName: 'pkg',
+            credentialsProvider: async () => ({
+                token: 'bw-token',
+                email: 'bw@example.com',
+                appId: 'botworks',
+            }),
+        });
+
+        await c.connect();
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+
+        const wsModule = await import('ws');
+        const firstSocket = (wsModule.default as any).instance;
+        firstSocket.emit('close');
+
+        await vi.advanceTimersByTimeAsync(3000);
+
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+        expect((wsModule.default as any).last).toMatchObject({
+            url: 'wss://tun.dev.autostaff.cn/_ws?session=sid-reconnect-1&token=bw-token',
+            options: {
+                headers: {
+                    Authorization: 'Bearer bw-token',
+                    'X-MCPLINX-APP-ID': 'botworks',
+                },
+            },
+        });
     });
 });
