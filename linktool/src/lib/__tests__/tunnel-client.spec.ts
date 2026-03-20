@@ -4,11 +4,24 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 vi.mock('ws', () => {
     class MockWebSocket {
         static last: { url: string; options: any } | null = null;
+        static instance: MockWebSocket | null = null;
+        private listeners = new Map<string, Function[]>();
         constructor(url: string, options?: any) {
             MockWebSocket.last = { url, options };
+            MockWebSocket.instance = this;
         }
-        on() {}
+        on(event: string, handler: Function) {
+            const list = this.listeners.get(event) ?? [];
+            list.push(handler);
+            this.listeners.set(event, list);
+        }
+        emit(event: string, value?: any) {
+            for (const handler of this.listeners.get(event) ?? []) {
+                handler(value);
+            }
+        }
         close() {}
+        send() {}
     }
     return { default: MockWebSocket };
 });
@@ -61,5 +74,102 @@ describe('TunnelClient', () => {
         const c = new TunnelClient({ host: 'localhost:16888', packageName: 'pkg' });
         await c.connect();
     });
-});
 
+    it('supports injected credentials and opaque tunnel session body', async () => {
+        const fetchMock = vi.fn(async (_url: any, init: any) => {
+            const headers = (init?.headers ?? {}) as Record<string, string>;
+            expect(headers.Authorization).toBe('Bearer bw-token');
+            expect(headers['X-MCPLINX-APP-ID']).toBe('botworks');
+            expect(init?.body).toBe(
+                JSON.stringify({
+                    packageName: 'pkg',
+                    tunnelPrefix: 'opaque-prefix',
+                    scopeKind: 'team',
+                    teamId: 'team_1',
+                }),
+            );
+            return new Response(JSON.stringify({ sessionId: 'sid-bw-1' }), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+            });
+        });
+        vi.stubGlobal('fetch', fetchMock);
+
+        const c = new TunnelClient({
+            host: 'tun.dev.autostaff.cn',
+            packageName: 'pkg',
+            sessionBody: {
+                tunnelPrefix: 'opaque-prefix',
+                scopeKind: 'team',
+                teamId: 'team_1',
+            },
+            credentialsProvider: async () => ({
+                token: 'bw-token',
+                email: 'bw@example.com',
+                appId: 'botworks',
+            }),
+        });
+
+        await c.connect();
+
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+        expect((globalThis as any).WebSocket?.last ?? null).toBeNull();
+        const wsModule = await import('ws');
+        expect((wsModule.default as any).last).toMatchObject({
+            url: 'wss://tun.dev.autostaff.cn/_ws?session=sid-bw-1&token=bw-token',
+            options: {
+                headers: {
+                    Authorization: 'Bearer bw-token',
+                    'X-MCPLINX-APP-ID': 'botworks',
+                },
+            },
+        });
+    });
+
+    it('accepts devkit-tun event payloads and rebuilds callback url with query', async () => {
+        const c = new TunnelClient({
+            host: 'tun.dev.autostaff.cn',
+            packageName: 'pkg',
+            sessionId: 'sid-bw-2',
+            credentialsProvider: async () => ({
+                token: 'bw-token',
+                email: 'bw@example.com',
+                appId: 'botworks',
+            }),
+        });
+        const handler = vi.fn(async () => null);
+        c.requestHandler = handler;
+
+        await c.connect();
+
+        const wsModule = await import('ws');
+        (wsModule.default as any).instance.emit(
+            'message',
+            Buffer.from(
+                JSON.stringify({
+                    eventType: 'callback',
+                    sessionId: 'sid-bw-2',
+                    scopeKind: 'team',
+                    request: {
+                        method: 'GET',
+                        path: '/opaque-prefix/pkg/callback',
+                        query: {
+                            code: 'abc123',
+                            state: 'xyz',
+                        },
+                        headers: {},
+                        body: null,
+                    },
+                }),
+            ),
+        );
+
+        expect(handler).toHaveBeenCalledWith(
+            expect.objectContaining({
+                method: 'GET',
+                path: '/opaque-prefix/pkg/callback',
+                url: 'https://tun.dev.autostaff.cn/opaque-prefix/pkg/callback?code=abc123&state=xyz',
+            }),
+        );
+    });
+});
