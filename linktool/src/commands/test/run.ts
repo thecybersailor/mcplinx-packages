@@ -1,7 +1,6 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { existsSync } from 'fs';
-import { join } from 'path';
+import { runTestRun } from '../../core/test-run.js';
 import { loadConnector } from '../../lib/connector-loader.js';
 import { createMockCtx } from '../../lib/runtime.js';
 import { getPackageName } from '../../lib/package-name.js';
@@ -33,7 +32,6 @@ export function runCommand() {
         }, 60000) // Default: 60 seconds = 60000 milliseconds
         .action(async (toolKey, options) => {
             const cwd = process.cwd();
-            const storage = new LinktoolStorage(cwd);
 
             try {
                 const connector = await loadConnector(cwd);
@@ -46,6 +44,22 @@ export function runCommand() {
                 }
 
                 console.log(chalk.cyan(`🔌 Tool: ${tool.name} (${toolKey})`));
+
+                if (tool.kind !== 'async') {
+                    await runTestRun(
+                        {
+                            cwd,
+                        },
+                        toolKey,
+                        {
+                            params: options.param,
+                            pollIntervalMs: options.pollInterval,
+                        },
+                    );
+                    process.exit(0);
+                }
+
+                const storage = new LinktoolStorage(cwd);
 
                 // Load Auth
                 const authData = storage.loadAuth() || {};
