@@ -8,6 +8,8 @@ export interface TunnelOptions {
     host: string;
     packageName: string;  // Changed from sessionId to packageName
     sessionId?: string;  // Optional: if provided, use it; otherwise create new
+    sessionBody?: Record<string, unknown>;
+    credentialsProvider?: () => Promise<Credentials | null> | Credentials | null;
 }
 
 /**
@@ -80,6 +82,14 @@ export class TunnelClient extends EventEmitter {
      * Ensure token is fresh before making requests
      */
     private async ensureFreshToken(): Promise<Credentials | null> {
+        if (this.options.credentialsProvider) {
+            const providedCreds = await this.options.credentialsProvider();
+            if (!providedCreds?.token) {
+                throw new Error('Not logged in. Please provide valid tunnel credentials.');
+            }
+            return providedCreds;
+        }
+
         // If already refreshing, wait for that promise
         if (this.isRefreshing && this.refreshPromise) {
             return this.refreshPromise;
@@ -136,9 +146,11 @@ export class TunnelClient extends EventEmitter {
 
         const { host, packageName, sessionId: providedSessionId } = this.options;
         
-        // If sessionId is provided, use it; otherwise create new session
+        // If sessionId is provided, or we already created one, reuse it on reconnect.
         if (providedSessionId) {
             this.sessionId = providedSessionId;
+        } else if (this.sessionId) {
+            // Reconnect path: keep the existing tunnel session binding stable.
         } else {
             // Create new session by calling tun system
             try {
@@ -150,6 +162,10 @@ export class TunnelClient extends EventEmitter {
 
                 const protocol = host.startsWith('localhost') || host.includes('127.0.0.1') ? 'http' : 'https';
                 const sessionUrl = `${protocol}://${host}/_session?package=${encodeURIComponent(packageName)}`;
+                const sessionBody = JSON.stringify({
+                    packageName,
+                    ...(this.options.sessionBody || {}),
+                });
                 
                 console.log(chalk.gray(`Creating session: ${sessionUrl}`));
                 
@@ -159,7 +175,8 @@ export class TunnelClient extends EventEmitter {
                         'Authorization': `Bearer ${freshCreds.token}`,
                         'Content-Type': 'application/json',
                         ...(freshCreds.appId ? { 'X-MCPLINX-APP-ID': freshCreds.appId } : {})
-                    }
+                    },
+                    body: sessionBody,
                 });
                 
                 // If 401, refresh token and retry
@@ -177,7 +194,8 @@ export class TunnelClient extends EventEmitter {
                             'Authorization': `Bearer ${retryCreds.token}`,
                             'Content-Type': 'application/json',
                             ...(retryCreds.appId ? { 'X-MCPLINX-APP-ID': retryCreds.appId } : {})
-                        }
+                        },
+                        body: sessionBody,
                     });
                 }
                 
@@ -215,10 +233,14 @@ export class TunnelClient extends EventEmitter {
 
         console.log(chalk.gray(`Connecting to tunnel: ${url.replace(freshCreds.token, '***')}`));
 
-        this.ws = new WebSocket(
-            url,
-            freshCreds.appId ? { headers: { 'X-MCPLINX-APP-ID': freshCreds.appId } } : undefined
-        );
+        const wsHeaders: Record<string, string> = {
+            Authorization: `Bearer ${freshCreds.token}`,
+        };
+        if (freshCreds.appId) {
+            wsHeaders['X-MCPLINX-APP-ID'] = freshCreds.appId;
+        }
+
+        this.ws = new WebSocket(url, { headers: wsHeaders });
 
         this.ws.on('open', () => {
             console.log(chalk.green('✓ Tunnel connected'));
@@ -230,6 +252,11 @@ export class TunnelClient extends EventEmitter {
                 const msg = JSON.parse(data.toString());
                 if (msg.type === 'request') {
                     this.handleRequest(msg.payload);
+                } else if (msg.request && (msg.eventType === 'callback' || msg.eventType === 'webhook')) {
+                    this.handleRequest({
+                        ...msg.request,
+                        url: this.buildPublicRequestUrl(msg.request.path, msg.request.query),
+                    });
                 } else if (msg.type === 'pong') {
                     // ignore
                 }
@@ -267,6 +294,31 @@ export class TunnelClient extends EventEmitter {
         this.reconnectTimer = setTimeout(() => this.connect(), 3000);
     }
 
+    private buildPublicRequestUrl(path: string, query?: Record<string, string | string[] | undefined>): string {
+        const normalizedPath = String(path || '/').startsWith('/') ? String(path || '/') : `/${String(path || '')}`;
+        const normalizedHost = this.options.host.replace(/\/+$/, '');
+        const baseUrl = normalizedHost.includes('://')
+            ? normalizedHost
+            : `${normalizedHost.startsWith('localhost') || normalizedHost.includes('127.0.0.1') ? 'http' : 'https'}://${normalizedHost}`;
+        const url = new URL(`${baseUrl}${normalizedPath}`);
+
+        for (const [key, rawValue] of Object.entries(query || {})) {
+            if (Array.isArray(rawValue)) {
+                for (const item of rawValue) {
+                    if (item != null) {
+                        url.searchParams.append(key, String(item));
+                    }
+                }
+                continue;
+            }
+            if (rawValue != null) {
+                url.searchParams.set(key, String(rawValue));
+            }
+        }
+
+        return url.toString();
+    }
+
     private async handleRequest(payload: any) {
         console.log(chalk.blue(`📥 Received Webhook: ${payload.method} ${payload.url}`));
 
@@ -301,7 +353,7 @@ export class TunnelClient extends EventEmitter {
         }
 
         // Send response back
-        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+        if (payload?.id && this.ws && this.ws.readyState === WebSocket.OPEN) {
             this.ws.send(JSON.stringify({
                 type: 'response',
                 payload: {

@@ -3,6 +3,7 @@ import chalk from 'chalk';
 // Open will be imported dynamically
 import { existsSync } from 'fs';
 import { join } from 'path';
+import { runTestAuth } from '../../core/test-auth.js';
 import { loadConnector } from '../../lib/connector-loader.js';
 import { TunnelClient } from '../../lib/tunnel-client.js';
 import { getPackageName } from '../../lib/package-name.js';
@@ -58,10 +59,25 @@ export function authCommand() {
                 process.exit(1);
             }
             
-            // If --show-url-only, just display the URL and exit
             if (options.showUrlOnly) {
-                const callbackUrl = `https://${TUNNEL_HOST}/${userHashId}/${packageName}/callback`;
-                console.log(chalk.green(callbackUrl));
+                await runTestAuth(
+                    {
+                        cwd,
+                        tunnelBaseUrl: `https://${TUNNEL_HOST}`,
+                    },
+                    {
+                        cliConnectorId,
+                        showUrlOnly: true,
+                    },
+                    {
+                        getPackageName: () => packageName,
+                        getAuthContext: () => ({
+                            userHashId,
+                            tunnelBaseUrl: `https://${TUNNEL_HOST}`,
+                        }),
+                        writeStdout: (value) => process.stdout.write(chalk.green(value)),
+                    },
+                );
                 process.exit(0);
             }
             
