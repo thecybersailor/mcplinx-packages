@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { createLinktoolCoreContext } from '../core/types.js';
 import {
@@ -11,27 +14,92 @@ import {
 
 describe('linktool core platform runners', () => {
   it('runs publish against injected platform runtime', async () => {
-    const fetchImpl = vi.fn(async () =>
-      new Response(JSON.stringify({ data: { ok: true, kind: 'publish' } }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      }),
+    const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'linktool-publish-'));
+    fs.mkdirSync(path.join(cwd, 'dist'), { recursive: true });
+    fs.writeFileSync(path.join(cwd, 'dist/bundle.js'), 'console.log("demo")');
+    fs.writeFileSync(path.join(cwd, 'dist/manifest.json'), '{"tools":[]}');
+    fs.writeFileSync(
+      path.join(cwd, 'package.json'),
+      JSON.stringify({ name: '@examples/demo-connector', version: '0.1.0' }),
     );
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            data: {
+              upload_urls: {
+                'bundle.js': 'https://upload.example.com/bundle.js',
+                'manifest.json': 'https://upload.example.com/manifest.json',
+              },
+            },
+          }),
+          {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          },
+        ),
+      )
+      .mockResolvedValueOnce(new Response('', { status: 200 }))
+      .mockResolvedValueOnce(new Response('', { status: 200 }))
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ data: { ok: true, kind: 'publish' } }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      );
 
     const result = await runPublish(
-      createLinktoolCoreContext({ cwd: '/tmp/connector' }),
-      { payload: { name: 'demo' } },
+      createLinktoolCoreContext({ cwd }),
+      { payload: { connectorKey: 'examples/demo-connector' } },
       {
         fetchImpl,
         resolvePublishRuntime: async () => ({
           baseUrl: 'https://host.example.com',
           accessToken: 'token_1',
           publishPath: '/api/v1/connectors/publish',
+          uploadPath: '/api/v1/connectors/upload-url',
         }),
       },
     );
 
-    expect(fetchImpl).toHaveBeenCalledWith(
+    expect(fetchImpl).toHaveBeenNthCalledWith(
+      1,
+      'https://host.example.com/api/v1/connectors/upload-url',
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({
+          Authorization: 'Bearer token_1',
+          'Content-Type': 'application/json',
+        }),
+        body: JSON.stringify({
+          name: 'examples/demo-connector',
+          files: ['bundle.js', 'manifest.json'],
+        }),
+      }),
+    );
+    expect(fetchImpl).toHaveBeenNthCalledWith(
+      2,
+      'https://upload.example.com/bundle.js',
+      expect.objectContaining({
+        method: 'PUT',
+        headers: expect.objectContaining({
+          'Content-Type': 'application/javascript',
+        }),
+      }),
+    );
+    expect(fetchImpl).toHaveBeenNthCalledWith(
+      3,
+      'https://upload.example.com/manifest.json',
+      expect.objectContaining({
+        method: 'PUT',
+        headers: expect.objectContaining({
+          'Content-Type': 'application/json',
+        }),
+      }),
+    );
+    expect(fetchImpl).toHaveBeenNthCalledWith(
+      4,
       'https://host.example.com/api/v1/connectors/publish',
       expect.objectContaining({
         method: 'POST',
@@ -39,7 +107,7 @@ describe('linktool core platform runners', () => {
           Authorization: 'Bearer token_1',
           'Content-Type': 'application/json',
         }),
-        body: JSON.stringify({ name: 'demo' }),
+        body: JSON.stringify({ name: 'examples/demo-connector' }),
       }),
     );
     expect(result).toEqual({ ok: true, kind: 'publish' });

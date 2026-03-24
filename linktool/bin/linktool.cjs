@@ -64681,9 +64681,15 @@ async function handleOAuth2Interactive(ctx, connector, input, deps) {
   const authUrl = await buildOAuthAuthorizeUrl(ctx, oauth2Auth, callbackUrl);
   (deps.writeStdout ?? process.stdout.write.bind(process.stdout))(`${authUrl}
 `);
+  await (deps.openBrowser ?? openBrowserUrl)(authUrl);
   await done;
 }
 __name(handleOAuth2Interactive, "handleOAuth2Interactive");
+async function openBrowserUrl(url2) {
+  const { default: open } = await import("open");
+  await open(url2);
+}
+__name(openBrowserUrl, "openBrowserUrl");
 async function handleFormInteractive(ctx, connector, deps) {
   const fields = Array.isArray(connector.authentication?.fields) ? connector.authentication.fields : [];
   const promptInput = deps.promptInput ?? defaultPromptInput;

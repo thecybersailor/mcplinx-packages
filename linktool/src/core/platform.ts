@@ -1,4 +1,7 @@
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import type { LinktoolCoreContext } from './types.js';
+import { getPackageName } from '../lib/package-name.js';
 
 type FetchImpl = typeof fetch;
 
@@ -32,6 +35,7 @@ export type PublishRuntime = {
   baseUrl: string;
   accessToken: string;
   publishPath: string;
+  uploadPath?: string;
   deployPath?: string;
   listPath?: string;
 };
@@ -54,9 +58,26 @@ export async function runPublish(
   deps: PlatformDeps = {},
 ): Promise<unknown> {
   const runtime = await requirePublishRuntime(ctx, deps);
+  const fetchImpl = deps.fetchImpl ?? fetch;
+  const payload = normalizePublishPayload(ctx.cwd, options.payload);
+  const artifacts = readPublishArtifacts(ctx.cwd);
+  const uploadPath = runtime.uploadPath ?? runtime.publishPath.replace(/\/publish$/, '/upload-url');
+
+  const uploadResponse = await requestJSON(fetchImpl, runtime.baseUrl, uploadPath, runtime.accessToken, {
+    method: 'POST',
+    body: {
+      name: payload.name,
+      files: ['bundle.js', 'manifest.json'],
+    },
+  });
+
+  const uploadUrls = readUploadUrls(uploadResponse);
+  await uploadArtifact(fetchImpl, uploadUrls['bundle.js'], artifacts.bundle, 'application/javascript');
+  await uploadArtifact(fetchImpl, uploadUrls['manifest.json'], artifacts.manifest, 'application/json');
+
   return requestJSON(deps.fetchImpl ?? fetch, runtime.baseUrl, runtime.publishPath, runtime.accessToken, {
     method: 'POST',
-    body: options.payload ?? {},
+    body: payload,
   });
 }
 
@@ -175,6 +196,25 @@ async function requestJSON(
   return unwrapPinResponse(payload);
 }
 
+async function uploadArtifact(
+  fetchImpl: FetchImpl,
+  url: string,
+  body: string | Uint8Array,
+  contentType: string,
+): Promise<void> {
+  const response = await fetchImpl(url, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': contentType,
+    },
+    body: body as BodyInit,
+  });
+  if (!response.ok) {
+    const text = await response.text().catch(() => '');
+    throw new Error(text || `artifact upload failed: ${response.status}`);
+  }
+}
+
 function normalizeBaseUrl(value: string): string {
   const normalized = String(value ?? '').trim().replace(/\/+$/, '');
   if (!normalized) throw new Error('Missing base url');
@@ -197,4 +237,51 @@ function withQuery(pathname: string, query: Record<string, string> = {}): string
   }
   const qs = params.toString();
   return qs ? `${pathname}?${qs}` : pathname;
+}
+
+function normalizePublishPayload(cwd: string, payload: Record<string, unknown> = {}): Record<string, unknown> {
+  const input = { ...payload };
+  const resolvedName = resolvePublishName(cwd, input);
+  delete input.connectorKey;
+  return {
+    ...input,
+    name: resolvedName,
+  };
+}
+
+function resolvePublishName(cwd: string, payload: Record<string, unknown>): string {
+  const directName = String(payload.name ?? '').trim();
+  if (directName) return directName;
+  const legacyKey = String(payload.connectorKey ?? '').trim();
+  if (legacyKey) return legacyKey;
+  return getPackageName(cwd);
+}
+
+function readPublishArtifacts(cwd: string): { bundle: Uint8Array; manifest: string } {
+  const distDir = join(cwd, 'dist');
+  const bundlePath = join(distDir, 'bundle.js');
+  const manifestPath = join(distDir, 'manifest.json');
+  if (!existsSync(bundlePath) || !existsSync(manifestPath)) {
+    throw new Error('build artifacts not found: run `syntool build` first');
+  }
+  return {
+    bundle: new Uint8Array(readFileSync(bundlePath)),
+    manifest: readFileSync(manifestPath, 'utf-8'),
+  };
+}
+
+function readUploadUrls(payload: unknown): Record<string, string> {
+  const uploadUrls = (payload as { upload_urls?: unknown })?.upload_urls;
+  if (!uploadUrls || typeof uploadUrls !== 'object') {
+    throw new Error('upload-url response missing upload_urls');
+  }
+  const bundleUrl = String((uploadUrls as Record<string, unknown>)['bundle.js'] ?? '').trim();
+  const manifestUrl = String((uploadUrls as Record<string, unknown>)['manifest.json'] ?? '').trim();
+  if (!bundleUrl || !manifestUrl) {
+    throw new Error('upload-url response missing bundle.js or manifest.json');
+  }
+  return {
+    'bundle.js': bundleUrl,
+    'manifest.json': manifestUrl,
+  };
 }
