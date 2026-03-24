@@ -76,8 +76,8 @@ async function main() {
     console.log('\nNext steps:');
     console.log(chalk.cyan(`  cd ${projectName}`));
     console.log(chalk.cyan('  npm install'));
-    console.log(chalk.cyan('  npx linktool login'));
-    console.log(chalk.cyan('  npx linktool publish'));
+    console.log(chalk.cyan('  npx syntool login'));
+    console.log(chalk.cyan('  npx syntool publish'));
 }
 
 main().catch(err => {
