@@ -11,7 +11,7 @@ const __dirname = dirname(__filename);
 
 const rootDir = join(__dirname, '..');
 const entryPoint = join(rootDir, 'src/index.ts');
-const outfile = join(rootDir, 'bin/syntool.cjs');
+const outfile = join(rootDir, 'bin/linktool.cjs');
 
 // Read package.json to inject version info
 const pkg = JSON.parse(readFileSync(join(rootDir, 'package.json'), 'utf-8'));
@@ -45,6 +45,8 @@ try {
             'process.env.PKG_NAME': JSON.stringify(pkg.name),
         },
         external: [
+            // Keep peer dependencies external
+            '@mcplinx/connector-core',
             // Keep esbuild external (used by build command)
             'esbuild',
             // Keep tsx external (used by connector loader at runtime)

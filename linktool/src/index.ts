@@ -19,7 +19,7 @@ import { helpCommand } from './commands/help/index.js';
 const pkg = {
     version: process.env.PKG_VERSION || '0.0.0',
     description: process.env.PKG_DESCRIPTION || 'DevKit for MCPLINX Connectors',
-    name: process.env.PKG_NAME || '@syngy/syntool',
+    name: process.env.PKG_NAME || '@mcplinx/linktool',
 };
 
 const program = new Command();
