@@ -13,8 +13,11 @@ const EXAMPLES_URL = 'https://github.com/thecybersailor/remote-connector-example
 
 export type HelpCommandContext = {
     cwd: string;
+    projectDataDirName?: string;
     logger?: Pick<typeof console, 'log' | 'error'>;
 };
+
+const DEFAULT_PROJECT_DATA_DIR = '.linktool';
 
 export function createHelpCommandContext(input: HelpCommandContext): HelpCommandContext {
     return {
@@ -62,13 +65,14 @@ type DownloadAndExtractContext = HelpCommandContext & {
 async function runDownloadAndExtract(ctx: DownloadAndExtractContext): Promise<void> {
     const logger = ctx.logger ?? console;
     const targetPath = join(ctx.cwd, ctx.outputDir);
-    const tempZipPath = join(ctx.cwd, '.linktool', ctx.tempZipName);
+    const projectDataDirName = ctx.projectDataDirName ?? DEFAULT_PROJECT_DATA_DIR;
+    const tempZipPath = join(ctx.cwd, projectDataDirName, ctx.tempZipName);
 
     try {
         logger.log(chalk.blue(`📥 Downloading ${ctx.title}...`));
         logger.log(chalk.gray(`URL: ${ctx.archiveUrl}`));
 
-        const linktoolDir = join(ctx.cwd, '.linktool');
+        const linktoolDir = join(ctx.cwd, projectDataDirName);
         if (!existsSync(linktoolDir)) {
             mkdirSync(linktoolDir, { recursive: true });
         }

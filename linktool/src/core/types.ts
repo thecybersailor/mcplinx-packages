@@ -2,6 +2,9 @@ export type LinktoolCoreContext = {
   cwd: string
   tunnelBaseUrl?: string
   credentialsPath?: string
+  projectDataDirName?: string
+  homeDataDirName?: string
+  homeDir?: string
   logger?: Pick<typeof console, 'log' | 'error' | 'warn'>
 }
 

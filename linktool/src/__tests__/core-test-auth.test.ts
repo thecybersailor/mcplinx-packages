@@ -24,7 +24,7 @@ describe('linktool core test auth', () => {
 
     beforeEach(() => {
         cwd = createTempDir('linktool-core-auth-');
-        fs.mkdirSync(path.join(cwd, '.linktool'), { recursive: true });
+        fs.mkdirSync(path.join(cwd, '.syntool'), { recursive: true });
     });
 
     afterEach(() => {
@@ -96,7 +96,7 @@ describe('linktool core test auth', () => {
         const stdout = vi.fn();
 
         await runInteractiveTestAuth(
-            createLinktoolCoreContext({ cwd }),
+            createLinktoolCoreContext({ cwd, projectDataDirName: '.syntool' }),
             {
                 packageName: 'connector-example',
                 authContext: {
@@ -117,7 +117,7 @@ describe('linktool core test auth', () => {
         expect(tunnel.connect).toHaveBeenCalledTimes(1);
         expect(getAccessToken).toHaveBeenCalledTimes(1);
         expect(testAuth).toHaveBeenCalledTimes(1);
-        const saved = JSON.parse(fs.readFileSync(path.join(cwd, '.linktool', 'connection.json'), 'utf8'));
+        const saved = JSON.parse(fs.readFileSync(path.join(cwd, '.syntool', 'connection.json'), 'utf8'));
         expect(saved.authData).toEqual({ access_token: 'access_1' });
         expect(saved.name).toBe('Demo OAuth Account');
     });
@@ -137,7 +137,7 @@ describe('linktool core test auth', () => {
         });
 
         await runInteractiveTestAuth(
-            createLinktoolCoreContext({ cwd }),
+            createLinktoolCoreContext({ cwd, projectDataDirName: '.syntool' }),
             {
                 packageName: 'connector-example-custom',
                 authContext: {
@@ -154,7 +154,7 @@ describe('linktool core test auth', () => {
         );
 
         expect(testAuth).toHaveBeenCalledTimes(1);
-        const saved = JSON.parse(fs.readFileSync(path.join(cwd, '.linktool', 'connection.json'), 'utf8'));
+        const saved = JSON.parse(fs.readFileSync(path.join(cwd, '.syntool', 'connection.json'), 'utf8'));
         expect(saved.authData).toEqual({ app_id: 'my_app', app_secret: 'my_secret' });
         expect(saved.name).toBe('Form Connection');
     });

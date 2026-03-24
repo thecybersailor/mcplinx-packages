@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
-const LINKTOOL_DIR = '.linktool';
+export const DEFAULT_PROJECT_DATA_DIR = '.linktool';
 const CONNECTION_FILE = 'connection.json';
 const CONFIG_FILE = 'config.json';
 
@@ -14,9 +14,9 @@ export class LinktoolStorage {
     private cwd: string;
     private linktoolPath: string;
 
-    constructor(cwd: string) {
+    constructor(cwd: string, projectDataDirName = DEFAULT_PROJECT_DATA_DIR) {
         this.cwd = cwd;
-        this.linktoolPath = join(cwd, LINKTOOL_DIR);
+        this.linktoolPath = join(cwd, projectDataDirName);
         this.ensureDir();
     }
 

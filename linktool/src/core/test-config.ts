@@ -19,7 +19,7 @@ export async function runTestConfig(
 ): Promise<void> {
     const logger = ctx.logger ?? console;
     const prompt = deps.prompt ?? ((questions) => inquirer.prompt(questions as any) as Promise<Record<string, unknown>>);
-    const storage = new LinktoolStorage(ctx.cwd);
+    const storage = new LinktoolStorage(ctx.cwd, ctx.projectDataDirName);
     const connector = await loadConnector(ctx.cwd);
 
     const tool = connector.tools?.[toolKey];

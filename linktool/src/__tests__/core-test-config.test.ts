@@ -27,7 +27,7 @@ describe('linktool core test config runner', () => {
         vi.resetAllMocks();
     });
 
-    it('uses injected cwd and persists tool config into .linktool/config.json', async () => {
+    it('uses injected cwd and persists tool config into injected project data dir', async () => {
         (loadConnector as any).mockResolvedValue({
             tools: {
                 search: {
@@ -47,6 +47,7 @@ describe('linktool core test config runner', () => {
         await runTestConfig(
             createLinktoolCoreContext({
                 cwd,
+                projectDataDirName: '.syntool',
                 logger: {
                     log: vi.fn(),
                     error: vi.fn(),
@@ -60,7 +61,7 @@ describe('linktool core test config runner', () => {
         );
 
         expect(loadConnector).toHaveBeenCalledWith(cwd);
-        const saved = JSON.parse(fs.readFileSync(path.join(cwd, '.linktool', 'config.json'), 'utf8'));
+        const saved = JSON.parse(fs.readFileSync(path.join(cwd, '.syntool', 'config.json'), 'utf8'));
         expect(saved.search.query).toBe('botworks');
     });
 });

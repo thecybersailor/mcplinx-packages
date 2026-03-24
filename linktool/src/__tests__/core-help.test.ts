@@ -15,4 +15,13 @@ describe('linktool core help runners', () => {
         expect(typeof getDocsCommandRunner).toBe('function');
         expect(typeof getExamplesCommandRunner).toBe('function');
     });
+
+    it('preserves injected project data dir in help context', () => {
+        const ctx = createHelpCommandContext({
+            cwd: '/tmp/project',
+            projectDataDirName: '.syntool',
+        });
+
+        expect(ctx.projectDataDirName).toBe('.syntool');
+    });
 });

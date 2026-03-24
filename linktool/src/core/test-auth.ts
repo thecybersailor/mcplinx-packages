@@ -159,7 +159,7 @@ async function handleOAuth2Interactive(
 
                 const authData = await exchangeOAuthToken(ctx, connector, oauth2Auth, code, callbackUrl);
                 const connectionName = await testAndResolveConnectionName(ctx, connector, authData);
-                const storage = new LinktoolStorage(ctx.cwd);
+                const storage = new LinktoolStorage(ctx.cwd, ctx.projectDataDirName);
                 storage.saveConnection({
                     name: connectionName,
                     authData,
@@ -201,7 +201,7 @@ async function handleFormInteractive(
     }
 
     const connectionName = await testAndResolveConnectionName(ctx, connector, authData);
-    const storage = new LinktoolStorage(ctx.cwd);
+    const storage = new LinktoolStorage(ctx.cwd, ctx.projectDataDirName);
     storage.saveConnection({
         name: connectionName,
         authData,

@@ -20,19 +20,19 @@ describe('linktool core test run runner', () => {
 
     beforeEach(() => {
         cwd = createTempDir('linktool-core-run-');
-        fs.mkdirSync(path.join(cwd, '.linktool'), { recursive: true });
+        fs.mkdirSync(path.join(cwd, '.syntool'), { recursive: true });
         fs.writeFileSync(
             path.join(cwd, 'package.json'),
             JSON.stringify({ name: 'connector-example', version: '1.0.0' }),
             'utf8',
         );
         fs.writeFileSync(
-            path.join(cwd, '.linktool', 'config.json'),
+            path.join(cwd, '.syntool', 'config.json'),
             JSON.stringify({ search: { query: 'from-config' } }),
             'utf8',
         );
         fs.writeFileSync(
-            path.join(cwd, '.linktool', 'connection.json'),
+            path.join(cwd, '.syntool', 'connection.json'),
             JSON.stringify({ name: 'conn', authData: { api_key: 'auth_1' } }),
             'utf8',
         );
@@ -64,6 +64,7 @@ describe('linktool core test run runner', () => {
         const out = await runTestRun(
             createLinktoolCoreContext({
                 cwd,
+                projectDataDirName: '.syntool',
                 logger: {
                     log: vi.fn(),
                     error: vi.fn(),
@@ -124,7 +125,7 @@ describe('linktool core test run runner', () => {
         });
 
         const out = await runAsyncTestRun(
-            createLinktoolCoreContext({ cwd }),
+            createLinktoolCoreContext({ cwd, projectDataDirName: '.syntool' }),
             'async_with_webhook',
             {},
             {
@@ -172,7 +173,7 @@ describe('linktool core test run runner', () => {
         const delay = vi.fn(async () => {});
 
         const out = await runAsyncTestRun(
-            createLinktoolCoreContext({ cwd }),
+            createLinktoolCoreContext({ cwd, projectDataDirName: '.syntool' }),
             'async_polling',
             {
                 pollIntervalMs: 1000,
@@ -218,7 +219,7 @@ describe('linktool core test run runner', () => {
         });
 
         const out = await runTestRun(
-            createLinktoolCoreContext({ cwd }),
+            createLinktoolCoreContext({ cwd, projectDataDirName: '.syntool' }),
             'async_polling',
             {
                 pollIntervalMs: 1,

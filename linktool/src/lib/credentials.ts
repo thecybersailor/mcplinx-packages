@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
 
-const CREDS_DIR = '.linktool';
+export const DEFAULT_HOME_DATA_DIR = '.linktool';
 const CREDS_FILE = 'credentials.json';
 
 export interface Credentials {
@@ -14,12 +14,18 @@ export interface Credentials {
     appId?: string;
 }
 
+type CredentialsManagerOptions = {
+    homeDir?: string;
+    dataDirName?: string;
+};
+
 export class CredentialsManager {
     private credsPath: string;
 
-    constructor() {
-        const baseHome = process.env.LINKTOOL_HOME || process.env.MCPLINX_LINKTOOL_HOME || homedir();
-        this.credsPath = join(baseHome, CREDS_DIR);
+    constructor(options: CredentialsManagerOptions = {}) {
+        const baseHome = options.homeDir || process.env.LINKTOOL_HOME || process.env.MCPLINX_LINKTOOL_HOME || homedir();
+        const dataDirName = options.dataDirName || DEFAULT_HOME_DATA_DIR;
+        this.credsPath = join(baseHome, dataDirName);
         this.ensureDir();
     }
 

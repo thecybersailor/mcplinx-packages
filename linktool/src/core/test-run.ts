@@ -46,7 +46,7 @@ export async function runTestRun(
     deps: AsyncTestRunDeps = {},
 ): Promise<SyncRunResult | AsyncRunResult> {
     const logger = ctx.logger ?? console;
-    const storage = new LinktoolStorage(ctx.cwd);
+    const storage = new LinktoolStorage(ctx.cwd, ctx.projectDataDirName);
     const connector = await loadConnector(ctx.cwd);
 
     const tool = connector.tools?.[toolKey];
@@ -112,7 +112,7 @@ export async function runAsyncTestRun(
     deps: AsyncTestRunDeps = {},
 ): Promise<AsyncRunResult> {
     const logger = ctx.logger ?? console;
-    const storage = new LinktoolStorage(ctx.cwd);
+    const storage = new LinktoolStorage(ctx.cwd, ctx.projectDataDirName);
     const connector = await loadConnector(ctx.cwd);
 
     const tool = connector.tools?.[toolKey];
