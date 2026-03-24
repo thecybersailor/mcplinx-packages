@@ -45,8 +45,6 @@ try {
             'process.env.PKG_NAME': JSON.stringify(pkg.name),
         },
         external: [
-            // Keep peer dependencies external
-            '@mcplinx/connector-core',
             // Keep esbuild external (used by build command)
             'esbuild',
             // Keep tsx external (used by connector loader at runtime)

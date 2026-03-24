@@ -22,6 +22,12 @@
             "types": "./dist/lib/test-utils.d.ts"
         }
     },
+    "files": [
+        "README.md",
+        "bin/syntool.cjs",
+        "dist",
+        "docs/TESTING.md"
+    ],
     "scripts": {
         "prebuild": "npm --prefix ../connector-core run build",
         "pretest": "npm --prefix ../connector-core run build",
