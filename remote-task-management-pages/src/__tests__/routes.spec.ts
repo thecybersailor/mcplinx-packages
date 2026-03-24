@@ -32,7 +32,7 @@ describe('createRemoteTaskManagementRoutes', () => {
     expect(routes[0]?.path).toBe('connectors')
     const children = routes[0]?.children ?? []
     expect(children.map(route => route.name)).toEqual([
-      'platform-remote-task-index',
+      'platform-remote-task-dashboard',
       'platform-remote-task-packages',
       'platform-remote-task-package-detail',
       'platform-remote-task-instances',

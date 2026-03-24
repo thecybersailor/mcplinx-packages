@@ -21,7 +21,27 @@ export interface ConnectorWorkbenchDetail {
   status?: string
   summary?: string
   next_steps?: string[]
+  latest_version?: string
+  tool_count?: number
   can_connect_directly?: boolean
+}
+
+export interface ConnectorWorkbenchVersion {
+  id?: string | number
+  version?: string
+  toolCount?: number
+  size?: string | number
+  uploadedAt?: string
+  createdAt?: string
+}
+
+export interface ConnectorWorkbenchInstance {
+  id?: string | number
+  name?: string
+  visibility?: string
+  status?: string
+  activeVersion?: string
+  oauthCallbackURL?: string
 }
 
 export interface ConnectorWorkbenchCreateConnectionRequest {
@@ -32,6 +52,8 @@ export interface ConnectorWorkbenchCreateConnectionRequest {
 export interface ConnectorWorkbenchFacade {
   getWorkbench(query?: { limit?: number }): Promise<ConnectorWorkbenchResponse>
   getConnectorDetail(id: string): Promise<ConnectorWorkbenchDetail>
+  listPackageVersions?(id: string): Promise<ConnectorWorkbenchVersion[]>
+  listPackageInstances?(id: string): Promise<ConnectorWorkbenchInstance[]>
   createConnection(request: ConnectorWorkbenchCreateConnectionRequest): Promise<Record<string, unknown>>
 }
 

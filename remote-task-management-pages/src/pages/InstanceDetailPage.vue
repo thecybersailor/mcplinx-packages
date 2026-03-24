@@ -63,6 +63,51 @@ onMounted(load)
           <div><dt class="text-xs uppercase tracking-wide text-slate-400">Package ID</dt><dd class="mt-1 text-sm text-slate-800">{{ instance.pkgID || '-' }}</dd></div>
         </dl>
       </BundlePanel>
+      <BundlePanel>
+        <h2 class="mb-3 text-base font-semibold text-slate-950">Active Deployment</h2>
+        <dl class="grid gap-3 md:grid-cols-2">
+          <div><dt class="text-xs uppercase tracking-wide text-slate-400">Version</dt><dd class="mt-1 text-sm text-slate-800">{{ instance.activeVersion || '-' }}</dd></div>
+          <div><dt class="text-xs uppercase tracking-wide text-slate-400">Updated</dt><dd class="mt-1 text-sm text-slate-800">{{ instance.updatedAt || '-' }}</dd></div>
+          <div><dt class="text-xs uppercase tracking-wide text-slate-400">OAuth Callback</dt><dd class="mt-1 break-all text-sm text-slate-800">{{ instance.oauthCallbackURL || '-' }}</dd></div>
+          <div><dt class="text-xs uppercase tracking-wide text-slate-400">Status</dt><dd class="mt-1 text-sm text-slate-800">{{ instance.status || '-' }}</dd></div>
+        </dl>
+      </BundlePanel>
+      <BundlePanel>
+        <h2 class="mb-3 text-base font-semibold text-slate-950">Variables</h2>
+        <div v-if="instance.envConfig && Object.keys(instance.envConfig).length" class="space-y-2">
+          <div v-for="(value, key) in instance.envConfig" :key="key" class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+            <span class="text-sm font-medium text-slate-700">{{ key }}</span>
+            <span class="text-sm text-slate-500">{{ value }}</span>
+          </div>
+        </div>
+        <p v-else class="text-sm text-slate-500">No variables configured.</p>
+      </BundlePanel>
+      <BundlePanel>
+        <h2 class="mb-3 text-base font-semibold text-slate-950">Secrets</h2>
+        <div v-if="instance.secretConfig && Object.keys(instance.secretConfig).length" class="space-y-2">
+          <div v-for="(configured, key) in instance.secretConfig" :key="key" class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+            <span class="text-sm font-medium text-slate-700">{{ key }}</span>
+            <span class="text-sm text-slate-500">{{ configured ? 'Configured' : 'Missing' }}</span>
+          </div>
+        </div>
+        <p v-else class="text-sm text-slate-500">No secrets declared.</p>
+      </BundlePanel>
+      <BundlePanel>
+        <h2 class="mb-3 text-base font-semibold text-slate-950">Version History</h2>
+        <div v-if="instance.versions?.length" class="overflow-hidden rounded-2xl border border-slate-200">
+          <table class="min-w-full bg-white">
+            <thead class="bg-slate-50 text-left text-sm text-slate-500"><tr><th class="px-4 py-3 font-medium">Version</th><th class="px-4 py-3 font-medium">Tools</th><th class="px-4 py-3 font-medium">Created</th></tr></thead>
+            <tbody>
+              <tr v-for="version in instance.versions" :key="version.id || version.version" class="border-t border-slate-200">
+                <td class="px-4 py-4 text-slate-800">{{ version.version || '-' }}</td>
+                <td class="px-4 py-4 text-slate-600">{{ version.toolCount || 0 }}</td>
+                <td class="px-4 py-4 text-slate-600">{{ version.createdAt || '-' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p v-else class="text-sm text-slate-500">No version history available.</p>
+      </BundlePanel>
       <BundlePanel v-if="canModerate" class="space-y-3">
         <label class="grid gap-2">
           <span class="text-sm font-medium text-slate-700">Review reason</span>

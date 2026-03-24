@@ -7,6 +7,7 @@ import {
   type RemoteTaskManagementScope,
   type RemoteTaskManagementTranslate,
 } from './facade'
+import DashboardPage from './pages/DashboardPage.vue'
 import PackagesPage from './pages/PackagesPage.vue'
 import PackageDetailPage from './pages/PackageDetailPage.vue'
 import InstancesPage from './pages/InstancesPage.vue'
@@ -51,7 +52,7 @@ function createShell(
 export function createRemoteTaskManagementRoutes(options: CreateRemoteTaskManagementRoutesOptions): RouteRecordRaw[] {
   const prefix = options.routePrefix
   const children: RouteRecordRaw[] = [
-    { path: '', name: `${prefix}-index`, redirect: { name: `${prefix}-packages` } },
+    { path: '', name: `${prefix}-dashboard`, component: DashboardPage },
     { path: 'packages', name: `${prefix}-packages`, component: PackagesPage },
     { path: 'packages/:pkgId', name: `${prefix}-package-detail`, component: PackageDetailPage },
     { path: 'instances', name: `${prefix}-instances`, component: InstancesPage },

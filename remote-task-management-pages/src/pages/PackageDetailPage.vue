@@ -65,6 +65,28 @@ onMounted(load)
     <BundleState v-if="loading" variant="loading" message="Loading..." />
     <BundleState v-else-if="error" variant="error" :message="error" />
     <div v-else-if="pkg" class="space-y-4">
+      <BundlePanel>
+        <h2 class="mb-3 text-base font-semibold text-slate-950">Package Statistics</h2>
+        <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+            <div class="text-xs font-medium uppercase tracking-wide text-slate-500">Total Instances</div>
+            <div class="mt-2 text-2xl font-semibold text-slate-950">{{ pkg.totalInstances ?? 0 }}</div>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+            <div class="text-xs font-medium uppercase tracking-wide text-slate-500">Active Instances</div>
+            <div class="mt-2 text-2xl font-semibold text-slate-950">{{ pkg.activeInstances ?? 0 }}</div>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+            <div class="text-xs font-medium uppercase tracking-wide text-slate-500">Public Instances</div>
+            <div class="mt-2 text-2xl font-semibold text-slate-950">{{ pkg.publicInstances ?? 0 }}</div>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+            <div class="text-xs font-medium uppercase tracking-wide text-slate-500">Pending Reviews</div>
+            <div class="mt-2 text-2xl font-semibold text-slate-950">{{ pkg.pendingReviews ?? 0 }}</div>
+          </div>
+        </div>
+      </BundlePanel>
+
       <BundlePanel v-if="runtime.sharedConnectionRoutePrefix">
         <div class="flex items-center justify-between gap-4">
           <div>

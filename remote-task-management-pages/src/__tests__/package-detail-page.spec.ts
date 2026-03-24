@@ -102,6 +102,8 @@ describe('PackageDetailPage', () => {
 
     await flushPromises()
     expect(wrapper.get('[data-test-id="remote-task-management.package-detail.page"]').text()).toContain('Versions')
+    expect(wrapper.text()).toContain('Package Statistics')
+    expect(wrapper.text()).toContain('Total Instances')
     await wrapper.get('[data-test-id="remote-task-management.package-detail.shared-connections"]').trigger('click')
     await flushPromises()
     expect(router.currentRoute.value.name).toBe('team-shared-connections')

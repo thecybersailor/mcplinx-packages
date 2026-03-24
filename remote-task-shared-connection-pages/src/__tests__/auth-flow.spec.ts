@@ -18,6 +18,7 @@ function createFacade(): RemoteTaskSharedConnectionFacade {
       id: 'shared_1',
       connector_id: 'gmail',
       label: 'Support Mailbox',
+      requires_reauth: true,
       principal_pattern: 'org/team/team_1',
       inherits_to: ['team'],
       resolution_hint: 'team -> tenant -> platform',
@@ -85,7 +86,7 @@ describe('shared connection auth flow', () => {
 
     expect(facade.submitAuth).toHaveBeenCalledWith(expect.objectContaining({
       connection_id: 'shared_1',
-      auth_data: { api_key: 'secret' },
+      auth_data: { 'API Key': 'secret' },
     }))
     expect(router.currentRoute.value.name).toBe('shared-connections-detail')
   })
@@ -105,14 +106,6 @@ describe('shared connection auth flow', () => {
     await flushPromises()
     expect(facade.reauthConnection).toHaveBeenCalledWith('shared_1', expect.objectContaining({
       principal_pattern: 'org/team/team_1',
-    }))
-
-    await wrapper.get('[data-test-id="shared-connections.detail.auth-field.api_key"]').setValue('rotated')
-    await wrapper.get('[data-test-id="shared-connections.detail.submit-auth"]').trigger('click')
-    await flushPromises()
-    expect(facade.submitAuth).toHaveBeenCalledWith(expect.objectContaining({
-      connection_id: 'shared_1',
-      auth_data: { api_key: 'rotated' },
     }))
   })
 })

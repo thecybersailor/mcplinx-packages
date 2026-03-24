@@ -50,7 +50,8 @@ export function createConnectorWorkbenchRoutes(options: CreateConnectorWorkbench
       component: createShell(options.facade, prefix, options.t),
       children: [
         { path: '', name: `${prefix}-workbench`, component: WorkbenchPage },
-        { path: 'all', name: `${prefix}-catalog`, component: DiscoverableCatalogPage },
+        { path: 'catalog', name: `${prefix}-catalog`, component: DiscoverableCatalogPage },
+        { path: 'all', redirect: { name: `${prefix}-catalog` } },
         { path: 'packages', redirect: { name: `${prefix}-workbench` } },
         { path: 'packages/:pkgId', redirect: to => detailRedirect(prefix, to) },
         { path: 'publish', redirect: { name: `${prefix}-workbench` } },

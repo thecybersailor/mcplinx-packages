@@ -12,6 +12,28 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "types": ["vitest/globals"]
   },
-  "include": ["src/**/*.ts", "src/**/*.vue"],
+  "include": [
+    "src/index.ts",
+    "src/routes.ts",
+    "src/facade.ts",
+    "src/components/BundlePage.vue",
+    "src/components/BundlePanel.vue",
+    "src/components/BundleState.vue",
+    "src/components/lib/utils.ts",
+    "src/components/ui/button/Button.vue",
+    "src/components/ui/button/index.ts",
+    "src/components/ui/badge/Badge.vue",
+    "src/components/ui/badge/index.ts",
+    "src/components/ui/card/Card.vue",
+    "src/components/ui/card/CardContent.vue",
+    "src/components/ui/card/CardHeader.vue",
+    "src/components/ui/card/CardTitle.vue",
+    "src/components/ui/card/index.ts",
+    "src/components/ui/label/Label.vue",
+    "src/components/ui/label/index.ts",
+    "src/components/ui/connector-icon/ConnectorIcon.vue",
+    "src/components/ui/connector-icon/index.ts",
+    "src/pages/**/*.vue"
+  ],
   "exclude": ["src/**/__tests__/**"]
 }

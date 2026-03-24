@@ -86,36 +86,27 @@ async function mountAt(path: string, scope: RemoteTaskManagementScope) {
   return { wrapper, facade }
 }
 
-describe('PackagesPage cli hints', () => {
-  it('shows team login url and profile-driven commands', async () => {
+describe('PackagesPage', () => {
+  it('keeps the packages entry focused on filters and table structure from checklist', async () => {
     const { wrapper } = await mountAt('/team/team_1/connectors/packages', 'team')
 
+    expect(wrapper.text()).toContain('Connector Packages')
+    expect(wrapper.text()).toContain('Application')
+    expect(wrapper.text()).toContain('Author')
+    expect(wrapper.text()).toContain('Version')
+    expect(wrapper.text()).toContain('Tools')
     expect(wrapper.find('[data-test-id="remote-task-management.packages.cli-hint"]').exists()).toBe(false)
-    await wrapper.get('[data-test-id="remote-task-management.packages.cli-hint-toggle"]').trigger('click')
-    await flushPromises()
-
-    const hint = wrapper.get('[data-test-id="remote-task-management.packages.cli-hint"]').text()
-    expect(hint).toContain('linktool login --login-url')
-    expect(hint).toContain('/team/team_1/linktool-login')
-    expect(hint).toContain('linktool publish --payload')
-    expect(hint).toContain('linktool deploy --payload')
-    expect(hint).not.toContain('--scope')
-    expect(hint).not.toContain('--team-id')
-    expect(hint).not.toContain('--base-url')
+    const actionTexts = wrapper.findAll('button').map((node) => node.text())
+    expect(actionTexts).not.toContain('CLI Hint')
+    expect(actionTexts).not.toContain('Publish')
+    expect(actionTexts).not.toContain('Deploy')
+    expect(actionTexts).not.toContain('Config')
   })
 
-  it('shows tenant login url without old scope flags', async () => {
+  it('keeps status filter visible for tenant scope', async () => {
     const { wrapper } = await mountAt('/connectors/packages', 'tenant')
-
-    await wrapper.get('[data-test-id="remote-task-management.packages.cli-hint-toggle"]').trigger('click')
-    await flushPromises()
-
-    const hint = wrapper.get('[data-test-id="remote-task-management.packages.cli-hint"]').text()
-    expect(hint).toContain('/dashboard/linktool-login/tenant')
-    expect(hint).toContain('linktool publish --payload')
-    expect(hint).not.toContain('--team-id')
-    expect(hint).not.toContain('--scope')
-    expect(hint).not.toContain('--base-url')
+    expect(wrapper.find('[data-test-id="remote-task-management.packages.status"]').exists()).toBe(true)
+    expect(wrapper.text()).toContain('Application')
   })
 
   it('uses dark bundle surfaces instead of light borders on packages page', async () => {
@@ -125,14 +116,10 @@ describe('PackagesPage cli hints', () => {
     expect(page.classes().join(' ')).toContain('bg-transparent')
     expect(page.classes().join(' ')).toContain('border-transparent')
 
-    await wrapper.get('[data-test-id="remote-task-management.packages.cli-hint-toggle"]').trigger('click')
-    await flushPromises()
-
-    const hint = wrapper.get('[data-test-id="remote-task-management.packages.cli-hint"]')
-    expect(hint.classes().join(' ')).toContain('border-white/10')
-    expect(hint.classes().join(' ')).toContain('bg-white/[0.03]')
-
     const table = wrapper.get('[data-test-id="remote-task-management.packages.table"]')
     expect(table.classes().join(' ')).toContain('bg-transparent')
+
+    const row = wrapper.get('[data-test-id="remote-task-management.packages.row.pkg_1"]')
+    expect(row.classes().join(' ')).toContain('border-white/10')
   })
 })

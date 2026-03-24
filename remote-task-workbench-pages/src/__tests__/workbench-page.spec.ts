@@ -46,15 +46,15 @@ async function mountAt(path: string) {
 }
 
 describe('team connector workbench pages', () => {
-  it('shows available and discoverable connectors and supports more/detail/connect flows', async () => {
+  it('shows connector package table and supports more/detail/connect flows', async () => {
     const { wrapper, router } = await mountAt('/team/team_1/connectors')
-    expect(wrapper.find('[data-test-id="team-connectors.available.card.gmail"]').exists()).toBe(true)
-    expect(wrapper.find('[data-test-id="team-connectors.discoverable.card.notion"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test-id="team-connectors.row.gmail"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test-id="team-connectors.row.notion"]').exists()).toBe(true)
 
-    await wrapper.get('[data-test-id="team-connectors.more.top"]').trigger('click')
+    await wrapper.get('[data-test-id="team-connectors.more.bottom"]').trigger('click')
     await flushPromises()
     expect(router.currentRoute.value.name).toBe('team-connectors-catalog')
-    expect(wrapper.find('[data-test-id="team-connectors.catalog.card.slack"]').exists()).toBe(true)
+    expect(String(router.currentRoute.value.fullPath)).toContain('/catalog')
 
     await router.push('/team/team_1/connectors/notion')
     await flushPromises()
@@ -74,6 +74,8 @@ describe('team connector workbench pages', () => {
   it('keeps cli hint collapsed by default and expands profile-driven cli commands on demand', async () => {
     const { wrapper } = await mountAt('/team/team_1/connectors')
 
+    expect(wrapper.find('[data-test-id="team-connectors.cli-hint.section"]').exists()).toBe(true)
+    expect(wrapper.text()).toContain('My Connector Packages')
     expect(wrapper.find('[data-test-id="team-connectors.cli-hint.panel"]').exists()).toBe(false)
 
     await wrapper.get('[data-test-id="team-connectors.cli-hint.toggle"]').trigger('click')

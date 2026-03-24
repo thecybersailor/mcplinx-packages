@@ -14,6 +14,9 @@ export interface SharedConnectionRecord {
   label?: string
   status?: string
   requires_reauth?: boolean
+  token_expires_at?: string
+  auth_scopes?: string[]
+  required_scopes?: string[]
   scope?: string
   principal_pattern?: string
   inherits_to?: string[]

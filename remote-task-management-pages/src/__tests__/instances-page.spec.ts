@@ -80,6 +80,9 @@ describe('InstancesPage', () => {
     await flushPromises()
     expect(facade.listInstances).toHaveBeenCalled()
     expect(wrapper.get('[data-test-id="remote-task-management.instances.row.7"]').text()).toContain('Tenant Slack')
+    expect(wrapper.find('[data-test-id="remote-task-management.instances.status"]').exists()).toBe(true)
+    expect(wrapper.text()).toContain('Visibility')
+    expect(wrapper.text()).toContain('Owner')
   })
 
   it('hides moderation actions for team scope instance detail', async () => {
