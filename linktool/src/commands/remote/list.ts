@@ -16,8 +16,8 @@ export function listCommand() {
 
                 if (connectors.length === 0) {
                     console.log(chalk.yellow('\nNo connectors found. Publish your first connector with:'));
-                    console.log(chalk.gray('  linktool build'));
-                    console.log(chalk.gray('  linktool remote publish'));
+                    console.log(chalk.gray('  syntool build'));
+                    console.log(chalk.gray('  syntool remote publish'));
                     process.exit(0);
                 }
 
@@ -36,7 +36,7 @@ export function listCommand() {
                     console.log('');
                 }
 
-                console.log(chalk.gray(`Run 'linktool remote info <pkg-id>' for more details.`));
+                console.log(chalk.gray(`Run 'syntool remote info <pkg-id>' for more details.`));
 
             } catch (error: any) {
                 if (error instanceof ApiError) {
@@ -47,7 +47,7 @@ export function listCommand() {
                         traceId: error.traceId
                     }, null, 2));
                     if (error.statusCode === 401) {
-                        console.error(chalk.yellow('Your session may have expired. Please run: linktool login'));
+                        console.error(chalk.yellow('Your session may have expired. Please run: syntool login'));
                     }
                 } else {
                     console.error(chalk.red('Failed to list connectors:'), error.message);

@@ -44,7 +44,7 @@ export function deleteCommand() {
                     if (error.statusCode === 404) {
                         console.error(chalk.yellow(`Connector or version not found.`));
                     } else if (error.statusCode === 401) {
-                        console.error(chalk.yellow('Your session may have expired. Please run: linktool login'));
+                        console.error(chalk.yellow('Your session may have expired. Please run: syntool login'));
                     }
                 } else {
                     console.error(chalk.red('Failed to delete:'), error.message);

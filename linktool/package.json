@@ -1,10 +1,10 @@
 {
-    "name": "@mcplinx/linktool",
+    "name": "@syngy/syntool",
     "version": "0.1.0",
     "description": "DevKit for MCPLINX Connectors",
     "type": "module",
     "bin": {
-        "linktool": "./bin/linktool.cjs"
+        "syntool": "./bin/syntool.cjs"
     },
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -28,7 +28,7 @@
         "build": "node scripts/build.js && tsc",
         "watch": "tsc -w",
         "dev": "tsx src/index.ts",
-        "linktool": "tsx src/index.ts",
+        "syntool": "tsx src/index.ts",
         "test:e2e:pty": "vitest run e2e/pty",
         "test": "vitest",
         "type-check": "tsc --noEmit",

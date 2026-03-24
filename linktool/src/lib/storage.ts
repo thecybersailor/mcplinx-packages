@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
-export const DEFAULT_PROJECT_DATA_DIR = '.linktool';
+export const DEFAULT_PROJECT_DATA_DIR = '.syntool';
 const CONNECTION_FILE = 'connection.json';
 const CONFIG_FILE = 'config.json';
 

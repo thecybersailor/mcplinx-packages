@@ -19,13 +19,13 @@ import { helpCommand } from './commands/help/index.js';
 const pkg = {
     version: process.env.PKG_VERSION || '0.0.0',
     description: process.env.PKG_DESCRIPTION || 'DevKit for MCPLINX Connectors',
-    name: process.env.PKG_NAME || '@mcplinx/linktool',
+    name: process.env.PKG_NAME || '@syngy/syntool',
 };
 
 const program = new Command();
 
 program
-    .name('linktool')
+    .name('syntool')
     .description(pkg.description)
     .version(pkg.version);
 
@@ -80,11 +80,11 @@ program.configureHelp({
 
         // Help Commands
         output += 'Help Commands:\n';
-        output += '  help get-docs              Download and extract connector documentation to .linktool/docs/\n';
-        output += '  help get-examples          Download and extract connector examples to .linktool/examples/\n\n';
+        output += '  help get-docs              Download and extract connector documentation to .syntool/docs/\n';
+        output += '  help get-examples          Download and extract connector examples to .syntool/examples/\n\n';
 
         // Footer
-        output += 'Run \'linktool <command> --help\' for more information on a command.\n';
+        output += 'Run \'syntool <command> --help\' for more information on a command.\n';
 
         return output;
     }

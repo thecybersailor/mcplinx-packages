@@ -69,7 +69,7 @@ export function loginCommand() {
                 });
 
                 console.log(chalk.green(`\n✓ Logged in successfully as ${email}!`));
-                console.log(chalk.gray(`✓ Token saved to ~/.linktool/credentials.json`));
+                console.log(chalk.gray(`✓ Token saved to ~/.syntool/credentials.json`));
                 return
             }
 
@@ -83,7 +83,7 @@ export function loginCommand() {
                 });
 
                 const session = await authApi.auth.sessionsCreate({
-                    client_name: 'linktool',
+                    client_name: 'syntool',
                     client_version: '0.1.0'
                 });
 
@@ -184,7 +184,7 @@ export function loginCommand() {
                             });
 
                             console.log(chalk.green(`\n✓ Logged in successfully as ${data.user_email}!`));
-                            console.log(chalk.gray(`✓ Token saved to ~/.linktool/credentials.json`));
+                            console.log(chalk.gray(`✓ Token saved to ~/.syntool/credentials.json`));
                             return;
                         } else if (data.status === 'expired') {
                             console.error(chalk.red('\nLogin session expired. Please try again.'));

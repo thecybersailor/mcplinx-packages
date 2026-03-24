@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
 
-export const DEFAULT_HOME_DATA_DIR = '.linktool';
+export const DEFAULT_HOME_DATA_DIR = '.syntool';
 const CREDS_FILE = 'credentials.json';
 
 export interface Credentials {

@@ -11,7 +11,7 @@ const __dirname = dirname(__filename);
 
 const rootDir = join(__dirname, '..');
 const entryPoint = join(rootDir, 'src/index.ts');
-const outfile = join(rootDir, 'bin/linktool.cjs');
+const outfile = join(rootDir, 'bin/syntool.cjs');
 
 // Read package.json to inject version info
 const pkg = JSON.parse(readFileSync(join(rootDir, 'package.json'), 'utf-8'));
