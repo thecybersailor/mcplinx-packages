@@ -62,13 +62,13 @@ export async function runTestRun(
 
     const authData = storage.loadAuth() || {};
     if (!storage.hasAuth() && connector.authentication) {
-        logger.warn?.('⚠ No auth found. Run `npx syntool auth` first.');
+        logger.warn?.('⚠ No auth found. Run `npx linktool auth` first.');
     }
 
     let inputData: Record<string, unknown> = {};
     const savedConfig = storage.loadToolConfig(toolKey);
     if (savedConfig) {
-        logger.log('Loading config from .syntool/config.json');
+        logger.log('Loading config from .linktool/config.json');
         inputData = savedConfig;
     }
 

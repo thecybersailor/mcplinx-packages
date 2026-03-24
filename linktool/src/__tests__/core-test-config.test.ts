@@ -47,7 +47,7 @@ describe('linktool core test config runner', () => {
         await runTestConfig(
             createLinktoolCoreContext({
                 cwd,
-                projectDataDirName: '.syntool',
+                projectDataDirName: '.linktool',
                 logger: {
                     log: vi.fn(),
                     error: vi.fn(),
@@ -56,12 +56,12 @@ describe('linktool core test config runner', () => {
             }),
             'search',
             {
-                prompt: vi.fn(async () => ({ query: 'botworks' })),
+                prompt: vi.fn(async () => ({ query: 'sample-app' })),
             },
         );
 
         expect(loadConnector).toHaveBeenCalledWith(cwd);
-        const saved = JSON.parse(fs.readFileSync(path.join(cwd, '.syntool', 'config.json'), 'utf8'));
-        expect(saved.search.query).toBe('botworks');
+        const saved = JSON.parse(fs.readFileSync(path.join(cwd, '.linktool', 'config.json'), 'utf8'));
+        expect(saved.search.query).toBe('sample-app');
     });
 });

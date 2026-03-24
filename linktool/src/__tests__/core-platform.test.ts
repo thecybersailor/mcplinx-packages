@@ -24,7 +24,7 @@ describe('linktool core platform runners', () => {
       {
         fetchImpl,
         resolvePublishRuntime: async () => ({
-          baseUrl: 'https://host.autostaff.cn',
+          baseUrl: 'https://host.example.com',
           accessToken: 'token_1',
           publishPath: '/api/v1/connectors/publish',
         }),
@@ -32,7 +32,7 @@ describe('linktool core platform runners', () => {
     );
 
     expect(fetchImpl).toHaveBeenCalledWith(
-      'https://host.autostaff.cn/api/v1/connectors/publish',
+      'https://host.example.com/api/v1/connectors/publish',
       expect.objectContaining({
         method: 'POST',
         headers: expect.objectContaining({
@@ -63,7 +63,7 @@ describe('linktool core platform runners', () => {
 
     const ctx = createLinktoolCoreContext({ cwd: '/tmp/connector' });
     const resolvePublishRuntime = async () => ({
-      baseUrl: 'https://host.autostaff.cn',
+      baseUrl: 'https://host.example.com',
       accessToken: 'token_2',
       publishPath: '/api/v1/connectors/publish',
       deployPath: '/api/v1/connectors/deploy',
@@ -83,7 +83,7 @@ describe('linktool core platform runners', () => {
 
     expect(fetchImpl).toHaveBeenNthCalledWith(
       1,
-      'https://host.autostaff.cn/api/v1/connectors/connectors?q=demo',
+      'https://host.example.com/api/v1/connectors/connectors?q=demo',
       expect.objectContaining({
         method: 'GET',
         headers: expect.objectContaining({
@@ -93,7 +93,7 @@ describe('linktool core platform runners', () => {
     );
     expect(fetchImpl).toHaveBeenNthCalledWith(
       2,
-      'https://host.autostaff.cn/api/v1/connectors/deploy',
+      'https://host.example.com/api/v1/connectors/deploy',
       expect.objectContaining({
         method: 'POST',
         headers: expect.objectContaining({

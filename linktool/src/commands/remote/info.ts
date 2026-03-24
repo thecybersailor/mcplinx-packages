@@ -50,7 +50,7 @@ export function infoCommand() {
                     console.log(chalk.yellow('\n  No versions found.'));
                 }
 
-                console.log(chalk.gray(`\nRun 'syntool remote use ${pkgId} <version>' to change active version.`));
+                console.log(chalk.gray(`\nRun 'linktool remote use ${pkgId} <version>' to change active version.`));
 
             } catch (error: any) {
                 if (error instanceof ApiError) {
@@ -58,7 +58,7 @@ export function infoCommand() {
                     if (error.statusCode === 404) {
                         console.error(chalk.yellow(`Connector '${pkgId}' not found or you don't have access to it.`));
                     } else if (error.statusCode === 401) {
-                        console.error(chalk.yellow('Your session may have expired. Please run: syntool login'));
+                        console.error(chalk.yellow('Your session may have expired. Please run: linktool login'));
                     }
                 } else {
                     console.error(chalk.red('Failed to fetch package info:'), error.message);

@@ -5,10 +5,10 @@
   "main": "src/index.ts",
   "type": "module",
   "scripts": {
-    "build": "syntool build",
-    "dev": "syntool dev",
-    "test": "syntool test",
-    "publish": "syntool remote deploy"
+    "build": "linktool build",
+    "dev": "linktool dev",
+    "test": "linktool test",
+    "publish": "linktool remote deploy"
   },
   "dependencies": {
     "@mcplinx/connector-core": "^1.0.0"

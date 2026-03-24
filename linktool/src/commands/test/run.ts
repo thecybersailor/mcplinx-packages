@@ -60,7 +60,7 @@ async function createDefaultTunnelSession(packageName: string) {
   const credsManager = new CredentialsManager();
   const creds = credsManager.loadCredentials();
   if (!creds?.token) {
-    throw new Error('Not logged in. Please run "syntool login" first.');
+    throw new Error('Not logged in. Please run "linktool login" first.');
   }
 
   const userHashId = getUserHashIdFromToken(creds.token);

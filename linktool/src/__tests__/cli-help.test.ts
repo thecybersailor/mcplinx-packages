@@ -3,7 +3,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 describe('linktool cli help', () => {
-    it('prints syntool help text and syntool data directories', () => {
+    it('prints linktool help text and linktool data directories', () => {
         const output = execFileSync(
             'npx',
             ['tsx', 'src/index.ts', '--help'],
@@ -13,10 +13,8 @@ describe('linktool cli help', () => {
             },
         );
 
-        expect(output).toContain('Usage: syntool');
-        expect(output).toContain('.syntool/docs/');
-        expect(output).toContain('.syntool/examples/');
-        expect(output).not.toContain('Usage: linktool');
-        expect(output).not.toContain('.linktool/docs/');
+        expect(output).toContain('Usage: linktool');
+        expect(output).toContain('.linktool/docs/');
+        expect(output).toContain('.linktool/examples/');
     });
 });

@@ -27,7 +27,7 @@ vi.mock('../lib/credentials.js', () => ({
     loadCredentials() {
       return {
         token: 'token_1',
-        appId: 'botworks',
+        appId: 'sample-app',
       };
     }
   },

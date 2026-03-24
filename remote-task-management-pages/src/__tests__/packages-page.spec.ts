@@ -95,10 +95,10 @@ describe('PackagesPage cli hints', () => {
     await flushPromises()
 
     const hint = wrapper.get('[data-test-id="remote-task-management.packages.cli-hint"]').text()
-    expect(hint).toContain('syntool login --login-url')
+    expect(hint).toContain('linktool login --login-url')
     expect(hint).toContain('/team/team_1/linktool-login')
-    expect(hint).toContain('syntool publish --payload')
-    expect(hint).toContain('syntool deploy --payload')
+    expect(hint).toContain('linktool publish --payload')
+    expect(hint).toContain('linktool deploy --payload')
     expect(hint).not.toContain('--scope')
     expect(hint).not.toContain('--team-id')
     expect(hint).not.toContain('--base-url')
@@ -112,7 +112,7 @@ describe('PackagesPage cli hints', () => {
 
     const hint = wrapper.get('[data-test-id="remote-task-management.packages.cli-hint"]').text()
     expect(hint).toContain('/dashboard/linktool-login/tenant')
-    expect(hint).toContain('syntool publish --payload')
+    expect(hint).toContain('linktool publish --payload')
     expect(hint).not.toContain('--team-id')
     expect(hint).not.toContain('--scope')
     expect(hint).not.toContain('--base-url')

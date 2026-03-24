@@ -24,7 +24,7 @@ describe('linktool core test auth', () => {
 
     beforeEach(() => {
         cwd = createTempDir('linktool-core-auth-');
-        fs.mkdirSync(path.join(cwd, '.syntool'), { recursive: true });
+        fs.mkdirSync(path.join(cwd, '.linktool'), { recursive: true });
     });
 
     afterEach(() => {
@@ -48,7 +48,7 @@ describe('linktool core test auth', () => {
         await runTestAuth(
             createLinktoolCoreContext({
                 cwd: '/tmp/connector',
-                tunnelBaseUrl: 'https://tun.dev.autostaff.cn',
+                tunnelBaseUrl: 'https://tun.dev.example.com',
                 logger,
             }),
             {
@@ -60,7 +60,7 @@ describe('linktool core test auth', () => {
                 getPackageName: vi.fn(() => 'connector-github'),
                 getAuthContext: vi.fn(() => ({
                     userHashId: 'user_hash_1',
-                    tunnelBaseUrl: 'https://tun.dev.autostaff.cn',
+                    tunnelBaseUrl: 'https://tun.dev.example.com',
                     callbackPath: '/opaque-prefix/connector-github/callback',
                 })),
                 writeStdout: vi.fn(),
@@ -77,7 +77,7 @@ describe('linktool core test auth', () => {
             connect: vi.fn(async () => {}),
             close: vi.fn(),
             setRequestHandler(handler: (payload: any) => Promise<unknown>) {
-                void handler({ url: 'https://tun.dev.autostaff.cn/opaque/callback?code=code_1' });
+                void handler({ url: 'https://tun.dev.example.com/opaque/callback?code=code_1' });
             },
         };
 
@@ -96,19 +96,19 @@ describe('linktool core test auth', () => {
         const stdout = vi.fn();
 
         await runInteractiveTestAuth(
-            createLinktoolCoreContext({ cwd, projectDataDirName: '.syntool' }),
+            createLinktoolCoreContext({ cwd, projectDataDirName: '.linktool' }),
             {
                 packageName: 'connector-example',
                 authContext: {
                     userHashId: 'user_hash_1',
-                    tunnelBaseUrl: 'https://tun.dev.autostaff.cn',
+                    tunnelBaseUrl: 'https://tun.dev.example.com',
                     callbackPath: '/opaque/connector-example/callback',
                 },
             },
             {
                 createTunnelSession: async () => ({
                     tunnel,
-                    callbackUrl: 'https://tun.dev.autostaff.cn/opaque/connector-example/callback',
+                    callbackUrl: 'https://tun.dev.example.com/opaque/connector-example/callback',
                 }),
                 writeStdout: stdout,
             },
@@ -117,7 +117,7 @@ describe('linktool core test auth', () => {
         expect(tunnel.connect).toHaveBeenCalledTimes(1);
         expect(getAccessToken).toHaveBeenCalledTimes(1);
         expect(testAuth).toHaveBeenCalledTimes(1);
-        const saved = JSON.parse(fs.readFileSync(path.join(cwd, '.syntool', 'connection.json'), 'utf8'));
+        const saved = JSON.parse(fs.readFileSync(path.join(cwd, '.linktool', 'connection.json'), 'utf8'));
         expect(saved.authData).toEqual({ access_token: 'access_1' });
         expect(saved.name).toBe('Demo OAuth Account');
     });
@@ -137,7 +137,7 @@ describe('linktool core test auth', () => {
         });
 
         await runInteractiveTestAuth(
-            createLinktoolCoreContext({ cwd, projectDataDirName: '.syntool' }),
+            createLinktoolCoreContext({ cwd, projectDataDirName: '.linktool' }),
             {
                 packageName: 'connector-example-custom',
                 authContext: {
@@ -154,7 +154,7 @@ describe('linktool core test auth', () => {
         );
 
         expect(testAuth).toHaveBeenCalledTimes(1);
-        const saved = JSON.parse(fs.readFileSync(path.join(cwd, '.syntool', 'connection.json'), 'utf8'));
+        const saved = JSON.parse(fs.readFileSync(path.join(cwd, '.linktool', 'connection.json'), 'utf8'));
         expect(saved.authData).toEqual({ app_id: 'my_app', app_secret: 'my_secret' });
         expect(saved.name).toBe('Form Connection');
     });

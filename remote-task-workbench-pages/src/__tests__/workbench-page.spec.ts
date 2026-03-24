@@ -80,10 +80,10 @@ describe('team connector workbench pages', () => {
     await flushPromises()
 
     const hint = wrapper.get('[data-test-id="team-connectors.cli-hint.panel"]').text()
-    expect(hint).toContain('syntool login --login-url')
+    expect(hint).toContain('linktool login --login-url')
     expect(hint).toContain('/team/team_1/linktool-login')
-    expect(hint).toContain('syntool build')
-    expect(hint).toContain('syntool deploy')
+    expect(hint).toContain('linktool build')
+    expect(hint).toContain('linktool deploy')
     expect(hint).not.toContain('--payload')
   })
 })

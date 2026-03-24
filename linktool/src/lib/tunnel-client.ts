@@ -97,7 +97,7 @@ export class TunnelClient extends EventEmitter {
 
         const currentCreds = this.credsMgr.loadCredentials();
         if (!currentCreds?.token) {
-            throw new Error('Not logged in. Please run "syntool login" first.');
+            throw new Error('Not logged in. Please run "linktool login" first.');
         }
 
         // Check if token needs refresh
@@ -107,7 +107,7 @@ export class TunnelClient extends EventEmitter {
 
         // Token is expired, refresh it
         if (!currentCreds.refreshToken) {
-            console.error(chalk.red('Token expired and no refresh token available. Please login again: syntool login'));
+            console.error(chalk.red('Token expired and no refresh token available. Please login again: linktool login'));
             return null;
         }
 
@@ -118,7 +118,7 @@ export class TunnelClient extends EventEmitter {
             const refreshed = await refreshAccessToken(currentCreds.refreshToken!, this.host);
 
             if (!refreshed) {
-                console.error(chalk.red('Failed to refresh token. Please login again: syntool login'));
+                console.error(chalk.red('Failed to refresh token. Please login again: linktool login'));
                 this.isRefreshing = false;
                 this.refreshPromise = null;
                 return null;
@@ -157,7 +157,7 @@ export class TunnelClient extends EventEmitter {
                 // Ensure token is fresh
                 const freshCreds = await this.ensureFreshToken();
                 if (!freshCreds?.token) {
-                    throw new Error('Not logged in. Please run "syntool login" first.');
+                    throw new Error('Not logged in. Please run "linktool login" first.');
                 }
 
                 const protocol = host.startsWith('localhost') || host.includes('127.0.0.1') ? 'http' : 'https';
@@ -219,7 +219,7 @@ export class TunnelClient extends EventEmitter {
         // Ensure token is fresh before connecting
         const freshCreds = await this.ensureFreshToken();
         if (!freshCreds?.token) {
-            throw new Error('Not logged in. Please run "syntool login" first.');
+            throw new Error('Not logged in. Please run "linktool login" first.');
         }
         
         // 如果 host 包含协议则使用，否则默认

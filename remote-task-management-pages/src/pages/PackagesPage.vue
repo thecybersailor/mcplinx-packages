@@ -36,15 +36,15 @@ const loginUrl = computed(() => {
 })
 
 const loginCommand = computed(() => {
-  return `syntool login --login-url ${loginUrl.value || '<login-url>'}`
+  return `linktool login --login-url ${loginUrl.value || '<login-url>'}`
 })
 
 const publishCommand = computed(() => {
-  return `syntool publish --payload '{\"name\":\"your_connector\"}'`
+  return `linktool publish --payload '{\"name\":\"your_connector\"}'`
 })
 
 const deployCommand = computed(() => {
-  return `syntool deploy --payload '{\"name\":\"your_connector\",\"version\":\"latest\"}'`
+  return `linktool deploy --payload '{\"name\":\"your_connector\",\"version\":\"latest\"}'`
 })
 
 async function load() {
@@ -101,7 +101,7 @@ onMounted(load)
       <div class="space-y-1">
         <h2 class="text-base font-semibold text-white">CLI Quickstart</h2>
         <p class="text-sm leading-6 text-slate-300">
-          Start by logging <code class="rounded border border-white/10 bg-black/30 px-1.5 py-0.5 text-[13px] text-white">syntool</code> into the current
+          Start by logging <code class="rounded border border-white/10 bg-black/30 px-1.5 py-0.5 text-[13px] text-white">linktool</code> into the current
           <span class="font-medium text-cyan-100">{{ runtime.scope }}</span> scope. After that, publish and deploy commands reuse the stored profile automatically.
         </p>
       </div>

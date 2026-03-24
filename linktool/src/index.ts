@@ -25,7 +25,7 @@ const pkg = {
 const program = new Command();
 
 program
-    .name('syntool')
+    .name('linktool')
     .description(pkg.description)
     .version(pkg.version);
 
@@ -80,11 +80,11 @@ program.configureHelp({
 
         // Help Commands
         output += 'Help Commands:\n';
-        output += '  help get-docs              Download and extract connector documentation to .syntool/docs/\n';
-        output += '  help get-examples          Download and extract connector examples to .syntool/examples/\n\n';
+        output += '  help get-docs              Download and extract connector documentation to .linktool/docs/\n';
+        output += '  help get-examples          Download and extract connector examples to .linktool/examples/\n\n';
 
         // Footer
-        output += 'Run \'syntool <command> --help\' for more information on a command.\n';
+        output += 'Run \'linktool <command> --help\' for more information on a command.\n';
 
         return output;
     }

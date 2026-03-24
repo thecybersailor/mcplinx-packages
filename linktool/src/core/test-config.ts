@@ -35,7 +35,7 @@ export async function runTestConfig(
 
     const authData = storage.loadAuth() || {};
     if (!storage.hasAuth() && connector.authentication) {
-        logger.warn?.(chalk.yellow('⚠ No auth found. Run `npx syntool auth` first.\n'));
+        logger.warn?.(chalk.yellow('⚠ No auth found. Run `npx linktool auth` first.\n'));
     }
 
     const config: Record<string, unknown> = {};
@@ -55,7 +55,7 @@ export async function runTestConfig(
     logger.log('');
     logger.log(chalk.green(`✓ Configuration saved to ${configPath}`));
     logger.log(chalk.gray('\nYou can now run:'));
-    logger.log(chalk.cyan(`  npx syntool run ${toolKey}`));
+    logger.log(chalk.cyan(`  npx linktool run ${toolKey}`));
 }
 
 async function promptField(

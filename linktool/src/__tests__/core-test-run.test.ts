@@ -20,19 +20,19 @@ describe('linktool core test run runner', () => {
 
     beforeEach(() => {
         cwd = createTempDir('linktool-core-run-');
-        fs.mkdirSync(path.join(cwd, '.syntool'), { recursive: true });
+        fs.mkdirSync(path.join(cwd, '.linktool'), { recursive: true });
         fs.writeFileSync(
             path.join(cwd, 'package.json'),
             JSON.stringify({ name: 'connector-example', version: '1.0.0' }),
             'utf8',
         );
         fs.writeFileSync(
-            path.join(cwd, '.syntool', 'config.json'),
+            path.join(cwd, '.linktool', 'config.json'),
             JSON.stringify({ search: { query: 'from-config' } }),
             'utf8',
         );
         fs.writeFileSync(
-            path.join(cwd, '.syntool', 'connection.json'),
+            path.join(cwd, '.linktool', 'connection.json'),
             JSON.stringify({ name: 'conn', authData: { api_key: 'auth_1' } }),
             'utf8',
         );
@@ -64,7 +64,7 @@ describe('linktool core test run runner', () => {
         const out = await runTestRun(
             createLinktoolCoreContext({
                 cwd,
-                projectDataDirName: '.syntool',
+                projectDataDirName: '.linktool',
                 logger: {
                     log: vi.fn(),
                     error: vi.fn(),
@@ -102,7 +102,7 @@ describe('linktool core test run runner', () => {
             close: vi.fn(),
             setRequestHandler(handler: (payload: any) => Promise<unknown>) {
                 void handler({
-                    url: 'https://tun.dev.autostaff.cn/opaque/connector-example/webhook',
+                    url: 'https://tun.dev.example.com/opaque/connector-example/webhook',
                     method: 'POST',
                     headers: { 'content-type': 'application/json' },
                     body: JSON.stringify({ taskId: 'task_1', output: { ok: true }, status: 'completed' }),
@@ -125,13 +125,13 @@ describe('linktool core test run runner', () => {
         });
 
         const out = await runAsyncTestRun(
-            createLinktoolCoreContext({ cwd, projectDataDirName: '.syntool' }),
+            createLinktoolCoreContext({ cwd, projectDataDirName: '.linktool' }),
             'async_with_webhook',
             {},
             {
                 createTunnelSession: async () => ({
                     tunnel,
-                    webhookUrl: 'https://tun.dev.autostaff.cn/opaque/connector-example/webhook',
+                    webhookUrl: 'https://tun.dev.example.com/opaque/connector-example/webhook',
                 }),
             },
         );
@@ -173,7 +173,7 @@ describe('linktool core test run runner', () => {
         const delay = vi.fn(async () => {});
 
         const out = await runAsyncTestRun(
-            createLinktoolCoreContext({ cwd, projectDataDirName: '.syntool' }),
+            createLinktoolCoreContext({ cwd, projectDataDirName: '.linktool' }),
             'async_polling',
             {
                 pollIntervalMs: 1000,
@@ -219,7 +219,7 @@ describe('linktool core test run runner', () => {
         });
 
         const out = await runTestRun(
-            createLinktoolCoreContext({ cwd, projectDataDirName: '.syntool' }),
+            createLinktoolCoreContext({ cwd, projectDataDirName: '.linktool' }),
             'async_polling',
             {
                 pollIntervalMs: 1,

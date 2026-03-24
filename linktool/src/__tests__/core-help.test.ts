@@ -19,9 +19,9 @@ describe('linktool core help runners', () => {
     it('preserves injected project data dir in help context', () => {
         const ctx = createHelpCommandContext({
             cwd: '/tmp/project',
-            projectDataDirName: '.syntool',
+            projectDataDirName: '.linktool',
         });
 
-        expect(ctx.projectDataDirName).toBe('.syntool');
+        expect(ctx.projectDataDirName).toBe('.linktool');
     });
 });

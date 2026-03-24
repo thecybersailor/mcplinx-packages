@@ -27,15 +27,15 @@ const loginUrl = computed(() => {
 })
 
 const loginCommand = computed(() => {
-  return `syntool login --login-url ${loginUrl.value || '<login-url>'}`
+  return `linktool login --login-url ${loginUrl.value || '<login-url>'}`
 })
 
 const buildCommand = computed(() => {
-  return 'syntool build'
+  return 'linktool build'
 })
 
 const deployCommand = computed(() => {
-  return 'syntool deploy'
+  return 'linktool deploy'
 })
 
 async function load() {
@@ -145,7 +145,7 @@ onMounted(load)
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div class="space-y-1">
             <h2 class="text-base font-semibold text-foreground">{{ runtime.t('teamConnectors.cli.title', 'CLI Hint') }}</h2>
-            <p class="text-sm text-muted-foreground">{{ runtime.t('teamConnectors.cli.description', 'Only login needs an explicit URL. After that, syntool reuses the stored profile for build and deploy.') }}</p>
+            <p class="text-sm text-muted-foreground">{{ runtime.t('teamConnectors.cli.description', 'Only login needs an explicit URL. After that, linktool reuses the stored profile for build and deploy.') }}</p>
           </div>
           <button
             data-test-id="team-connectors.cli-hint.toggle"

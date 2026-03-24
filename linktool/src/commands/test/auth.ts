@@ -77,12 +77,12 @@ function resolveDefaultAuthContext(): {
   const credsManager = new CredentialsManager();
   const creds = credsManager.loadCredentials();
   if (!creds?.token) {
-    throw new Error('Not logged in. Please run "syntool login" first.');
+    throw new Error('Not logged in. Please run "linktool login" first.');
   }
 
   const userHashId = getUserHashIdFromToken(creds.token);
   if (!userHashId) {
-    throw new Error('User hashid not found in token. Please run "syntool login" again.');
+    throw new Error('User hashid not found in token. Please run "linktool login" again.');
   }
 
   return {

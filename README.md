@@ -5,7 +5,7 @@ This repository contains the current contents of `mcplinx/packages` as a standal
 Mount points:
 
 - `mcplinx` mounts this repository at `packages/`
-- `botworks` mounts this repository at `mcplinx-packages/`
+- other consumers may mount this repository at a project-specific path
 
 Bootstrap:
 

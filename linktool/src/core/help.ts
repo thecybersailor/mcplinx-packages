@@ -17,7 +17,7 @@ export type HelpCommandContext = {
     logger?: Pick<typeof console, 'log' | 'error'>;
 };
 
-const DEFAULT_PROJECT_DATA_DIR = '.syntool';
+const DEFAULT_PROJECT_DATA_DIR = '.linktool';
 
 export function createHelpCommandContext(input: HelpCommandContext): HelpCommandContext {
     return {
@@ -30,7 +30,7 @@ export async function getDocsCommandRunner(ctx: HelpCommandContext): Promise<voi
     await runDownloadAndExtract({
         ...ctx,
         archiveUrl: DOCS_URL,
-        outputDir: '.syntool/docs',
+        outputDir: '.linktool/docs',
         tempZipName: 'docs-temp.zip',
         tempExtractDirName: 'docs-temp-extract',
         title: 'documentation',
@@ -43,7 +43,7 @@ export async function getExamplesCommandRunner(ctx: HelpCommandContext): Promise
     await runDownloadAndExtract({
         ...ctx,
         archiveUrl: EXAMPLES_URL,
-        outputDir: '.syntool/examples',
+        outputDir: '.linktool/examples',
         tempZipName: 'examples-temp.zip',
         tempExtractDirName: 'examples-temp-extract',
         title: 'examples',

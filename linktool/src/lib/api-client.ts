@@ -62,7 +62,7 @@ export function createDeveloperApiClient() {
     let creds = credsMgr.loadCredentials();
 
     if (!creds?.token) {
-        console.error(chalk.red('Not logged in. Please run: syntool login'));
+        console.error(chalk.red('Not logged in. Please run: linktool login'));
         process.exit(1);
     }
 
@@ -97,7 +97,7 @@ export function createDeveloperApiClient() {
 
         // Token is expired, refresh it
         if (!currentCreds.refreshToken) {
-            console.error(chalk.red('Token expired and no refresh token available. Please login again: syntool login'));
+            console.error(chalk.red('Token expired and no refresh token available. Please login again: linktool login'));
             return null;
         }
 
@@ -108,7 +108,7 @@ export function createDeveloperApiClient() {
             const refreshed = await refreshAccessToken(currentCreds.refreshToken!, host);
 
             if (!refreshed) {
-                console.error(chalk.red('Failed to refresh token. Please login again: syntool login'));
+                console.error(chalk.red('Failed to refresh token. Please login again: linktool login'));
                 isRefreshing = false;
                 refreshPromise = null;
                 return null;

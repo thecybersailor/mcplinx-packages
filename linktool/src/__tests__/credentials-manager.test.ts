@@ -18,13 +18,14 @@ describe('credentials manager', () => {
         }
     });
 
-    it('stores credentials inside injected home data dir instead of ~/.linktool', () => {
+    it('stores credentials inside the injected home data dir', () => {
         const homeDir = createTempDir('linktool-creds-home-');
         tempDirs.push(homeDir);
+        const dataDirName = '.custom-linktool-home';
 
         const manager = new CredentialsManager({
             homeDir,
-            dataDirName: '.syntool',
+            dataDirName,
         });
 
         manager.saveCredentials({
@@ -32,7 +33,6 @@ describe('credentials manager', () => {
             email: 'demo@example.com',
         });
 
-        expect(fs.existsSync(path.join(homeDir, '.syntool', 'credentials.json'))).toBe(true);
-        expect(fs.existsSync(path.join(homeDir, '.linktool', 'credentials.json'))).toBe(false);
+        expect(fs.existsSync(path.join(homeDir, dataDirName, 'credentials.json'))).toBe(true);
     });
 });

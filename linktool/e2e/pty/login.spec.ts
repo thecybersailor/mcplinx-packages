@@ -64,7 +64,7 @@ d('linktool login/whoami/logout (pty)', () => {
     await p.waitFor(/Email/i, 30_000)
     p.write('dev@example.com\r')
     await p.waitFor(/Logged in successfully/i, 30_000)
-    expect(fs.existsSync(path.join(linktoolHome, '.syntool', 'credentials.json'))).toBe(true)
+    expect(fs.existsSync(path.join(linktoolHome, '.linktool', 'credentials.json'))).toBe(true)
     expect(fs.existsSync(path.join(linktoolHome, '.linktool', 'credentials.json'))).toBe(false)
 
     const who = spawnPty('/usr/bin/env', ['npx', 'tsx', repoLayout.linktoolEntrypoint, 'whoami'], {

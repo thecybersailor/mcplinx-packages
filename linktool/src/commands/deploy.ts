@@ -54,7 +54,7 @@ export function deployCommand() {
             } else {
                 // --publish-only: Validate that build artifacts exist
                 if (!existsSync(manifestPath) || !existsSync(bundlePath)) {
-                    console.error(chalk.red('Error: Build artifacts not found. Please run \"syntool build\" first.'));
+                    console.error(chalk.red('Error: Build artifacts not found. Please run \"linktool build\" first.'));
                     process.exit(1);
                 }
             }
@@ -136,7 +136,7 @@ export function deployCommand() {
                         (deployResult.available_instances || []).forEach((inst: any, idx: number) => {
                             console.log(chalk.gray(`   ${idx + 1}. ${inst.name} (${inst.id}) - ${inst.visibility} - version ${inst.version}`));
                         });
-                        console.log(chalk.yellow('\n   Run: syntool deploy --instance <instance-id>'));
+                        console.log(chalk.yellow('\n   Run: linktool deploy --instance <instance-id>'));
                         process.exit(0);
                     }
 
@@ -151,7 +151,7 @@ export function deployCommand() {
                     if (error instanceof ApiError) {
                         console.error(chalk.red('API Error:'), error.message);
                         if (error.statusCode === 401) {
-                            console.error(chalk.yellow('Your session may have expired. Please run: syntool login'));
+                            console.error(chalk.yellow('Your session may have expired. Please run: linktool login'));
                         }
                     } else {
                         console.error(chalk.red('Deploy failed:'), error.message);
@@ -166,7 +166,7 @@ async function runBuild(cwd: string): Promise<void> {
     return new Promise((resolve, reject) => {
         // Import build command and execute it programmatically
         // Since build is a command, we'll spawn it as a subprocess
-        const buildProcess = spawn('npx', ['syntool', 'build'], {
+        const buildProcess = spawn('npx', ['linktool', 'build'], {
             cwd,
             stdio: 'inherit',
             shell: true

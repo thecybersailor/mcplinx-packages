@@ -79,8 +79,8 @@ describe('TunnelClient', () => {
     it('supports injected credentials and opaque tunnel session body', async () => {
         const fetchMock = vi.fn(async (_url: any, init: any) => {
             const headers = (init?.headers ?? {}) as Record<string, string>;
-            expect(headers.Authorization).toBe('Bearer bw-token');
-            expect(headers['X-MCPLINX-APP-ID']).toBe('botworks');
+            expect(headers.Authorization).toBe('Bearer sample-token');
+            expect(headers['X-MCPLINX-APP-ID']).toBe('sample-app');
             expect(init?.body).toBe(
                 JSON.stringify({
                     packageName: 'pkg',
@@ -89,7 +89,7 @@ describe('TunnelClient', () => {
                     teamId: 'team_1',
                 }),
             );
-            return new Response(JSON.stringify({ sessionId: 'sid-bw-1' }), {
+            return new Response(JSON.stringify({ sessionId: 'sid-app-1' }), {
                 status: 200,
                 headers: { 'Content-Type': 'application/json' },
             });
@@ -97,7 +97,7 @@ describe('TunnelClient', () => {
         vi.stubGlobal('fetch', fetchMock);
 
         const c = new TunnelClient({
-            host: 'tun.dev.autostaff.cn',
+            host: 'tun.dev.example.com',
             packageName: 'pkg',
             sessionBody: {
                 tunnelPrefix: 'opaque-prefix',
@@ -105,9 +105,9 @@ describe('TunnelClient', () => {
                 teamId: 'team_1',
             },
             credentialsProvider: async () => ({
-                token: 'bw-token',
+                token: 'sample-token',
                 email: 'bw@example.com',
-                appId: 'botworks',
+                appId: 'sample-app',
             }),
         });
 
@@ -117,11 +117,11 @@ describe('TunnelClient', () => {
         expect((globalThis as any).WebSocket?.last ?? null).toBeNull();
         const wsModule = await import('ws');
         expect((wsModule.default as any).last).toMatchObject({
-            url: 'wss://tun.dev.autostaff.cn/_ws?session=sid-bw-1&token=bw-token',
+            url: 'wss://tun.dev.example.com/_ws?session=sid-app-1&token=sample-token',
             options: {
                 headers: {
-                    Authorization: 'Bearer bw-token',
-                    'X-MCPLINX-APP-ID': 'botworks',
+                    Authorization: 'Bearer sample-token',
+                    'X-MCPLINX-APP-ID': 'sample-app',
                 },
             },
         });
@@ -129,13 +129,13 @@ describe('TunnelClient', () => {
 
     it('accepts devkit-tun event payloads and rebuilds callback url with query', async () => {
         const c = new TunnelClient({
-            host: 'tun.dev.autostaff.cn',
+            host: 'tun.dev.example.com',
             packageName: 'pkg',
-            sessionId: 'sid-bw-2',
+            sessionId: 'sid-app-2',
             credentialsProvider: async () => ({
-                token: 'bw-token',
+                token: 'sample-token',
                 email: 'bw@example.com',
-                appId: 'botworks',
+                appId: 'sample-app',
             }),
         });
         const handler = vi.fn(async () => null);
@@ -149,7 +149,7 @@ describe('TunnelClient', () => {
             Buffer.from(
                 JSON.stringify({
                     eventType: 'callback',
-                    sessionId: 'sid-bw-2',
+                    sessionId: 'sid-app-2',
                     scopeKind: 'team',
                     request: {
                         method: 'GET',
@@ -169,7 +169,7 @@ describe('TunnelClient', () => {
             expect.objectContaining({
                 method: 'GET',
                 path: '/opaque-prefix/pkg/callback',
-                url: 'https://tun.dev.autostaff.cn/opaque-prefix/pkg/callback?code=abc123&state=xyz',
+                url: 'https://tun.dev.example.com/opaque-prefix/pkg/callback?code=abc123&state=xyz',
             }),
         );
     });
@@ -186,12 +186,12 @@ describe('TunnelClient', () => {
         vi.stubGlobal('fetch', fetchMock);
 
         const c = new TunnelClient({
-            host: 'tun.dev.autostaff.cn',
+            host: 'tun.dev.example.com',
             packageName: 'pkg',
             credentialsProvider: async () => ({
-                token: 'bw-token',
+                token: 'sample-token',
                 email: 'bw@example.com',
-                appId: 'botworks',
+                appId: 'sample-app',
             }),
         });
 
@@ -206,11 +206,11 @@ describe('TunnelClient', () => {
 
         expect(fetchMock).toHaveBeenCalledTimes(1);
         expect((wsModule.default as any).last).toMatchObject({
-            url: 'wss://tun.dev.autostaff.cn/_ws?session=sid-reconnect-1&token=bw-token',
+            url: 'wss://tun.dev.example.com/_ws?session=sid-reconnect-1&token=sample-token',
             options: {
                 headers: {
-                    Authorization: 'Bearer bw-token',
-                    'X-MCPLINX-APP-ID': 'botworks',
+                    Authorization: 'Bearer sample-token',
+                    'X-MCPLINX-APP-ID': 'sample-app',
                 },
             },
         });

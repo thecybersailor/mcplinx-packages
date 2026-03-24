@@ -55099,7 +55099,7 @@ __name(createApi, "createApi");
 var import_fs = require("fs");
 var import_path = require("path");
 var import_os = require("os");
-var DEFAULT_HOME_DATA_DIR = ".syntool";
+var DEFAULT_HOME_DATA_DIR = ".linktool";
 var CREDS_FILE = "credentials.json";
 var CredentialsManager = class {
   static {
@@ -57615,7 +57615,7 @@ function loginCommand() {
       });
       console.log(source_default.green(`
 \u2713 Logged in successfully as ${email}!`));
-      console.log(source_default.gray(`\u2713 Token saved to ~/.syntool/credentials.json`));
+      console.log(source_default.gray(`\u2713 Token saved to ~/.linktool/credentials.json`));
       return;
     }
     const { default: open } = await import("open");
@@ -57624,7 +57624,7 @@ function loginCommand() {
         baseUrl: host
       });
       const session = await authApi.auth.sessionsCreate({
-        client_name: "syntool",
+        client_name: "linktool",
         client_version: "0.1.0"
       });
       const sessionId = session.session_id;
@@ -57702,7 +57702,7 @@ function loginCommand() {
             });
             console.log(source_default.green(`
 \u2713 Logged in successfully as ${data.user_email}!`));
-            console.log(source_default.gray(`\u2713 Token saved to ~/.syntool/credentials.json`));
+            console.log(source_default.gray(`\u2713 Token saved to ~/.linktool/credentials.json`));
             return;
           } else if (data.status === "expired") {
             console.error(source_default.red("\nLogin session expired. Please try again."));
@@ -63456,7 +63456,7 @@ function createDeveloperApiClient() {
   const credsMgr = new CredentialsManager();
   let creds = credsMgr.loadCredentials();
   if (!creds?.token) {
-    console.error(source_default.red("Not logged in. Please run: syntool login"));
+    console.error(source_default.red("Not logged in. Please run: linktool login"));
     process.exit(1);
   }
   const host = creds.host || "https://api.mcplinx.com";
@@ -63477,7 +63477,7 @@ function createDeveloperApiClient() {
       return currentCreds;
     }
     if (!currentCreds.refreshToken) {
-      console.error(source_default.red("Token expired and no refresh token available. Please login again: syntool login"));
+      console.error(source_default.red("Token expired and no refresh token available. Please login again: linktool login"));
       return null;
     }
     console.log(source_default.yellow("Token expired, refreshing..."));
@@ -63485,7 +63485,7 @@ function createDeveloperApiClient() {
     refreshPromise = (async () => {
       const refreshed = await refreshAccessToken(currentCreds.refreshToken, host);
       if (!refreshed) {
-        console.error(source_default.red("Failed to refresh token. Please login again: syntool login"));
+        console.error(source_default.red("Failed to refresh token. Please login again: linktool login"));
         isRefreshing = false;
         refreshPromise = null;
         return null;
@@ -63587,7 +63587,7 @@ function deployCommand() {
       }
     } else {
       if (!(0, import_fs7.existsSync)(manifestPath) || !(0, import_fs7.existsSync)(bundlePath)) {
-        console.error(source_default.red('Error: Build artifacts not found. Please run "syntool build" first.'));
+        console.error(source_default.red('Error: Build artifacts not found. Please run "linktool build" first.'));
         process.exit(1);
       }
     }
@@ -63648,7 +63648,7 @@ function deployCommand() {
           (deployResult.available_instances || []).forEach((inst, idx) => {
             console.log(source_default.gray(`   ${idx + 1}. ${inst.name} (${inst.id}) - ${inst.visibility} - version ${inst.version}`));
           });
-          console.log(source_default.yellow("\n   Run: syntool deploy --instance <instance-id>"));
+          console.log(source_default.yellow("\n   Run: linktool deploy --instance <instance-id>"));
           process.exit(0);
         }
         console.log(source_default.green("\n\u2705 Deployment successful!"));
@@ -63661,7 +63661,7 @@ function deployCommand() {
         if (error instanceof ApiError2) {
           console.error(source_default.red("API Error:"), error.message);
           if (error.statusCode === 401) {
-            console.error(source_default.yellow("Your session may have expired. Please run: syntool login"));
+            console.error(source_default.yellow("Your session may have expired. Please run: linktool login"));
           }
         } else {
           console.error(source_default.red("Deploy failed:"), error.message);
@@ -63674,7 +63674,7 @@ function deployCommand() {
 __name(deployCommand, "deployCommand");
 async function runBuild2(cwd) {
   return new Promise((resolve2, reject) => {
-    const buildProcess = (0, import_child_process2.spawn)("npx", ["syntool", "build"], {
+    const buildProcess = (0, import_child_process2.spawn)("npx", ["linktool", "build"], {
       cwd,
       stdio: "inherit",
       shell: true
@@ -63757,7 +63757,7 @@ __name(createMockCtx, "createMockCtx");
 // src/lib/storage.ts
 var import_fs9 = require("fs");
 var import_path8 = require("path");
-var DEFAULT_PROJECT_DATA_DIR = ".syntool";
+var DEFAULT_PROJECT_DATA_DIR = ".linktool";
 var CONNECTION_FILE = "connection.json";
 var CONFIG_FILE = "config.json";
 var LinktoolStorage = class {
@@ -63848,12 +63848,12 @@ async function runTestRun(ctx, toolKey, options = {}, deps = {}) {
   logger.log(`\u{1F50C} Tool: ${tool.name} (${toolKey})`);
   const authData = storage.loadAuth() || {};
   if (!storage.hasAuth() && connector.authentication) {
-    logger.warn?.("\u26A0 No auth found. Run `npx syntool auth` first.");
+    logger.warn?.("\u26A0 No auth found. Run `npx linktool auth` first.");
   }
   let inputData = {};
   const savedConfig = storage.loadToolConfig(toolKey);
   if (savedConfig) {
-    logger.log("Loading config from .syntool/config.json");
+    logger.log("Loading config from .linktool/config.json");
     inputData = savedConfig;
   }
   if (options.params && Object.keys(options.params).length > 0) {
@@ -64137,13 +64137,13 @@ var TunnelClient = class extends import_events10.default {
     }
     const currentCreds = this.credsMgr.loadCredentials();
     if (!currentCreds?.token) {
-      throw new Error('Not logged in. Please run "syntool login" first.');
+      throw new Error('Not logged in. Please run "linktool login" first.');
     }
     if (!isTokenExpired2(currentCreds.token)) {
       return currentCreds;
     }
     if (!currentCreds.refreshToken) {
-      console.error(source_default.red("Token expired and no refresh token available. Please login again: syntool login"));
+      console.error(source_default.red("Token expired and no refresh token available. Please login again: linktool login"));
       return null;
     }
     console.log(source_default.yellow("Token expired, refreshing..."));
@@ -64151,7 +64151,7 @@ var TunnelClient = class extends import_events10.default {
     this.refreshPromise = (async () => {
       const refreshed = await refreshAccessToken2(currentCreds.refreshToken, this.host);
       if (!refreshed) {
-        console.error(source_default.red("Failed to refresh token. Please login again: syntool login"));
+        console.error(source_default.red("Failed to refresh token. Please login again: linktool login"));
         this.isRefreshing = false;
         this.refreshPromise = null;
         return null;
@@ -64179,7 +64179,7 @@ var TunnelClient = class extends import_events10.default {
       try {
         const freshCreds2 = await this.ensureFreshToken();
         if (!freshCreds2?.token) {
-          throw new Error('Not logged in. Please run "syntool login" first.');
+          throw new Error('Not logged in. Please run "linktool login" first.');
         }
         const protocol = host.startsWith("localhost") || host.includes("127.0.0.1") ? "http" : "https";
         const sessionUrl = `${protocol}://${host}/_session?package=${encodeURIComponent(packageName)}`;
@@ -64231,7 +64231,7 @@ var TunnelClient = class extends import_events10.default {
     }
     const freshCreds = await this.ensureFreshToken();
     if (!freshCreds?.token) {
-      throw new Error('Not logged in. Please run "syntool login" first.');
+      throw new Error('Not logged in. Please run "linktool login" first.');
     }
     let url2;
     if (host.includes("://")) {
@@ -64404,7 +64404,7 @@ async function createDefaultTunnelSession(packageName) {
   const credsManager = new CredentialsManager();
   const creds = credsManager.loadCredentials();
   if (!creds?.token) {
-    throw new Error('Not logged in. Please run "syntool login" first.');
+    throw new Error('Not logged in. Please run "linktool login" first.');
   }
   const userHashId = getUserHashIdFromToken(creds.token);
   if (!userHashId) {
@@ -64452,7 +64452,7 @@ async function runTestConfig(ctx, toolKey, deps = {}) {
   logger.log("");
   const authData = storage.loadAuth() || {};
   if (!storage.hasAuth() && connector.authentication) {
-    logger.warn?.(source_default.yellow("\u26A0 No auth found. Run `npx syntool auth` first.\n"));
+    logger.warn?.(source_default.yellow("\u26A0 No auth found. Run `npx linktool auth` first.\n"));
   }
   const config = {};
   for (const field of tool.inputFields || []) {
@@ -64469,7 +64469,7 @@ async function runTestConfig(ctx, toolKey, deps = {}) {
   logger.log("");
   logger.log(source_default.green(`\u2713 Configuration saved to ${configPath}`));
   logger.log(source_default.gray("\nYou can now run:"));
-  logger.log(source_default.cyan(`  npx syntool run ${toolKey}`));
+  logger.log(source_default.cyan(`  npx linktool run ${toolKey}`));
 }
 __name(runTestConfig, "runTestConfig");
 async function promptField(field, currentConfig, context) {
@@ -64851,11 +64851,11 @@ function resolveDefaultAuthContext() {
   const credsManager = new CredentialsManager();
   const creds = credsManager.loadCredentials();
   if (!creds?.token) {
-    throw new Error('Not logged in. Please run "syntool login" first.');
+    throw new Error('Not logged in. Please run "linktool login" first.');
   }
   const userHashId = getUserHashIdFromToken(creds.token);
   if (!userHashId) {
-    throw new Error('User hashid not found in token. Please run "syntool login" again.');
+    throw new Error('User hashid not found in token. Please run "linktool login" again.');
   }
   return {
     userHashId,
@@ -64908,8 +64908,8 @@ function listCommand() {
       const connectors = await api.developer.registryConnectorsList();
       if (connectors.length === 0) {
         console.log(source_default.yellow("\nNo connectors found. Publish your first connector with:"));
-        console.log(source_default.gray("  syntool build"));
-        console.log(source_default.gray("  syntool remote publish"));
+        console.log(source_default.gray("  linktool build"));
+        console.log(source_default.gray("  linktool remote publish"));
         process.exit(0);
       }
       console.log(source_default.green(`
@@ -64926,7 +64926,7 @@ function listCommand() {
         }
         console.log("");
       }
-      console.log(source_default.gray(`Run 'syntool remote info <pkg-id>' for more details.`));
+      console.log(source_default.gray(`Run 'linktool remote info <pkg-id>' for more details.`));
     } catch (error) {
       if (error instanceof ApiError2) {
         console.error(source_default.red("API Error:"), error.message);
@@ -64936,7 +64936,7 @@ function listCommand() {
           traceId: error.traceId
         }, null, 2));
         if (error.statusCode === 401) {
-          console.error(source_default.yellow("Your session may have expired. Please run: syntool login"));
+          console.error(source_default.yellow("Your session may have expired. Please run: linktool login"));
         }
       } else {
         console.error(source_default.red("Failed to list connectors:"), error.message);
@@ -64988,14 +64988,14 @@ function infoCommand() {
         console.log(source_default.yellow("\n  No versions found."));
       }
       console.log(source_default.gray(`
-Run 'syntool remote use ${pkgId} <version>' to change active version.`));
+Run 'linktool remote use ${pkgId} <version>' to change active version.`));
     } catch (error) {
       if (error instanceof ApiError2) {
         console.error(source_default.red("API Error:"), error.message);
         if (error.statusCode === 404) {
           console.error(source_default.yellow(`Connector '${pkgId}' not found or you don't have access to it.`));
         } else if (error.statusCode === 401) {
-          console.error(source_default.yellow("Your session may have expired. Please run: syntool login"));
+          console.error(source_default.yellow("Your session may have expired. Please run: linktool login"));
         }
       } else {
         console.error(source_default.red("Failed to fetch package info:"), error.message);
@@ -65031,7 +65031,7 @@ function useCommand() {
         if (error.statusCode === 404) {
           console.error(source_default.yellow(`Connector '${pkgId}' or version '${version}' not found.`));
         } else if (error.statusCode === 401) {
-          console.error(source_default.yellow("Your session may have expired. Please run: syntool login"));
+          console.error(source_default.yellow("Your session may have expired. Please run: linktool login"));
         }
       } else {
         console.error(source_default.red("Failed to set active version:"), error.message);
@@ -65071,7 +65071,7 @@ function deleteCommand() {
         if (error.statusCode === 404) {
           console.error(source_default.yellow(`Connector or version not found.`));
         } else if (error.statusCode === 401) {
-          console.error(source_default.yellow("Your session may have expired. Please run: syntool login"));
+          console.error(source_default.yellow("Your session may have expired. Please run: linktool login"));
         }
       } else {
         console.error(source_default.red("Failed to delete:"), error.message);
@@ -65116,7 +65116,7 @@ var import_util3 = require("util");
 var execAsync = (0, import_util3.promisify)(import_child_process3.exec);
 var DOCS_URL = "https://github.com/thecybersailor/remote-connector-docs/archive/refs/heads/main.zip";
 var EXAMPLES_URL = "https://github.com/thecybersailor/remote-connector-examples/archive/refs/heads/main.zip";
-var DEFAULT_PROJECT_DATA_DIR2 = ".syntool";
+var DEFAULT_PROJECT_DATA_DIR2 = ".linktool";
 function createHelpCommandContext(input) {
   return {
     logger: console,
@@ -65128,7 +65128,7 @@ async function getDocsCommandRunner(ctx) {
   await runDownloadAndExtract({
     ...ctx,
     archiveUrl: DOCS_URL,
-    outputDir: ".syntool/docs",
+    outputDir: ".linktool/docs",
     tempZipName: "docs-temp.zip",
     tempExtractDirName: "docs-temp-extract",
     title: "documentation",
@@ -65141,7 +65141,7 @@ async function getExamplesCommandRunner(ctx) {
   await runDownloadAndExtract({
     ...ctx,
     archiveUrl: EXAMPLES_URL,
-    outputDir: ".syntool/examples",
+    outputDir: ".linktool/examples",
     tempZipName: "examples-temp.zip",
     tempExtractDirName: "examples-temp-extract",
     title: "examples",
@@ -65286,7 +65286,7 @@ var pkg = {
   name: "@mcplinx/linktool"
 };
 var program2 = new Command();
-program2.name("syntool").description(pkg.description).version(pkg.version);
+program2.name("linktool").description(pkg.description).version(pkg.version);
 program2.configureHelp({
   formatHelp: /* @__PURE__ */ __name((cmd, helper) => {
     const termWidth = helper.padWidth(cmd, helper);
@@ -65324,9 +65324,9 @@ program2.configureHelp({
     output += "  remote use <pkg-id> <ver>  Set active version for a package\n";
     output += "  remote delete <pkg-id>     Delete a connector package or version\n\n";
     output += "Help Commands:\n";
-    output += "  help get-docs              Download and extract connector documentation to .syntool/docs/\n";
-    output += "  help get-examples          Download and extract connector examples to .syntool/examples/\n\n";
-    output += "Run 'syntool <command> --help' for more information on a command.\n";
+    output += "  help get-docs              Download and extract connector documentation to .linktool/docs/\n";
+    output += "  help get-examples          Download and extract connector examples to .linktool/examples/\n\n";
+    output += "Run 'linktool <command> --help' for more information on a command.\n";
     return output;
   }, "formatHelp")
 });

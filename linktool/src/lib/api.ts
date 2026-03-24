@@ -11,7 +11,7 @@ export class ApiClient {
         const creds = credsMgr.loadCredentials();
 
         if (!creds || !creds.token) {
-            console.error(chalk.red('Error: Not logged in. Please run "syntool login" first.'));
+            console.error(chalk.red('Error: Not logged in. Please run "linktool login" first.'));
             process.exit(1);
         }
 
