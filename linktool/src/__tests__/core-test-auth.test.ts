@@ -94,6 +94,7 @@ describe('linktool core test auth', () => {
         });
 
         const stdout = vi.fn();
+        const openBrowser = vi.fn(async () => undefined);
 
         await runInteractiveTestAuth(
             createLinktoolCoreContext({ cwd, projectDataDirName: '.linktool' }),
@@ -110,11 +111,13 @@ describe('linktool core test auth', () => {
                     tunnel,
                     callbackUrl: 'https://tun.dev.example.com/opaque/connector-example/callback',
                 }),
+                openBrowser,
                 writeStdout: stdout,
             },
         );
 
         expect(tunnel.connect).toHaveBeenCalledTimes(1);
+        expect(openBrowser).toHaveBeenCalledWith('https://mock.dev.mcplinx.com/oauth2/authorize?client_id=demo');
         expect(getAccessToken).toHaveBeenCalledTimes(1);
         expect(testAuth).toHaveBeenCalledTimes(1);
         const saved = JSON.parse(fs.readFileSync(path.join(cwd, '.linktool', 'connection.json'), 'utf8'));

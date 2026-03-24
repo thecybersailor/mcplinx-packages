@@ -96,6 +96,7 @@ type InteractiveAuthDeps = {
     }>;
     promptInput?: (label: string) => Promise<string>;
     writeStdout?: (value: string) => void;
+    openBrowser?: (url: string) => Promise<unknown>;
 };
 
 export async function runInteractiveTestAuth(
@@ -180,7 +181,13 @@ async function handleOAuth2Interactive(
 
     const authUrl = await buildOAuthAuthorizeUrl(ctx, oauth2Auth, callbackUrl);
     (deps.writeStdout ?? process.stdout.write.bind(process.stdout))(`${authUrl}\n`);
+    await (deps.openBrowser ?? openBrowserUrl)(authUrl);
     await done;
+}
+
+async function openBrowserUrl(url: string): Promise<void> {
+    const { default: open } = await import('open');
+    await open(url);
 }
 
 async function handleFormInteractive(
