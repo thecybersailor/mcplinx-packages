@@ -16,6 +16,7 @@ export type {
 } from './facade'
 export {
   defaultTranslate,
+  remoteTaskManagementRuntimeKey,
   useRemoteTaskManagementRuntime,
 } from './facade'
 export { default as PackagesPage } from './pages/PackagesPage.vue'

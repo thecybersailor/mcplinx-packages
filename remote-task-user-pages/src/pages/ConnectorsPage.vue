@@ -46,8 +46,8 @@ onMounted(load)
 <template>
   <BundlePage
     data-test-id="remote-task-user.connectors.page"
-    :title="runtime.t('remoteTaskUser.connectors.title', 'Connectors')"
-    description="Single-source connector catalog pages from mcplinx."
+    :title="runtime.t('remoteTaskUser.connectors.title', 'Available Connectors')"
+    description="Browse available connectors and start the authorization flow."
   >
     <template #actions>
       <button
@@ -103,7 +103,7 @@ onMounted(load)
               class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
               @click="goToDetail(connector.id)"
             >
-              {{ runtime.t('remoteTaskUser.connectors.detail', 'Details') }}
+              {{ runtime.t('remoteTaskUser.connectors.detail', 'View Details') }}
             </button>
           </div>
         </div>

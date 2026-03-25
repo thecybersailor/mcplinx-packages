@@ -8,9 +8,14 @@ import type {
   VoVoUserConnectorListResponse,
 } from '@mcplinx/api-client-user'
 
-export type RemoteTaskUserConnector = VoVoConnectorResponse
+export type RemoteTaskUserConnector = VoVoConnectorResponse & {
+  tools?: Array<Record<string, unknown>>
+}
 export type RemoteTaskUserConnectorListResponse = VoVoUserConnectorListResponse
-export type RemoteTaskUserConnection = VoVoConnection
+export type RemoteTaskUserConnection = VoVoConnection & {
+  tools?: Array<Record<string, unknown>>
+  url?: string
+}
 export type RemoteTaskUserConnectionListResponse = VoVoConnectionListResponse
 export type RemoteTaskExecution = {
   id?: string

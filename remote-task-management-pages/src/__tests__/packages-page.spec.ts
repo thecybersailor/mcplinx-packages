@@ -17,7 +17,9 @@ function createFacade(): RemoteTaskManagementFacade {
     listPackageVersions: vi.fn(async () => []),
     listPackageInstances: vi.fn(async () => []),
     listInstances: vi.fn(async () => []),
+    createInstance: vi.fn(async () => ({ id: 9 })),
     getInstance: vi.fn(async () => ({ id: 1 })),
+    updateInstance: vi.fn(async () => ({ id: 1 })),
     reviewInstance: vi.fn(async () => ({})),
     createUploadUrls: vi.fn(async () => ({ upload_urls: {} })),
     publish: vi.fn(async () => ({})),
@@ -87,17 +89,17 @@ async function mountAt(path: string, scope: RemoteTaskManagementScope) {
 }
 
 describe('PackagesPage', () => {
-  it('keeps the packages entry focused on filters and table structure from checklist', async () => {
+  it('restores the historical my connector packages shell and table structure', async () => {
     const { wrapper } = await mountAt('/team/team_1/connectors/packages', 'team')
 
-    expect(wrapper.text()).toContain('Connector Packages')
+    expect(wrapper.text()).toContain('My Connector Packages')
+    expect(wrapper.text()).toContain('Getting Started')
     expect(wrapper.text()).toContain('Application')
-    expect(wrapper.text()).toContain('Author')
     expect(wrapper.text()).toContain('Version')
     expect(wrapper.text()).toContain('Tools')
-    expect(wrapper.find('[data-test-id="remote-task-management.packages.cli-hint"]').exists()).toBe(false)
+    expect(wrapper.text()).toContain('Last Updated')
+    expect(wrapper.find('[data-test-id="remote-task-management.packages.cli-hint"]').exists()).toBe(true)
     const actionTexts = wrapper.findAll('button').map((node) => node.text())
-    expect(actionTexts).not.toContain('CLI Hint')
     expect(actionTexts).not.toContain('Publish')
     expect(actionTexts).not.toContain('Deploy')
     expect(actionTexts).not.toContain('Config')

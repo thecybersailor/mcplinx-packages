@@ -16,6 +16,7 @@ function createFacade(): RemoteTaskManagementFacade {
     listPackageVersions: vi.fn(async () => []),
     listPackageInstances: vi.fn(async () => []),
     listInstances: vi.fn(async () => []),
+    createInstance: vi.fn(async () => ({ id: 9 })),
     getInstance: vi.fn(async () => ({
       id: 7,
       name: 'Tenant Slack',
@@ -24,6 +25,7 @@ function createFacade(): RemoteTaskManagementFacade {
       activeVersion: '1.2.3',
       pkgID: 'pkg_1',
     })),
+    updateInstance: vi.fn(async () => ({ id: 7 })),
     reviewInstance: vi.fn(async () => ({})),
     createUploadUrls: vi.fn(async () => ({ upload_urls: {} })),
     publish: vi.fn(async () => ({})),

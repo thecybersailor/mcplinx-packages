@@ -54,15 +54,15 @@ onMounted(load)
 <template>
   <BundlePage
     data-test-id="remote-task-user.connections.page"
-    :title="runtime.t('remoteTaskUser.connections.title', 'Connections')"
-    description="Use the same connector management surface across team, tenant, and platform hosts."
+    :title="runtime.t('remoteTaskUser.connections.title', 'My Connections')"
+    description="Manage the app connections available to this team."
   >
     <template #actions>
       <button class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100" @click="load">
         {{ runtime.t('remoteTaskUser.common.retry', 'Retry') }}
       </button>
-      <button class="inline-flex items-center justify-center rounded-xl bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800" @click="router.push({ name: nameOf('connectors') })">
-        Browse
+      <button data-test-id="remote-task-user.connections.connect-app" class="inline-flex items-center justify-center rounded-xl bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800" @click="router.push({ name: nameOf('connectors') })">
+        {{ runtime.t('remoteTaskUser.connections.connectApp', 'Connect App') }}
       </button>
     </template>
 
@@ -78,18 +78,28 @@ onMounted(load)
       :action-label="runtime.t('remoteTaskUser.common.retry', 'Retry')"
       @action="load"
     />
-    <BundleState
-      v-else-if="!connections?.length"
-      variant="empty"
-      :message="runtime.t('remoteTaskUser.connections.empty', 'No connections yet.')"
-    />
+    <div v-else-if="!connections?.length" class="space-y-3">
+      <BundleState
+        variant="empty"
+        :message="runtime.t('remoteTaskUser.connections.empty', `You haven't connected any apps yet.`)"
+      />
+      <button
+        data-test-id="remote-task-user.connections.connect-first"
+        class="inline-flex items-center justify-center rounded-xl bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+        @click="router.push({ name: nameOf('connectors') })"
+      >
+        {{ runtime.t('remoteTaskUser.connections.connectFirst', 'Connect Your First App') }}
+      </button>
+    </div>
     <div v-else class="overflow-hidden rounded-2xl border border-slate-200">
       <table data-test-id="remote-task-user.connections.table" class="min-w-full bg-white">
         <thead class="bg-slate-50 text-left text-sm text-slate-500">
           <tr>
-            <th class="px-4 py-3 font-medium">Name</th>
+            <th class="px-4 py-3 font-medium">Connector</th>
+            <th class="px-4 py-3 font-medium">Label</th>
+            <th class="px-4 py-3 font-medium">Scopes</th>
             <th class="px-4 py-3 font-medium">Status</th>
-            <th class="px-4 py-3 font-medium">Updated</th>
+            <th class="px-4 py-3 font-medium">Created</th>
             <th class="px-4 py-3 font-medium">Actions</th>
           </tr>
         </thead>
@@ -101,8 +111,10 @@ onMounted(load)
             class="border-t border-slate-200"
           >
             <td class="px-4 py-4 font-medium text-slate-950">{{ connection.package?.name || connection.connector_id || connection.id }}</td>
+            <td class="px-4 py-4 text-slate-600">{{ connection.label || '-' }}</td>
+            <td class="px-4 py-4 text-slate-600">{{ connection.auth_scopes?.join(', ') || '-' }}</td>
             <td class="px-4 py-4 text-slate-600">{{ connection.status || '-' }}</td>
-            <td class="px-4 py-4 text-slate-600">{{ connection.updated_at || '-' }}</td>
+            <td class="px-4 py-4 text-slate-600">{{ connection.created_at || '-' }}</td>
             <td class="px-4 py-4">
               <div class="flex flex-wrap gap-2">
                 <button class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100" @click="detail(connection.id)">Details</button>

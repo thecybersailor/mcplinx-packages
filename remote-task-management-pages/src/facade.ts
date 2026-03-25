@@ -13,9 +13,32 @@ import type {
   DeveloperUploadURLResponse,
 } from '@mcplinx/api-client-developer'
 
-export type RemoteTaskManagementPackage = VoAdminConnectorPkgResponse
-export type RemoteTaskManagementPackageVersion = VoAdminConnectorPkgVersionResponse
-export type RemoteTaskManagementInstance = VoAdminConnectorInstanceResponse
+export type RemoteTaskManagementPackage = VoAdminConnectorPkgResponse & {
+  package_description?: string
+  source_id?: string
+  totalInstances?: number
+  activeInstances?: number
+  publicInstances?: number
+  pendingReviews?: number
+}
+export type RemoteTaskManagementPackageVersion = VoAdminConnectorPkgVersionResponse & {
+  toolCount?: number
+  createdAt?: string
+}
+export type RemoteTaskManagementInstance = VoAdminConnectorInstanceResponse & {
+  instance_description?: string
+  pkgName?: string
+  ownerName?: string
+  ownerId?: string | number
+  ownerID?: string | number
+  pkgID?: string | number
+  description?: string
+  updatedAt?: string
+  oauthCallbackURL?: string
+  envConfig?: Record<string, unknown>
+  secretConfig?: Record<string, boolean>
+  versions?: RemoteTaskManagementPackageVersion[]
+}
 export type RemoteTaskManagementConfigRecord = {
   id?: string
   name?: string
@@ -27,6 +50,14 @@ export type RemoteTaskManagementConfigRecord = {
   secret_config?: Record<string, boolean>
 }
 export type RemoteTaskManagementReviewRequest = AdminReviewInstanceRequest
+export interface RemoteTaskManagementCreateInstanceRequest {
+  pkg_id: string
+  name: string
+  active_version: string
+  description?: string
+  visibility?: string
+  env_config?: Record<string, unknown>
+}
 export type RemoteTaskManagementUploadURLRequest = DeveloperUploadURLRequest
 export type RemoteTaskManagementUploadURLResponse = DeveloperUploadURLResponse
 export type RemoteTaskManagementPublishRequest = DeveloperPublishRequest
@@ -46,7 +77,9 @@ export interface RemoteTaskManagementFacade {
   listPackageVersions(pkgId: string): Promise<RemoteTaskManagementPackageVersion[]>
   listPackageInstances(pkgId: string): Promise<RemoteTaskManagementInstance[]>
   listInstances(query?: { status?: string }): Promise<RemoteTaskManagementInstance[]>
+  createInstance?: (request: RemoteTaskManagementCreateInstanceRequest) => Promise<RemoteTaskManagementInstance>
   getInstance(instanceId: string): Promise<RemoteTaskManagementInstance>
+  updateInstance?: (instanceId: string, request: RemoteTaskManagementCreateInstanceRequest) => Promise<RemoteTaskManagementInstance>
   reviewInstance?: (instanceId: string, request: RemoteTaskManagementReviewRequest) => Promise<Record<string, unknown>>
   createUploadUrls(request: RemoteTaskManagementUploadURLRequest): Promise<RemoteTaskManagementUploadURLResponse>
   publish(request: RemoteTaskManagementPublishRequest): Promise<Record<string, unknown>>
