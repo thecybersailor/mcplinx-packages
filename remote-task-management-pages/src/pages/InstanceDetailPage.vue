@@ -82,6 +82,11 @@ async function saveConfig() {
         .filter((item) => item.key.trim())
         .map((item) => [item.key.trim(), item.value]),
     )
+    const secretConfig = Object.fromEntries(
+      secretVars.value
+        .filter((item) => item.key.trim() && item.value)
+        .map((item) => [item.key.trim(), item.value]),
+    )
     await runtime.facade.updateInstance(String(instance.value.id), {
       pkg_id: String(instance.value.pkgID || ''),
       name: instance.value.name || '',
@@ -89,6 +94,7 @@ async function saveConfig() {
       description: instance.value.description || undefined,
       visibility: instance.value.visibility || undefined,
       env_config: envConfig,
+      secret_config: secretConfig,
     })
     await load()
   } finally {

@@ -24,6 +24,8 @@ function createFacade(): RemoteTaskManagementFacade {
       visibility: 'tenant',
       activeVersion: '1.2.3',
       pkgID: 'pkg_1',
+      envConfig: { CLIENT_ID: 'initial-client' },
+      secretConfig: { CLIENT_SECRET: true },
     })),
     updateInstance: vi.fn(async () => ({ id: 7 })),
     reviewInstance: vi.fn(async () => ({})),
@@ -86,5 +88,58 @@ describe('InstanceDetailPage', () => {
     expect(wrapper.text()).toContain('Variables')
     expect(wrapper.text()).toContain('Secrets')
     expect(wrapper.text()).toContain('Version History')
+  })
+
+  it('saves env_config and secret_config as separate fields', async () => {
+    const facade = createFacade()
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        {
+          path: '/instances/:instanceId',
+          component: RuntimeProvider,
+          props: { facade },
+          children: [{ path: '', component: InstanceDetailPage }],
+        },
+      ],
+    })
+
+    await router.push('/instances/inst_7')
+    await router.isReady()
+
+    const wrapper = mount(defineComponent(() => () => h(RouterView)), {
+      global: {
+        plugins: [router],
+      },
+    })
+
+    await flushPromises()
+
+    const inputs = wrapper.findAll('input')
+    expect(inputs.length).toBeGreaterThanOrEqual(4)
+
+    await inputs[0]!.setValue('CLIENT_ID')
+    await inputs[1]!.setValue('updated-client')
+    await inputs[2]!.setValue('CLIENT_SECRET')
+    await inputs[3]!.setValue('updated-secret')
+
+    const saveButton = wrapper.findAll('button').find((button) => button.text().includes('Save Changes'))
+    expect(saveButton).toBeTruthy()
+    await saveButton!.trigger('click')
+    await flushPromises()
+
+    expect(facade.updateInstance).toHaveBeenCalledWith('7', {
+      pkg_id: 'pkg_1',
+      name: 'Tenant Slack',
+      active_version: '1.2.3',
+      description: undefined,
+      visibility: 'tenant',
+      env_config: {
+        CLIENT_ID: 'updated-client',
+      },
+      secret_config: {
+        CLIENT_SECRET: 'updated-secret',
+      },
+    })
   })
 })

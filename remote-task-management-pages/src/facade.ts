@@ -57,6 +57,7 @@ export interface RemoteTaskManagementCreateInstanceRequest {
   description?: string
   visibility?: string
   env_config?: Record<string, unknown>
+  secret_config?: Record<string, unknown>
 }
 export type RemoteTaskManagementUploadURLRequest = DeveloperUploadURLRequest
 export type RemoteTaskManagementUploadURLResponse = DeveloperUploadURLResponse
