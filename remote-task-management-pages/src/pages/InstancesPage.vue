@@ -118,7 +118,7 @@ onMounted(load)
               <div class="font-medium text-white">{{ instance.name || instance.id }}</div>
               <div class="text-sm leading-6 text-slate-400">{{ instance.instance_description || '-' }}</div>
             </td>
-            <td class="px-4 py-4 text-slate-300">{{ instance.pkgName || instance.pkgID || '-' }}</td>
+            <td class="px-4 py-4 text-slate-300">{{ instance.pkgName || instance.pkg_id || '-' }}</td>
             <td class="px-4 py-4 text-slate-300">{{ ownerLabelOf(instance) }}</td>
             <td class="px-4 py-4 text-slate-300">{{ instance.visibility || '-' }}</td>
             <td class="px-4 py-4">

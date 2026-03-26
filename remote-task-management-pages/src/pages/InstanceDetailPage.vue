@@ -88,7 +88,7 @@ async function saveConfig() {
         .map((item) => [item.key.trim(), item.value]),
     )
     await runtime.facade.updateInstance(String(instance.value.id), {
-      pkg_id: String(instance.value.pkgID || ''),
+      pkg_id: String(instance.value.pkg_id || ''),
       name: instance.value.name || '',
       active_version: instance.value.activeVersion || '',
       description: instance.value.description || undefined,

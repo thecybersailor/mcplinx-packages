@@ -28,10 +28,10 @@ export type RemoteTaskManagementPackageVersion = VoAdminConnectorPkgVersionRespo
 export type RemoteTaskManagementInstance = VoAdminConnectorInstanceResponse & {
   instance_description?: string
   pkgName?: string
+  pkg_id?: string
   ownerName?: string
   ownerId?: string | number
   ownerID?: string | number
-  pkgID?: string | number
   description?: string
   updatedAt?: string
   oauthCallbackURL?: string
