@@ -100,4 +100,37 @@ describe('DashboardPage', () => {
     await flushPromises()
     expect(router.currentRoute.value.name).toBe('connectors-shared-connections-connections')
   })
+
+  it('renders dashboard surfaces through shared card primitives', async () => {
+    const facade = createFacade()
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        {
+          path: '/connectors',
+          component: RuntimeProvider,
+          props: { facade, scope: 'tenant' },
+          children: [
+            { path: '', component: DashboardPage },
+            { path: 'packages', name: 'connectors-packages', component: defineComponent(() => () => h('div', 'packages')) },
+            { path: 'shared-connections/connections', name: 'connectors-shared-connections-connections', component: defineComponent(() => () => h('div', 'connections')) },
+          ],
+        },
+      ],
+    })
+
+    await router.push('/connectors')
+    await router.isReady()
+
+    const wrapper = mount(defineComponent(() => () => h(RouterView)), {
+      global: {
+        plugins: [router],
+      },
+    })
+
+    await flushPromises()
+
+    expect(wrapper.get('[data-test-id="remote-task-management.dashboard.page"]').attributes()['data-slot']).toBe('card')
+    expect(wrapper.findAll('[data-slot="card"]').length).toBeGreaterThanOrEqual(3)
+  })
 })

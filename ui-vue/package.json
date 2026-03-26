@@ -1,5 +1,5 @@
 {
-  "name": "@mcplinx/remote-task-shared-connection-pages",
+  "name": "@mcplinx/ui-vue",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -15,11 +15,7 @@
     "build": "vue-tsc --noEmit -p tsconfig.json",
     "test": "vitest run src/__tests__/*.spec.ts --environment jsdom"
   },
-  "dependencies": {
-    "@mcplinx/ui-vue": "*"
-  },
   "peerDependencies": {
-    "vue": "^3.5.22",
-    "vue-router": "^4.6.3 || ^5.0.0"
+    "vue": "^3.5.22"
   }
 }

@@ -1,6 +1,23 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import {
+  Button,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  Textarea,
+} from '@mcplinx/ui-vue'
 import BundlePage from '../components/BundlePage.vue'
 import BundlePanel from '../components/BundlePanel.vue'
 import BundleState from '../components/BundleState.vue'
@@ -127,14 +144,14 @@ onMounted(load)
                 <h2 class="text-base font-semibold text-white">Deployment</h2>
                 <p class="mt-1 text-sm text-slate-400">Create and manage deployable instances for this connector package.</p>
               </div>
-              <button
+              <Button
                 v-if="runtime.facade.createInstance"
                 data-test-id="remote-task-management.package-detail.create-instance"
-                class="inline-flex items-center justify-center rounded-xl border border-white/12 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-white/20 hover:bg-white/[0.08]"
+                variant="outline"
                 @click="openCreateInstanceDrawer"
               >
                 + Create Instance
-              </button>
+              </Button>
             </div>
 
             <div v-if="instances.length" class="space-y-3">
@@ -257,65 +274,107 @@ onMounted(load)
         </div>
       </div>
 
-      <div
-        v-if="showCreateInstanceDrawer"
-        class="fixed inset-0 z-50 flex justify-end bg-slate-950/70 backdrop-blur-sm"
-        @click.self="showCreateInstanceDrawer = false"
-      >
-        <div class="h-full w-full max-w-xl overflow-y-auto border-l border-white/10 bg-slate-950 px-6 py-6 text-slate-100 shadow-2xl">
-          <div class="mb-6 flex items-center justify-between">
-            <div>
-              <h2 class="text-xl font-semibold text-white">Create New Instance</h2>
-              <p class="mt-1 text-sm text-slate-400">Create a deployable connector instance from this package.</p>
-            </div>
-            <button class="rounded-xl border border-white/12 px-3 py-2 text-sm text-slate-300 transition hover:border-white/20 hover:bg-white/[0.04]" @click="showCreateInstanceDrawer = false">Close</button>
-          </div>
+      <Sheet :open="showCreateInstanceDrawer" @update:open="showCreateInstanceDrawer = $event">
+        <SheetContent
+          side="right"
+          data-test-id="remote-task-management.package-detail.create-instance.sheet"
+          class="h-full w-full max-w-xl overflow-y-auto border-white/10 bg-slate-950 px-6 py-6 text-slate-100 sm:max-w-xl"
+        >
+          <SheetHeader class="mb-2 px-0 pr-10">
+            <SheetTitle class="text-xl text-white">Create New Instance</SheetTitle>
+            <SheetDescription class="mt-1 text-slate-400">
+              Create a deployable connector instance from this package.
+            </SheetDescription>
+          </SheetHeader>
 
           <div class="space-y-4">
-            <label class="grid gap-2">
-              <span class="text-sm font-medium text-slate-200">Name</span>
-              <input v-model="newInstanceForm.name" data-test-id="remote-task-management.package-detail.create-instance.name" class="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-slate-100 outline-none" placeholder="My Connector Instance" />
-            </label>
+            <div class="grid gap-2">
+              <Label for="create-instance-name" class="font-medium text-slate-200">Name</Label>
+              <Input
+                id="create-instance-name"
+                v-model="newInstanceForm.name"
+                data-test-id="remote-task-management.package-detail.create-instance.name"
+                class="border-white/10 bg-white/[0.03] text-slate-100"
+                placeholder="My Connector Instance"
+              />
+            </div>
 
-            <label class="grid gap-2">
-              <span class="text-sm font-medium text-slate-200">Description</span>
-              <textarea v-model="newInstanceForm.description" data-test-id="remote-task-management.package-detail.create-instance.description" class="min-h-24 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-slate-100 outline-none" placeholder="Description for this instance" />
-            </label>
+            <div class="grid gap-2">
+              <Label for="create-instance-description" class="font-medium text-slate-200">Description</Label>
+              <Textarea
+                id="create-instance-description"
+                v-model="newInstanceForm.description"
+                data-test-id="remote-task-management.package-detail.create-instance.description"
+                class="min-h-24 border-white/10 bg-white/[0.03] text-slate-100"
+                placeholder="Description for this instance"
+              />
+            </div>
 
-            <label class="grid gap-2">
-              <span class="text-sm font-medium text-slate-200">Version</span>
-              <select v-model="newInstanceForm.version" data-test-id="remote-task-management.package-detail.create-instance.version" class="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-slate-100 outline-none">
-                <option class="bg-slate-950 text-slate-100" value="">Select a version</option>
-                <option v-for="version in versions" :key="version.version" class="bg-slate-950 text-slate-100" :value="version.version">
-                  {{ version.version }}
-                </option>
-              </select>
-            </label>
+            <div class="grid gap-2">
+              <Label for="create-instance-version" class="font-medium text-slate-200">Version</Label>
+              <Select v-model="newInstanceForm.version">
+                <SelectTrigger
+                  id="create-instance-version"
+                  data-test-id="remote-task-management.package-detail.create-instance.version.trigger"
+                  class="w-full border-white/10 bg-white/[0.03] text-slate-100"
+                >
+                  <SelectValue placeholder="Select a version" />
+                </SelectTrigger>
+                <SelectContent class="border-white/10 bg-slate-950 text-slate-100">
+                  <SelectItem
+                    v-for="version in versions"
+                    :key="String(version.version || '')"
+                    :value="String(version.version || '')"
+                    :data-test-id="`remote-task-management.package-detail.create-instance.version.option.${String(version.version || '')}`"
+                  >
+                    {{ version.version }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-            <label class="grid gap-2">
-              <span class="text-sm font-medium text-slate-200">Visibility</span>
-              <select v-model="newInstanceForm.visibility" data-test-id="remote-task-management.package-detail.create-instance.visibility" class="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-slate-100 outline-none">
-                <option class="bg-slate-950 text-slate-100" value="private">Private</option>
-                <option class="bg-slate-950 text-slate-100" value="public">Public</option>
-              </select>
-            </label>
+            <div class="grid gap-2">
+              <Label for="create-instance-visibility" class="font-medium text-slate-200">Visibility</Label>
+              <Select v-model="newInstanceForm.visibility">
+                <SelectTrigger
+                  id="create-instance-visibility"
+                  data-test-id="remote-task-management.package-detail.create-instance.visibility.trigger"
+                  class="w-full border-white/10 bg-white/[0.03] text-slate-100"
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent class="border-white/10 bg-slate-950 text-slate-100">
+                  <SelectItem
+                    value="private"
+                    data-test-id="remote-task-management.package-detail.create-instance.visibility.option.private"
+                  >
+                    Private
+                  </SelectItem>
+                  <SelectItem
+                    value="public"
+                    data-test-id="remote-task-management.package-detail.create-instance.visibility.option.public"
+                  >
+                    Public
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
             <p v-if="createInstanceError" class="rounded-xl border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">{{ createInstanceError }}</p>
           </div>
 
-          <div class="mt-6 flex items-center gap-3">
-            <button
+          <SheetFooter class="mt-6 flex-row items-center justify-start px-0">
+            <Button
               data-test-id="remote-task-management.package-detail.create-instance.submit"
-              class="inline-flex items-center justify-center rounded-xl bg-white px-4 py-2 text-sm font-medium text-slate-950 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
               :disabled="creatingInstance || !newInstanceForm.version"
               @click="createInstance"
             >
               {{ creatingInstance ? 'Creating...' : 'Create Instance' }}
-            </button>
-            <button class="inline-flex items-center justify-center rounded-xl border border-white/12 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-white/20 hover:bg-white/[0.08]" @click="showCreateInstanceDrawer = false">Cancel</button>
-          </div>
-        </div>
-      </div>
+            </Button>
+            <Button variant="outline" @click="showCreateInstanceDrawer = false">Cancel</Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </div>
   </BundlePage>
 </template>

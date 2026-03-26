@@ -17,7 +17,8 @@
   },
   "dependencies": {
     "@mcplinx/api-client-admin": "*",
-    "@mcplinx/api-client-developer": "*"
+    "@mcplinx/api-client-developer": "*",
+    "@mcplinx/ui-vue": "*"
   },
   "peerDependencies": {
     "vue": "^3.5.22",

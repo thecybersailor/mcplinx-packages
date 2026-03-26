@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Badge, Button, Card, CardContent } from '@mcplinx/ui-vue'
+
 const props = defineProps<{
   variant: 'loading' | 'error' | 'empty'
   message: string
@@ -20,24 +22,39 @@ function paletteOf(variant: typeof props.variant) {
       return 'border-white/10 bg-white/[0.03] text-slate-300'
   }
 }
+
+function badgeVariantOf(variant: typeof props.variant) {
+  switch (variant) {
+    case 'error':
+      return 'destructive'
+    case 'empty':
+      return 'outline'
+    default:
+      return 'secondary'
+  }
+}
 </script>
 
 <template>
-  <div
+  <Card
     :data-test-id="dataTestId"
-    class="rounded-2xl border px-5 py-6 text-sm"
+    class="rounded-2xl text-sm"
     :class="paletteOf(variant)"
   >
-    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-      <p class="leading-6">{{ message }}</p>
-      <button
+    <CardContent class="flex flex-col gap-3 px-5 py-6 md:flex-row md:items-center md:justify-between">
+      <div class="space-y-3">
+        <Badge :variant="badgeVariantOf(variant)" class="uppercase tracking-wide">
+          {{ variant }}
+        </Badge>
+        <p class="leading-6">{{ message }}</p>
+      </div>
+      <Button
         v-if="actionLabel"
-        type="button"
-        class="inline-flex items-center justify-center rounded-xl border border-white/12 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-white/20 hover:bg-white/[0.08]"
+        variant="outline"
         @click="emit('action')"
       >
         {{ actionLabel }}
-      </button>
-    </div>
-  </div>
+      </Button>
+    </CardContent>
+  </Card>
 </template>

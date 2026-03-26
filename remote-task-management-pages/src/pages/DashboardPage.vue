@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { Button } from '@mcplinx/ui-vue'
 import BundlePage from '../components/BundlePage.vue'
+import BundlePanel from '../components/BundlePanel.vue'
 import BundleState from '../components/BundleState.vue'
 import { useRemoteTaskManagementRuntime } from '../facade'
 
@@ -58,21 +60,22 @@ onMounted(load)
     <BundleState v-else-if="error" variant="error" :message="error" action-label="Refresh" @action="load" />
 
     <div v-else class="space-y-4">
-      <section class="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+      <BundlePanel>
         <h2 class="text-lg font-semibold text-white">Connections</h2>
         <p class="mt-2 text-sm leading-6 text-slate-400">
           Open the shared connection task surface without leaving the connector domain.
         </p>
-        <button
+        <Button
           data-test-id="remote-task-management.dashboard.open-connections"
-          class="mt-5 inline-flex items-center justify-center rounded-xl border border-white/12 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-white/20 hover:bg-white/[0.08]"
+          variant="outline"
+          class="mt-5"
           @click="openConnections"
         >
           Open Connections
-        </button>
-      </section>
+        </Button>
+      </BundlePanel>
 
-      <section class="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+      <BundlePanel>
         <h2 class="text-lg font-semibold text-white">Connectors</h2>
         <p class="mt-2 text-sm leading-6 text-slate-400">
           Review connector packages and moderate instances inside the same connector domain.
@@ -81,13 +84,14 @@ onMounted(load)
           Packages: <span class="font-medium text-white">{{ packageCount }}</span><br>
           Pending Review: <span class="font-medium text-white">{{ pendingReviewCount }}</span>
         </div>
-        <button
+        <Button
           data-test-id="remote-task-management.dashboard.open-connectors"
-          class="mt-5 inline-flex items-center justify-center rounded-xl border border-white/12 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-white/20 hover:bg-white/[0.08]"
+          variant="outline"
+          class="mt-5"
           @click="openConnectors"
         >
           Open Connectors
-        </button>
+        </Button>
         <div class="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4">
           <h3 class="text-sm font-semibold text-white">CLI Hint</h3>
           <p class="mt-2 text-sm leading-6 text-slate-400">
@@ -99,7 +103,7 @@ onMounted(load)
             <pre class="overflow-x-auto rounded-xl border border-white/10 bg-black/30 p-3"><code>{{ deployCommand }}</code></pre>
           </div>
         </div>
-      </section>
+      </BundlePanel>
     </div>
   </BundlePage>
 </template>

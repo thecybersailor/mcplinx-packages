@@ -205,12 +205,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Label } from '@mcplinx/ui-vue'
 import { useRemoteTaskSharedConnectionRuntime, type SharedConnectionRecord } from '../facade'
-import { Button } from '../components/ui/button'
-import { Badge } from '../components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
-import { Label } from '../components/ui/label'
-import { ConnectorIcon } from '../components/ui/connector-icon'
+import ConnectorIcon from '../components/ConnectorIcon.vue'
 
 const runtime = useRemoteTaskSharedConnectionRuntime()
 const route = useRoute()

@@ -12,15 +12,6 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "types": ["vitest/globals"]
   },
-  "include": [
-    "src/index.ts",
-    "src/routes.ts",
-    "src/facade.ts",
-    "src/components/BundlePage.vue",
-    "src/components/BundlePanel.vue",
-    "src/components/BundleState.vue",
-    "src/components/ConnectorIcon.vue",
-    "src/pages/**/*.vue"
-  ],
+  "include": ["src/**/*.ts", "src/**/*.vue"],
   "exclude": ["src/**/__tests__/**"]
 }

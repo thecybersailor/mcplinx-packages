@@ -13,6 +13,7 @@
     "create-cybersailor-connector",
     "linktool",
     "remote-skill-hub-public-sdk",
+    "ui-vue",
     "remote-task-management-pages",
     "remote-task-shared-connection-pages",
     "remote-task-user-pages"
@@ -31,5 +32,12 @@
   "scripts": {
     "build": "npm --workspace @mcplinx/linktool run build && npm --workspace @mcplinx/remote-task-user-pages run build && npm --workspace @mcplinx/remote-task-management-pages run build && npm --workspace @mcplinx/remote-task-shared-connection-pages run build",
     "test": "npm --workspace @mcplinx/linktool run test && npm --workspace @mcplinx/remote-task-user-pages run test && npm --workspace @mcplinx/remote-task-management-pages run test && npm --workspace @mcplinx/remote-task-shared-connection-pages run test"
+  },
+  "dependencies": {
+    "@vueuse/core": "^14.2.1",
+    "class-variance-authority": "^0.7.1",
+    "lucide-vue-next": "^1.0.0",
+    "reka-ui": "^2.9.2",
+    "tailwind-merge": "^3.5.0"
   }
 }
