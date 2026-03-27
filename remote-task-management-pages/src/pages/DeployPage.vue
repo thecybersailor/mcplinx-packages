@@ -4,9 +4,10 @@ import { Button, Input, Label } from '@mcplinx/ui-vue'
 import BundlePage from '../components/BundlePage.vue'
 import BundlePanel from '../components/BundlePanel.vue'
 import BundleState from '../components/BundleState.vue'
-import { useRemoteTaskManagementRuntime } from '../facade'
+import { remoteTaskManagementPageTestId, useRemoteTaskManagementRuntime } from '../facade'
 
 const runtime = useRemoteTaskManagementRuntime()
+const pageTestId = remoteTaskManagementPageTestId(runtime, 'deploy')
 const name = ref('')
 const version = ref('')
 const instanceId = ref('')
@@ -33,7 +34,7 @@ async function submit() {
 </script>
 
 <template>
-  <BundlePage data-test-id="remote-task-management.deploy.page" :title="runtime.t('remoteTaskManagement.deploy.title', 'Deploy')" :description="runtime.t('remoteTaskManagement.deploy.description', 'Use the same deployment form across every admin host.')">
+  <BundlePage :data-test-id="pageTestId" :title="runtime.t('remoteTaskManagement.deploy.title', 'Deploy')" :description="runtime.t('remoteTaskManagement.deploy.description', 'Use the same deployment form across every admin host.')">
     <BundlePanel class="space-y-4">
       <Label class="grid gap-2"><span class="text-sm font-medium text-slate-700">{{ runtime.t('remoteTaskManagement.common.packageName', 'Package name') }}</span><Input v-model="name" data-test-id="remote-task-management.deploy.name" class="border border-slate-300 bg-white text-slate-900" /></Label>
       <Label class="grid gap-2"><span class="text-sm font-medium text-slate-700">{{ runtime.t('remoteTaskManagement.common.version', 'Version') }}</span><Input v-model="version" data-test-id="remote-task-management.deploy.version" class="border border-slate-300 bg-white text-slate-900" /></Label>

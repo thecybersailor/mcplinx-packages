@@ -4,9 +4,10 @@ import { Button, Input, Label } from '@mcplinx/ui-vue'
 import BundlePage from '../components/BundlePage.vue'
 import BundlePanel from '../components/BundlePanel.vue'
 import BundleState from '../components/BundleState.vue'
-import { useRemoteTaskManagementRuntime } from '../facade'
+import { remoteTaskManagementPageTestId, useRemoteTaskManagementRuntime } from '../facade'
 
 const runtime = useRemoteTaskManagementRuntime()
+const pageTestId = remoteTaskManagementPageTestId(runtime, 'publish')
 const name = ref('')
 const files = ref('bundle.tgz')
 const loading = ref(false)
@@ -44,7 +45,7 @@ async function publish() {
 </script>
 
 <template>
-  <BundlePage data-test-id="remote-task-management.publish.page" :title="runtime.t('remoteTaskManagement.publish.title', 'Publish')" :description="runtime.t('remoteTaskManagement.publish.description', 'Use one shared publish form across platform and tenant hosts.')">
+  <BundlePage :data-test-id="pageTestId" :title="runtime.t('remoteTaskManagement.publish.title', 'Publish')" :description="runtime.t('remoteTaskManagement.publish.description', 'Use one shared publish form across platform and tenant hosts.')">
     <BundlePanel class="space-y-4">
       <Label class="grid gap-2"><span class="text-sm font-medium text-slate-700">{{ runtime.t('remoteTaskManagement.common.packageName', 'Package name') }}</span><Input v-model="name" data-test-id="remote-task-management.publish.name" class="border border-slate-300 bg-white text-slate-900" /></Label>
       <Label class="grid gap-2"><span class="text-sm font-medium text-slate-700">{{ runtime.t('remoteTaskManagement.publish.files', 'Files') }}</span><Input v-model="files" data-test-id="remote-task-management.publish.files" class="border border-slate-300 bg-white text-slate-900" /></Label>

@@ -4,9 +4,10 @@ import { useRouter } from 'vue-router'
 import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@mcplinx/ui-vue'
 import BundlePage from '../components/BundlePage.vue'
 import BundleState from '../components/BundleState.vue'
-import { useRemoteTaskManagementRuntime } from '../facade'
+import { remoteTaskManagementPageTestId, useRemoteTaskManagementRuntime } from '../facade'
 
 const runtime = useRemoteTaskManagementRuntime()
+const pageTestId = remoteTaskManagementPageTestId(runtime, 'instances')
 const router = useRouter()
 const loading = ref(true)
 const error = ref('')
@@ -65,7 +66,7 @@ onMounted(load)
 </script>
 
 <template>
-  <BundlePage data-test-id="remote-task-management.instances.page" :title="runtime.t('remoteTaskManagement.instances.title', 'Connector Instances')">
+  <BundlePage :data-test-id="pageTestId" :title="runtime.t('remoteTaskManagement.instances.title', 'Connector Instances')">
     <template #actions>
       <Button variant="outline" @click="load">{{ runtime.t('remoteTaskManagement.instances.refresh', 'Refresh') }}</Button>
       <Select v-model="status" @update:modelValue="load">

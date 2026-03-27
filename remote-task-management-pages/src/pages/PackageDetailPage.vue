@@ -160,29 +160,38 @@ onMounted(load)
               </Button>
             </div>
 
-            <div v-if="instances.length" class="space-y-3">
-              <button
+            <div
+              v-if="instances.length"
+              data-test-id="remote-task-management.package-detail.instances"
+              class="space-y-3"
+            >
+              <div
                 v-for="instance in instances"
                 :key="instance.id"
-                type="button"
-                class="w-full rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left transition hover:border-cyan-400/30 hover:bg-white/[0.06]"
-                @click="openInstanceDetail(instance.id)"
+                :data-test-id="`remote-task-management.package-detail.instances.row.${instance.id}`"
               >
-                <div class="mb-2 flex items-start justify-between gap-3">
-                  <div>
-                    <div class="text-sm font-semibold text-white">{{ instance.name || instance.id }}</div>
-                    <div class="mt-1 text-xs text-slate-400">ID: {{ instance.id }}</div>
+                <button
+                  :data-test-id="`remote-task-management.package-detail.instances.row.${instance.id}.detail`"
+                  type="button"
+                  class="w-full rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left transition hover:border-cyan-400/30 hover:bg-white/[0.06]"
+                  @click="openInstanceDetail(instance.id)"
+                >
+                  <div class="mb-2 flex items-start justify-between gap-3">
+                    <div>
+                      <div class="text-sm font-semibold text-white">{{ instance.name || instance.id }}</div>
+                      <div class="mt-1 text-xs text-slate-400">ID: {{ instance.id }}</div>
+                    </div>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                      <span class="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-slate-200">{{ instance.visibility || 'private' }}</span>
+                      <span class="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-slate-200">{{ instance.status || '-' }}</span>
+                    </div>
                   </div>
-                  <div class="flex flex-wrap gap-2 text-xs">
-                    <span class="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-slate-200">{{ instance.visibility || 'private' }}</span>
-                    <span class="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-slate-200">{{ instance.status || '-' }}</span>
+                  <div class="flex items-center justify-between text-sm text-slate-400">
+                    <span>{{ runtime.t('remoteTaskManagement.common.version', 'Version') }}: {{ instance.activeVersion || '-' }}</span>
+                    <span v-if="instance.status === 'pending_review'" class="text-amber-300">{{ runtime.t('remoteTaskManagement.instances.awaitingApproval', 'Awaiting admin approval') }}</span>
                   </div>
-                </div>
-                <div class="flex items-center justify-between text-sm text-slate-400">
-                  <span>{{ runtime.t('remoteTaskManagement.common.version', 'Version') }}: {{ instance.activeVersion || '-' }}</span>
-                  <span v-if="instance.status === 'pending_review'" class="text-amber-300">{{ runtime.t('remoteTaskManagement.instances.awaitingApproval', 'Awaiting admin approval') }}</span>
-                </div>
-              </button>
+                </button>
+              </div>
             </div>
             <div v-else class="rounded-2xl border border-dashed border-white/12 bg-white/[0.02] px-4 py-8 text-center">
               <div class="text-sm font-medium text-white">{{ runtime.t('remoteTaskManagement.packages.noInstances', 'No instances created yet') }}</div>

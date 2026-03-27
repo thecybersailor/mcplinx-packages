@@ -4,7 +4,7 @@ import { Button, Input, Label } from '@mcplinx/ui-vue'
 import BundlePage from '../components/BundlePage.vue'
 import BundlePanel from '../components/BundlePanel.vue'
 import BundleState from '../components/BundleState.vue'
-import { useRemoteTaskManagementRuntime } from '../facade'
+import { remoteTaskManagementPageTestId, useRemoteTaskManagementRuntime } from '../facade'
 
 const runtime = useRemoteTaskManagementRuntime()
 const name = ref('')
@@ -33,7 +33,7 @@ async function submit() {
 </script>
 
 <template>
-  <BundlePage data-test-id="remote-task-management.rollback.page" :title="runtime.t('remoteTaskManagement.rollback.title', 'Rollback')" :description="runtime.t('remoteTaskManagement.rollback.description', 'Rollback keeps the same contract as deploy, but always targets an older version.')">
+  <BundlePage :data-test-id="remoteTaskManagementPageTestId(runtime, 'rollback')" :title="runtime.t('remoteTaskManagement.rollback.title', 'Rollback')" :description="runtime.t('remoteTaskManagement.rollback.description', 'Rollback keeps the same contract as deploy, but always targets an older version.')">
     <BundlePanel class="space-y-4">
       <Label class="grid gap-2"><span class="text-sm font-medium text-slate-700">{{ runtime.t('remoteTaskManagement.common.packageName', 'Package name') }}</span><Input v-model="name" data-test-id="remote-task-management.rollback.name" class="border border-slate-300 bg-white text-slate-900" /></Label>
       <Label class="grid gap-2"><span class="text-sm font-medium text-slate-700">{{ runtime.t('remoteTaskManagement.common.version', 'Version') }}</span><Input v-model="version" data-test-id="remote-task-management.rollback.version" class="border border-slate-300 bg-white text-slate-900" /></Label>

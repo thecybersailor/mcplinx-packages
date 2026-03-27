@@ -4,9 +4,10 @@ import { Button } from '@mcplinx/ui-vue'
 import BundlePage from '../components/BundlePage.vue'
 import BundlePanel from '../components/BundlePanel.vue'
 import BundleState from '../components/BundleState.vue'
-import { useRemoteTaskManagementRuntime } from '../facade'
+import { remoteTaskManagementPageTestId, useRemoteTaskManagementRuntime } from '../facade'
 
 const runtime = useRemoteTaskManagementRuntime()
+const pageTestId = remoteTaskManagementPageTestId(runtime, 'config')
 const loading = ref(true)
 const saving = ref(false)
 const error = ref('')
@@ -54,7 +55,7 @@ onMounted(load)
 </script>
 
 <template>
-  <BundlePage data-test-id="remote-task-management.config.page" :title="runtime.t('remoteTaskManagement.config.title', 'Config')" :description="runtime.t('remoteTaskManagement.config.description', 'Shared connector configuration editor.')">
+  <BundlePage :data-test-id="pageTestId" :title="runtime.t('remoteTaskManagement.config.title', 'Config')" :description="runtime.t('remoteTaskManagement.config.description', 'Shared connector configuration editor.')">
     <template #actions>
       <Button variant="outline" @click="load">{{ runtime.t('remoteTaskManagement.common.refresh', 'Refresh') }}</Button>
     </template>

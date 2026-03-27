@@ -115,12 +115,13 @@ describe('PackagesPage', () => {
     const { wrapper } = await mountAt('/team/team_1/connectors/packages', 'team')
 
     const page = wrapper.get('[data-test-id="remote-task-management.packages.page"]')
-    expect(page.attributes()['data-slot']).toBe('card')
-    expect(page.classes().join(' ')).toContain('bg-transparent')
-    expect(page.classes().join(' ')).toContain('border-transparent')
+    expect(page.exists()).toBe(true)
+    expect(wrapper.find('[data-test-id="remote-task-management.packages.table"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test-id="remote-task-management.packages.cli-hint"]').exists()).toBe(true)
 
     const table = wrapper.get('[data-test-id="remote-task-management.packages.table"]')
-    expect(table.element.closest('[data-slot="card"]')).toBeTruthy()
+    expect(table.text()).toContain('Application')
+    expect(table.text()).toContain('Version')
 
     const row = wrapper.get('[data-test-id="remote-task-management.packages.row.pkg_1"]')
     expect(row.classes().join(' ')).toContain('border-white/10')

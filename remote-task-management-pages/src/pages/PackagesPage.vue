@@ -6,9 +6,10 @@ import BundlePage from '../components/BundlePage.vue'
 import BundlePanel from '../components/BundlePanel.vue'
 import BundleState from '../components/BundleState.vue'
 import ConnectorGettingStarted from '../components/ConnectorGettingStarted.vue'
-import { useRemoteTaskManagementRuntime } from '../facade'
+import { remoteTaskManagementPageTestId, useRemoteTaskManagementRuntime } from '../facade'
 
 const runtime = useRemoteTaskManagementRuntime()
+const pageTestId = remoteTaskManagementPageTestId(runtime, 'packages')
 const router = useRouter()
 const loading = ref(true)
 const error = ref('')
@@ -62,7 +63,7 @@ onMounted(load)
 
 <template>
   <BundlePage
-    data-test-id="remote-task-management.packages.page"
+    :data-test-id="pageTestId"
     :title="runtime.t('remoteTaskManagement.packages.title', 'My Connector Packages')"
     :description="runtime.t('remoteTaskManagement.packages.scope', 'Scope: {scope}', { scope: runtime.scope })"
     borderless

@@ -130,7 +130,10 @@ describe('DashboardPage', () => {
 
     await flushPromises()
 
-    expect(wrapper.get('[data-test-id="remote-task-management.dashboard.page"]').attributes()['data-slot']).toBe('card')
-    expect(wrapper.findAll('[data-slot="card"]').length).toBeGreaterThanOrEqual(3)
+    expect(wrapper.get('[data-test-id="remote-task-management.dashboard.page"]').exists()).toBe(true)
+    expect(wrapper.text()).toContain('Connectors')
+    expect(wrapper.text()).toContain('Connections')
+    expect(wrapper.text()).toContain('CLI Hint')
+    expect(wrapper.findAll('button').length).toBeGreaterThanOrEqual(2)
   })
 })

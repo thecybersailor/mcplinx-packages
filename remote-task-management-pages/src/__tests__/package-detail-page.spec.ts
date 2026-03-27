@@ -195,7 +195,12 @@ describe('PackageDetailPage', () => {
 
     await flushPromises()
 
-    expect(wrapper.get('[data-test-id="remote-task-management.package-detail.page"]').attributes()['data-slot']).toBe('card')
-    expect(wrapper.findAll('[data-slot="card"]').length).toBeGreaterThanOrEqual(5)
+    expect(wrapper.get('[data-test-id="remote-task-management.package-detail.page"]').exists()).toBe(true)
+    expect(wrapper.text()).toContain('Deployment')
+    expect(wrapper.text()).toContain('Basic Info')
+    expect(wrapper.text()).toContain('Package Statistics')
+    expect(wrapper.find('[data-test-id="remote-task-management.package-detail.instances"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test-id="remote-task-management.package-detail.instances.row.7"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test-id="remote-task-management.package-detail.instances.row.7.detail"]').exists()).toBe(true)
   })
 })

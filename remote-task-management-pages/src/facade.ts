@@ -113,3 +113,10 @@ export function useRemoteTaskManagementRuntime(): RemoteTaskManagementRuntime {
   if (!runtime) throw new Error('Remote task management runtime is missing')
   return runtime
 }
+
+export function remoteTaskManagementPageTestId(runtime: RemoteTaskManagementRuntime, page: string): string {
+  if (runtime.scope === 'team') {
+    return `remote-task-management.${page}.page`
+  }
+  return `remote-task-admin.${page}.page`
+}
