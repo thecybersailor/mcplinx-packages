@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { Button } from '@mcplinx/ui-vue'
 import BundlePage from '../components/BundlePage.vue'
 import BundlePanel from '../components/BundlePanel.vue'
 import BundleState from '../components/BundleState.vue'
@@ -47,9 +48,9 @@ onMounted(load)
     :description="connector?.package?.package_description || ''"
   >
     <template #actions>
-      <button class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100" @click="router.back()">
+      <Button variant="outline" @click="router.back()">
         {{ runtime.t('remoteTaskUser.connectorDetail.back', 'Back') }}
-      </button>
+      </Button>
     </template>
 
     <BundleState v-if="loading" variant="loading" :message="runtime.t('remoteTaskUser.common.loading', 'Loading...')" />
@@ -92,9 +93,9 @@ onMounted(load)
       <div class="space-y-4">
         <BundlePanel>
           <h2 class="mb-3 text-base font-semibold text-slate-950">Actions</h2>
-          <button data-test-id="remote-task-user.connector-detail.connect" class="inline-flex w-full items-center justify-center rounded-xl bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800" @click="connect">
+          <Button data-test-id="remote-task-user.connector-detail.connect" class="w-full" @click="connect">
             {{ runtime.t('remoteTaskUser.connectors.connect', 'Connect') }}
-          </button>
+          </Button>
         </BundlePanel>
 
         <BundlePanel>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { Button } from '@mcplinx/ui-vue'
 import BundlePage from '../components/BundlePage.vue'
 import BundlePanel from '../components/BundlePanel.vue'
 import BundleState from '../components/BundleState.vue'
@@ -53,12 +54,12 @@ onMounted(load)
 </script>
 
 <template>
-  <BundlePage data-test-id="remote-task-management.config.page" title="Config" description="Shared connector configuration editor.">
+  <BundlePage data-test-id="remote-task-management.config.page" :title="runtime.t('remoteTaskManagement.config.title', 'Config')" :description="runtime.t('remoteTaskManagement.config.description', 'Shared connector configuration editor.')">
     <template #actions>
-      <button class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100" @click="load">Refresh</button>
+      <Button variant="outline" @click="load">{{ runtime.t('remoteTaskManagement.common.refresh', 'Refresh') }}</Button>
     </template>
-    <BundleState v-if="loading" variant="loading" message="Loading..." />
-    <BundleState v-else-if="error" variant="error" :message="error" action-label="Refresh" @action="load" />
+    <BundleState v-if="loading" variant="loading" :message="runtime.t('remoteTaskManagement.common.loading', 'Loading...')" />
+    <BundleState v-else-if="error" variant="error" :message="error" :action-label="runtime.t('remoteTaskManagement.common.refresh', 'Refresh')" @action="load" />
     <div v-else class="grid gap-4 lg:grid-cols-[1fr,2fr]">
       <BundlePanel class="overflow-hidden p-0">
         <div
@@ -71,15 +72,15 @@ onMounted(load)
             <div class="font-medium text-slate-950">{{ config.name || config.id }}</div>
             <div class="text-sm text-slate-500">{{ config.status || '-' }}</div>
           </div>
-          <button class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100" @click="select(config.id)">Edit</button>
+          <Button variant="outline" size="sm" @click="select(config.id)">{{ runtime.t('remoteTaskManagement.common.edit', 'Edit') }}</Button>
         </div>
       </BundlePanel>
       <BundlePanel class="space-y-3">
-        <div class="text-sm text-slate-500">Connector ID: {{ selectedId || '-' }}</div>
+        <div class="text-sm text-slate-500">{{ runtime.t('remoteTaskManagement.config.connectorId', 'Connector ID') }}: {{ selectedId || '-' }}</div>
         <textarea v-model="editor" data-test-id="remote-task-management.config.editor" class="min-h-96 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 font-mono text-xs text-slate-900" />
-        <button data-test-id="remote-task-management.config.save" class="inline-flex items-center justify-center rounded-xl bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800" :disabled="saving || !selectedId" @click="save">
-          {{ saving ? 'Saving...' : 'Save config' }}
-        </button>
+        <Button data-test-id="remote-task-management.config.save" :disabled="saving || !selectedId" @click="save">
+          {{ saving ? runtime.t('remoteTaskManagement.common.saving', 'Saving...') : runtime.t('remoteTaskManagement.config.saveConfig', 'Save config') }}
+        </Button>
       </BundlePanel>
     </div>
   </BundlePage>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@mcplinx/ui-vue'
 import BundlePage from '../components/BundlePage.vue'
 import BundlePanel from '../components/BundlePanel.vue'
 import BundleState from '../components/BundleState.vue'
@@ -44,33 +45,33 @@ onMounted(load)
 </script>
 
 <template>
-  <BundlePage data-test-id="remote-task-management.pending-instances.page" title="Pending Instances" description="Moderation queue with the same review UI across every admin host.">
-    <BundleState v-if="loading" variant="loading" message="Loading..." />
+  <BundlePage data-test-id="remote-task-management.pending-instances.page" :title="runtime.t('remoteTaskManagement.pending.title', 'Pending Instances')" :description="runtime.t('remoteTaskManagement.pending.description', 'Moderation queue with the same review UI across every admin host.')">
+    <BundleState v-if="loading" variant="loading" :message="runtime.t('remoteTaskManagement.common.loading', 'Loading...')" />
     <BundleState v-else-if="error" variant="error" :message="error" />
-    <BundleState v-else-if="!instances.length" variant="empty" message="No pending instances." />
+    <BundleState v-else-if="!instances.length" variant="empty" :message="runtime.t('remoteTaskManagement.pending.empty', 'No pending instances.')" />
     <div v-else class="grid gap-4 lg:grid-cols-[2fr,1fr]">
       <div class="overflow-hidden rounded-2xl border border-slate-200">
-        <table data-test-id="remote-task-management.pending.table" class="min-w-full bg-white">
-          <thead class="bg-slate-50 text-left text-sm text-slate-500"><tr><th class="px-4 py-3 font-medium">Name</th><th class="px-4 py-3 font-medium">Status</th><th class="px-4 py-3 font-medium">Select</th></tr></thead>
-          <tbody>
-            <tr v-for="instance in instances" :key="instance.id" class="border-t border-slate-200">
-              <td class="px-4 py-4 text-slate-800">{{ instance.name || instance.id }}</td>
-              <td class="px-4 py-4 text-slate-600">{{ instance.status || '-' }}</td>
-              <td class="px-4 py-4">
-                <button :data-test-id="`remote-task-management.pending.select.${instance.id}`" class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100" @click="selectedId = String(instance.id)">Select</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <Table data-test-id="remote-task-management.pending.table">
+          <TableHeader class="bg-slate-50"><TableRow class="border-slate-200 hover:bg-transparent"><TableHead class="text-slate-500">{{ runtime.t('remoteTaskManagement.common.name', 'Name') }}</TableHead><TableHead class="text-slate-500">{{ runtime.t('remoteTaskManagement.common.status', 'Status') }}</TableHead><TableHead class="text-slate-500">{{ runtime.t('remoteTaskManagement.common.select', 'Select') }}</TableHead></TableRow></TableHeader>
+          <TableBody>
+            <TableRow v-for="instance in instances" :key="instance.id" class="border-slate-200 hover:bg-slate-50/50">
+              <TableCell class="text-slate-800">{{ instance.name || instance.id }}</TableCell>
+              <TableCell class="text-slate-600">{{ instance.status || '-' }}</TableCell>
+              <TableCell>
+                <Button :data-test-id="`remote-task-management.pending.select.${instance.id}`" variant="outline" size="sm" @click="selectedId = String(instance.id)">{{ runtime.t('remoteTaskManagement.common.select', 'Select') }}</Button>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
       </div>
 
       <BundlePanel>
-        <h2 class="mb-3 text-base font-semibold text-slate-950">Review</h2>
-        <p class="mb-3 text-sm leading-6 text-slate-500">{{ selected?.name || 'Choose an instance' }}</p>
+        <h2 class="mb-3 text-base font-semibold text-slate-950">{{ runtime.t('remoteTaskManagement.pending.review', 'Review') }}</h2>
+        <p class="mb-3 text-sm leading-6 text-slate-500">{{ selected?.name || runtime.t('remoteTaskManagement.pending.chooseInstance', 'Choose an instance') }}</p>
         <textarea v-model="reason" data-test-id="remote-task-management.pending.reason" class="mb-3 min-h-24 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-slate-900" />
         <div class="flex flex-wrap gap-2">
-          <button data-test-id="remote-task-management.pending.approve" class="inline-flex items-center justify-center rounded-xl bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800" :disabled="!selectedId" @click="review('approve')">Approve</button>
-          <button data-test-id="remote-task-management.pending.reject" class="inline-flex items-center justify-center rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-medium text-rose-700 transition hover:bg-rose-100" :disabled="!selectedId" @click="review('reject')">Reject</button>
+          <Button data-test-id="remote-task-management.pending.approve" :disabled="!selectedId" @click="review('approve')">{{ runtime.t('remoteTaskManagement.instances.approve', 'Approve') }}</Button>
+          <Button data-test-id="remote-task-management.pending.reject" variant="destructive" :disabled="!selectedId" @click="review('reject')">{{ runtime.t('remoteTaskManagement.instances.reject', 'Reject') }}</Button>
         </div>
       </BundlePanel>
     </div>

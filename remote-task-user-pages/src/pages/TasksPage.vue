@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { Button } from '@mcplinx/ui-vue'
 import BundlePage from '../components/BundlePage.vue'
 import BundleState from '../components/BundleState.vue'
 import { useRemoteTaskUserRuntime } from '../facade'
@@ -46,9 +47,9 @@ onMounted(load)
     description="Execution history uses the same review surface across all integrated hosts."
   >
     <template #actions>
-      <button class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100" @click="load">
+      <Button variant="outline" @click="load">
         {{ runtime.t('remoteTaskUser.common.retry', 'Retry') }}
-      </button>
+      </Button>
     </template>
 
     <BundleState v-if="loading" variant="loading" :message="runtime.t('remoteTaskUser.common.loading', 'Loading...')" />
@@ -72,10 +73,10 @@ onMounted(load)
               <td class="px-4 py-4 text-slate-600">{{ task.created_at || '-' }}</td>
               <td class="px-4 py-4">
                 <div class="flex flex-wrap gap-2">
-                  <button class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100" @click="openTask(task.id)">{{ runtime.t('remoteTaskUser.tasks.detail', 'Task detail') }}</button>
-                  <button class="inline-flex items-center justify-center rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700 transition hover:bg-rose-100" @click="cancelTask(task.id)">
+                  <Button variant="outline" size="sm" @click="openTask(task.id)">{{ runtime.t('remoteTaskUser.tasks.detail', 'Task detail') }}</Button>
+                  <Button variant="destructive" size="sm" @click="cancelTask(task.id)">
                     {{ runtime.t('remoteTaskUser.tasks.cancel', 'Cancel') }}
-                  </button>
+                  </Button>
                 </div>
               </td>
             </tr>

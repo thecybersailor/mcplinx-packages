@@ -17,5 +17,12 @@
   },
   "peerDependencies": {
     "vue": "^3.5.22"
+  },
+  "devDependencies": {
+    "shadcn-vue": "^2.4.3"
+  },
+  "dependencies": {
+    "@vueuse/core": "^14.2.1",
+    "reka-ui": "^2.9.2"
   }
 }

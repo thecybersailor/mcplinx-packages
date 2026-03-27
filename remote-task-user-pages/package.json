@@ -16,7 +16,8 @@
     "test": "vitest run src/__tests__/*.spec.ts --environment jsdom"
   },
   "dependencies": {
-    "@mcplinx/api-client-user": "*"
+    "@mcplinx/api-client-user": "*",
+    "@mcplinx/ui-vue": "*"
   },
   "peerDependencies": {
     "vue": "^3.5.22",

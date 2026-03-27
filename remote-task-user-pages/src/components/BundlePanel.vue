@@ -1,5 +1,11 @@
+<script setup lang="ts">
+import { Card, CardContent } from '@mcplinx/ui-vue'
+</script>
+
 <template>
-  <div class="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 text-slate-950 md:p-5">
-    <slot />
-  </div>
+  <Card class="bg-slate-50/80 shadow-none">
+    <CardContent class="p-4 md:p-5">
+      <slot />
+    </CardContent>
+  </Card>
 </template>

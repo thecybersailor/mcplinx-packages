@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { Button, Input, Label } from '@mcplinx/ui-vue'
 import BundlePage from '../components/BundlePage.vue'
 import BundlePanel from '../components/BundlePanel.vue'
 import BundleState from '../components/BundleState.vue'
@@ -32,12 +33,12 @@ async function submit() {
 </script>
 
 <template>
-  <BundlePage data-test-id="remote-task-management.rollback.page" title="Rollback" description="Rollback keeps the same contract as deploy, but always targets an older version.">
+  <BundlePage data-test-id="remote-task-management.rollback.page" :title="runtime.t('remoteTaskManagement.rollback.title', 'Rollback')" :description="runtime.t('remoteTaskManagement.rollback.description', 'Rollback keeps the same contract as deploy, but always targets an older version.')">
     <BundlePanel class="space-y-4">
-      <label class="grid gap-2"><span class="text-sm font-medium text-slate-700">Package name</span><input v-model="name" data-test-id="remote-task-management.rollback.name" class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-slate-900" /></label>
-      <label class="grid gap-2"><span class="text-sm font-medium text-slate-700">Version</span><input v-model="version" data-test-id="remote-task-management.rollback.version" class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-slate-900" /></label>
-      <label class="grid gap-2"><span class="text-sm font-medium text-slate-700">Instance ID</span><input v-model="instanceId" data-test-id="remote-task-management.rollback.instance" class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-slate-900" /></label>
-      <button data-test-id="remote-task-management.rollback.submit" class="inline-flex items-center justify-center rounded-xl bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800" :disabled="loading" @click="submit">Rollback</button>
+      <Label class="grid gap-2"><span class="text-sm font-medium text-slate-700">{{ runtime.t('remoteTaskManagement.common.packageName', 'Package name') }}</span><Input v-model="name" data-test-id="remote-task-management.rollback.name" class="border border-slate-300 bg-white text-slate-900" /></Label>
+      <Label class="grid gap-2"><span class="text-sm font-medium text-slate-700">{{ runtime.t('remoteTaskManagement.common.version', 'Version') }}</span><Input v-model="version" data-test-id="remote-task-management.rollback.version" class="border border-slate-300 bg-white text-slate-900" /></Label>
+      <Label class="grid gap-2"><span class="text-sm font-medium text-slate-700">{{ runtime.t('remoteTaskManagement.common.instanceId', 'Instance ID') }}</span><Input v-model="instanceId" data-test-id="remote-task-management.rollback.instance" class="border border-slate-300 bg-white text-slate-900" /></Label>
+      <Button data-test-id="remote-task-management.rollback.submit" :disabled="loading" @click="submit">{{ runtime.t('remoteTaskManagement.rollback.submit', 'Rollback') }}</Button>
     </BundlePanel>
     <BundleState v-if="error" variant="error" :message="error" />
     <BundlePanel v-if="result">

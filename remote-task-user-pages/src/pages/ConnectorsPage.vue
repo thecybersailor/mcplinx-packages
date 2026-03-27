@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { Button } from '@mcplinx/ui-vue'
 import BundlePage from '../components/BundlePage.vue'
 import BundlePanel from '../components/BundlePanel.vue'
 import BundleState from '../components/BundleState.vue'
@@ -50,13 +51,13 @@ onMounted(load)
     description="Browse available connectors and start the authorization flow."
   >
     <template #actions>
-      <button
+      <Button
         data-test-id="remote-task-user.connectors.retry"
-        class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+        variant="outline"
         @click="load"
       >
         {{ runtime.t('remoteTaskUser.common.retry', 'Retry') }}
-      </button>
+      </Button>
     </template>
 
     <BundleState
@@ -91,20 +92,20 @@ onMounted(load)
             <span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-500">{{ connector.version || '-' }}</span>
           </div>
           <div class="mt-auto flex flex-wrap gap-2">
-            <button
+            <Button
               :data-test-id="`remote-task-user.connectors.connect.${connector.id}`"
-              class="inline-flex items-center justify-center rounded-xl bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+              variant="default"
               @click="goToConnect(connector.id)"
             >
               {{ runtime.t('remoteTaskUser.connectors.connect', 'Connect') }}
-            </button>
-            <button
+            </Button>
+            <Button
               :data-test-id="`remote-task-user.connectors.detail.${connector.id}`"
-              class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+              variant="outline"
               @click="goToDetail(connector.id)"
             >
               {{ runtime.t('remoteTaskUser.connectors.detail', 'View Details') }}
-            </button>
+            </Button>
           </div>
         </div>
       </BundlePanel>

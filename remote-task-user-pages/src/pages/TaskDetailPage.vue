@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { Button } from '@mcplinx/ui-vue'
 import BundlePage from '../components/BundlePage.vue'
 import BundlePanel from '../components/BundlePanel.vue'
 import BundleState from '../components/BundleState.vue'
@@ -50,13 +51,13 @@ onMounted(load)
     :description="task?.action_name || task?.action_key || task?.id || ''"
   >
     <template #actions>
-      <button
+      <Button
         data-test-id="remote-task-user.task-detail.back"
-        class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+        variant="outline"
         @click="router.push({ name: `${runtime.routePrefix}-tasks` })"
       >
         {{ runtime.t('remoteTaskUser.common.backToList', 'Back to list') }}
-      </button>
+      </Button>
     </template>
 
     <BundleState v-if="loading" variant="loading" :message="runtime.t('remoteTaskUser.common.loading', 'Loading...')" />
@@ -75,14 +76,14 @@ onMounted(load)
         <pre data-test-id="remote-task-user.task-detail.json" class="overflow-auto rounded-xl bg-slate-950 p-4 text-xs text-slate-100">{{ JSON.stringify(task, null, 2) }}</pre>
       </BundlePanel>
 
-      <button
+      <Button
         data-test-id="remote-task-user.task-detail.cancel"
-        class="inline-flex items-center justify-center rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-medium text-rose-700 transition hover:bg-rose-100"
+        variant="destructive"
         :disabled="canceling"
         @click="cancelTask"
       >
         {{ canceling ? runtime.t('remoteTaskUser.tasks.canceling', 'Canceling...') : runtime.t('remoteTaskUser.tasks.cancel', 'Cancel') }}
-      </button>
+      </Button>
     </div>
   </BundlePage>
 </template>

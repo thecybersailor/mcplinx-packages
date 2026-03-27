@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { Button } from '@mcplinx/ui-vue'
 import BundlePage from '../components/BundlePage.vue'
 import BundleState from '../components/BundleState.vue'
 import { useRemoteTaskUserRuntime } from '../facade'
@@ -58,12 +59,12 @@ onMounted(load)
     description="Manage the app connections available to this team."
   >
     <template #actions>
-      <button class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100" @click="load">
+      <Button variant="outline" @click="load">
         {{ runtime.t('remoteTaskUser.common.retry', 'Retry') }}
-      </button>
-      <button data-test-id="remote-task-user.connections.connect-app" class="inline-flex items-center justify-center rounded-xl bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800" @click="router.push({ name: nameOf('connectors') })">
+      </Button>
+      <Button data-test-id="remote-task-user.connections.connect-app" @click="router.push({ name: nameOf('connectors') })">
         {{ runtime.t('remoteTaskUser.connections.connectApp', 'Connect App') }}
-      </button>
+      </Button>
     </template>
 
     <BundleState
@@ -83,13 +84,13 @@ onMounted(load)
         variant="empty"
         :message="runtime.t('remoteTaskUser.connections.empty', `You haven't connected any apps yet.`)"
       />
-      <button
+      <Button
         data-test-id="remote-task-user.connections.connect-first"
-        class="inline-flex items-center justify-center rounded-xl bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+        class="w-fit"
         @click="router.push({ name: nameOf('connectors') })"
       >
         {{ runtime.t('remoteTaskUser.connections.connectFirst', 'Connect Your First App') }}
-      </button>
+      </Button>
     </div>
     <div v-else class="overflow-hidden rounded-2xl border border-slate-200">
       <table data-test-id="remote-task-user.connections.table" class="min-w-full bg-white">
@@ -117,27 +118,30 @@ onMounted(load)
             <td class="px-4 py-4 text-slate-600">{{ connection.created_at || '-' }}</td>
             <td class="px-4 py-4">
               <div class="flex flex-wrap gap-2">
-                <button
+                <Button
                   :data-test-id="`remote-task-user.connections.row.${connection.id}.detail`"
-                  class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                  variant="outline"
+                  size="sm"
                   @click="detail(connection.id)"
                 >
                   Details
-                </button>
-                <button
+                </Button>
+                <Button
                   :data-test-id="`remote-task-user.connections.row.${connection.id}.reauth`"
-                  class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                  variant="outline"
+                  size="sm"
                   @click="reauth(connection.id)"
                 >
                   {{ runtime.t('remoteTaskUser.connections.reauth', 'Reauthorize') }}
-                </button>
-                <button
+                </Button>
+                <Button
                   :data-test-id="`remote-task-user.connections.row.${connection.id}.disconnect`"
-                  class="inline-flex items-center justify-center rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700 transition hover:bg-rose-100"
+                  variant="destructive"
+                  size="sm"
                   @click="disconnect(connection.id)"
                 >
                   {{ runtime.t('remoteTaskUser.connections.disconnect', 'Disconnect') }}
-                </button>
+                </Button>
               </div>
             </td>
           </tr>

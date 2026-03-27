@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Badge, Button, Card, CardContent } from '@mcplinx/ui-vue'
+import { Badge, Button, Card, CardContent, Skeleton } from '@mcplinx/ui-vue'
 
 const props = defineProps<{
   variant: 'loading' | 'error' | 'empty'
@@ -36,7 +36,16 @@ function badgeVariantOf(variant: typeof props.variant) {
 </script>
 
 <template>
+  <div v-if="variant === 'loading'" :data-test-id="dataTestId" class="space-y-4">
+    <Skeleton class="h-8 w-[250px] bg-white/10" />
+    <Skeleton class="h-[125px] w-full rounded-2xl bg-white/10" />
+    <div class="space-y-2">
+      <Skeleton class="h-4 w-[250px] bg-white/10" />
+      <Skeleton class="h-4 w-[200px] bg-white/10" />
+    </div>
+  </div>
   <Card
+    v-else
     :data-test-id="dataTestId"
     class="rounded-2xl text-sm"
     :class="paletteOf(variant)"

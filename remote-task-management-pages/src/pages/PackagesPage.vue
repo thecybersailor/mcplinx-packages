@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { Button } from '@mcplinx/ui-vue'
+import { useRouter } from 'vue-router'
+import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@mcplinx/ui-vue'
 import BundlePage from '../components/BundlePage.vue'
 import BundlePanel from '../components/BundlePanel.vue'
 import BundleState from '../components/BundleState.vue'
@@ -12,7 +12,8 @@ const runtime = useRemoteTaskManagementRuntime()
 const router = useRouter()
 const loading = ref(true)
 const error = ref('')
-const packages = ref<Awaited<ReturnType<typeof runtime.facade.listPackages>>>([])
+type RemotePackage = Awaited<ReturnType<typeof runtime.facade.listPackages>>[number]
+const packages = ref<RemotePackage[]>([])
 const statusFilter = ref<'all' | 'active' | 'disabled'>('all')
 
 function nameOf(suffix: string) {
@@ -42,14 +43,14 @@ function openDetail(id?: string) {
   void router.push({ name: nameOf('package-detail'), params: { pkgId: id } })
 }
 
-const latestVersionOf = (pkg: (typeof packages.value)[number]) => {
+const latestVersionOf = (pkg: RemotePackage) => {
   if (!pkg.versions?.length) return '-'
   return [...pkg.versions].sort((left, right) => {
     return new Date(right.createdAt || 0).getTime() - new Date(left.createdAt || 0).getTime()
   })[0]?.version || '-'
 }
 
-const latestToolCountOf = (pkg: (typeof packages.value)[number]) => {
+const latestToolCountOf = (pkg: RemotePackage) => {
   if (!pkg.versions?.length) return 0
   return [...pkg.versions].sort((left, right) => {
     return new Date(right.createdAt || 0).getTime() - new Date(left.createdAt || 0).getTime()
@@ -62,76 +63,76 @@ onMounted(load)
 <template>
   <BundlePage
     data-test-id="remote-task-management.packages.page"
-    title="My Connector Packages"
-    :description="`Scope: ${runtime.scope}`"
+    :title="runtime.t('remoteTaskManagement.packages.title', 'My Connector Packages')"
+    :description="runtime.t('remoteTaskManagement.packages.scope', 'Scope: {scope}', { scope: runtime.scope })"
     borderless
   >
     <template #actions>
-      <Button variant="outline" @click="load">Refresh</Button>
-      <select
-        v-model="statusFilter"
-        data-test-id="remote-task-management.packages.status"
-        class="rounded-xl border border-white/12 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-100 outline-none transition hover:border-white/20"
-        @change="load"
-      >
-        <option class="bg-slate-950 text-slate-100" value="all">All Status</option>
-        <option class="bg-slate-950 text-slate-100" value="active">Active</option>
-        <option class="bg-slate-950 text-slate-100" value="disabled">Disabled</option>
-      </select>
+      <Button variant="outline" @click="load">{{ runtime.t('remoteTaskManagement.packages.refresh', 'Refresh') }}</Button>
+      <Select v-model="statusFilter" @update:modelValue="load">
+        <SelectTrigger data-test-id="remote-task-management.packages.status" class="w-[140px] rounded-xl border-white/12 bg-white/[0.04] text-slate-100 hover:border-white/20">
+          <SelectValue :placeholder="runtime.t('remoteTaskManagement.packages.statusAll', 'All Status')" />
+        </SelectTrigger>
+        <SelectContent class="border-white/10 bg-slate-950 text-slate-100">
+          <SelectItem value="all">{{ runtime.t('remoteTaskManagement.packages.statusAll', 'All Status') }}</SelectItem>
+          <SelectItem value="active">{{ runtime.t('remoteTaskManagement.packages.statusActive', 'Active') }}</SelectItem>
+          <SelectItem value="disabled">{{ runtime.t('remoteTaskManagement.packages.statusDisabled', 'Disabled') }}</SelectItem>
+        </SelectContent>
+      </Select>
     </template>
 
-    <BundleState v-if="loading" variant="loading" message="Loading packages..." />
-    <BundleState v-else-if="error" variant="error" :message="error" action-label="Refresh" @action="load" />
+    <BundleState v-if="loading" variant="loading" :message="runtime.t('remoteTaskManagement.packages.loading', 'Loading packages...')" />
+    <BundleState v-else-if="error" variant="error" :message="error" :action-label="runtime.t('remoteTaskManagement.packages.refresh', 'Refresh')" @action="load" />
     <ConnectorGettingStarted data-test-id="remote-task-management.packages.cli-hint" />
     <BundlePanel v-if="!loading && !error && !packages.length">
       <div class="rounded-2xl border border-dashed border-white/12 bg-white/[0.03] px-6 py-10 text-center">
-        <div class="text-lg font-semibold text-white">You haven&apos;t published any connectors yet.</div>
-        <div class="mt-2 text-sm text-slate-400">Use the CLI commands above to publish your first connector.</div>
+        <div class="text-lg font-semibold text-white">{{ runtime.t('remoteTaskManagement.packages.emptyTitle', 'You haven\'t published any connectors yet.') }}</div>
+        <div class="mt-2 text-sm text-slate-400">{{ runtime.t('remoteTaskManagement.packages.emptySub', 'Use the CLI commands above to publish your first connector.') }}</div>
       </div>
     </BundlePanel>
     <BundlePanel v-else-if="!loading && !error" class="p-0">
       <div class="overflow-hidden rounded-2xl">
-        <table data-test-id="remote-task-management.packages.table" class="min-w-full bg-transparent">
-          <thead class="bg-white/[0.02] text-left text-sm text-slate-400">
-            <tr>
-              <th class="px-4 py-3 font-medium">Application</th>
-              <th class="px-4 py-3 font-medium">Version</th>
-              <th class="px-4 py-3 font-medium">Tools</th>
-              <th class="px-4 py-3 font-medium">Last Updated</th>
-              <th class="px-4 py-3 font-medium">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
+        <Table data-test-id="remote-task-management.packages.table">
+          <TableHeader class="bg-white/[0.02]">
+            <TableRow class="border-white/10 hover:bg-transparent">
+              <TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.packages.application', 'Application') }}</TableHead>
+              <TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.packages.version', 'Version') }}</TableHead>
+              <TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.packages.tools', 'Tools') }}</TableHead>
+              <TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.packages.lastUpdated', 'Last Updated') }}</TableHead>
+              <TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.packages.actions', 'Actions') }}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow
               v-for="pkg in packages"
               :key="pkg.hashID || pkg.id"
               :data-test-id="`remote-task-management.packages.row.${pkg.hashID || pkg.id}`"
-              class="cursor-pointer border-t border-white/10 transition hover:bg-white/[0.04]"
+              class="cursor-pointer border-white/10 transition hover:bg-white/[0.04]"
             >
-              <td class="px-4 py-4" @click="openDetail(pkg.hashID || String(pkg.id || ''))">
+              <TableCell @click="openDetail(pkg.hashID || String(pkg.id || ''))">
                 <div class="font-medium text-white">{{ pkg.name || pkg.hashID || pkg.id }}</div>
                 <div class="text-sm leading-6 text-slate-400">{{ pkg.package_description || '-' }}</div>
-              </td>
-              <td class="px-4 py-4">
+              </TableCell>
+              <TableCell>
                 <span class="rounded-full border border-cyan-400/20 bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-100">
                   {{ latestVersionOf(pkg) }}
                 </span>
-              </td>
-              <td class="px-4 py-4 text-slate-300">{{ latestToolCountOf(pkg) }}</td>
-              <td class="px-4 py-4 text-slate-300">{{ pkg.updatedAt || pkg.createdAt || '-' }}</td>
-              <td class="px-4 py-4">
+              </TableCell>
+              <TableCell class="text-slate-300">{{ latestToolCountOf(pkg) }}</TableCell>
+              <TableCell class="text-slate-300">{{ pkg.updatedAt || pkg.createdAt || '-' }}</TableCell>
+              <TableCell>
                 <Button
                   :data-test-id="`remote-task-management.packages.row.${pkg.hashID || pkg.id}.manage`"
                   variant="outline"
-                  class="px-3 py-2"
+                  size="sm"
                   @click="openDetail(pkg.hashID || String(pkg.id || ''))"
                 >
-                  Manage
+                  {{ runtime.t('remoteTaskManagement.packages.manage', 'Manage') }}
                 </Button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
       </div>
     </BundlePanel>
   </BundlePage>

@@ -52,18 +52,18 @@ onMounted(load)
 <template>
   <BundlePage
     data-test-id="remote-task-management.dashboard.page"
-    title="Connectors"
-    :description="`Scope: ${runtime.scope}`"
+    :title="runtime.t('remoteTaskManagement.dashboard.title', 'Connectors')"
+    :description="runtime.t('remoteTaskManagement.dashboard.scope', 'Scope: {scope}', { scope: runtime.scope })"
     borderless
   >
-    <BundleState v-if="loading" variant="loading" message="Loading connectors dashboard..." />
-    <BundleState v-else-if="error" variant="error" :message="error" action-label="Refresh" @action="load" />
+    <BundleState v-if="loading" variant="loading" :message="runtime.t('remoteTaskManagement.dashboard.loading', 'Loading connectors dashboard...')" />
+    <BundleState v-else-if="error" variant="error" :message="error" :action-label="runtime.t('remoteTaskManagement.common.refresh', 'Refresh')" @action="load" />
 
     <div v-else class="space-y-4">
       <BundlePanel>
-        <h2 class="text-lg font-semibold text-white">Connections</h2>
+        <h2 class="text-lg font-semibold text-white">{{ runtime.t('remoteTaskManagement.dashboard.connectionsTitle', 'Connections') }}</h2>
         <p class="mt-2 text-sm leading-6 text-slate-400">
-          Open the shared connection task surface without leaving the connector domain.
+          {{ runtime.t('remoteTaskManagement.dashboard.connectionsDesc', 'Open the shared connection task surface without leaving the connector domain.') }}
         </p>
         <Button
           data-test-id="remote-task-management.dashboard.open-connections"
@@ -71,18 +71,18 @@ onMounted(load)
           class="mt-5"
           @click="openConnections"
         >
-          Open Connections
+          {{ runtime.t('remoteTaskManagement.dashboard.openConnections', 'Open Connections') }}
         </Button>
       </BundlePanel>
 
       <BundlePanel>
-        <h2 class="text-lg font-semibold text-white">Connectors</h2>
+        <h2 class="text-lg font-semibold text-white">{{ runtime.t('remoteTaskManagement.dashboard.connectorsTitle', 'Connectors') }}</h2>
         <p class="mt-2 text-sm leading-6 text-slate-400">
-          Review connector packages and moderate instances inside the same connector domain.
+          {{ runtime.t('remoteTaskManagement.dashboard.connectorsDesc', 'Review connector packages and moderate instances inside the same connector domain.') }}
         </p>
         <div class="mt-4 text-sm text-slate-300">
-          Packages: <span class="font-medium text-white">{{ packageCount }}</span><br>
-          Pending Review: <span class="font-medium text-white">{{ pendingReviewCount }}</span>
+          {{ runtime.t('remoteTaskManagement.dashboard.packagesCount', 'Packages:') }} <span class="font-medium text-white">{{ packageCount }}</span><br>
+          {{ runtime.t('remoteTaskManagement.dashboard.pendingReviewCount', 'Pending Review:') }} <span class="font-medium text-white">{{ pendingReviewCount }}</span>
         </div>
         <Button
           data-test-id="remote-task-management.dashboard.open-connectors"
@@ -90,12 +90,12 @@ onMounted(load)
           class="mt-5"
           @click="openConnectors"
         >
-          Open Connectors
+          {{ runtime.t('remoteTaskManagement.dashboard.openConnectors', 'Open Connectors') }}
         </Button>
         <div class="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4">
-          <h3 class="text-sm font-semibold text-white">CLI Hint</h3>
+          <h3 class="text-sm font-semibold text-white">{{ runtime.t('remoteTaskManagement.dashboard.cliHint', 'CLI Hint') }}</h3>
           <p class="mt-2 text-sm leading-6 text-slate-400">
-            Use the CLI to build and deploy connector packages before you return to governance pages.
+            {{ runtime.t('remoteTaskManagement.dashboard.cliHintDesc', 'Use the CLI to build and deploy connector packages before you return to governance pages.') }}
           </p>
           <div class="mt-4 space-y-3 text-xs leading-6 text-slate-300">
             <pre class="overflow-x-auto rounded-xl border border-white/10 bg-black/30 p-3"><code>{{ loginCommand }}</code></pre>
