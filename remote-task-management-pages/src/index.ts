@@ -1,4 +1,3 @@
-export { createRemoteTaskManagementRoutes } from './routes'
 export type {
   RemoteTaskManagementConfigRecord,
   RemoteTaskManagementDeployRequest,
