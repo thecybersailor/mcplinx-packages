@@ -10,6 +10,7 @@ export interface ConnectorIndexCard {
   title: string
   description?: string
   actionLabel?: string
+  actionVariant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'
   to?: Record<string, unknown> | string
   stats?: ConnectorIndexCardStat[]
 }

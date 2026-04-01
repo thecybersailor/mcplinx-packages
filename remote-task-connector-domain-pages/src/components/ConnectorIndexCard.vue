@@ -8,8 +8,8 @@ defineProps<{
 </script>
 
 <template>
-  <Card class="rounded-2xl border border-white/10 bg-white/[0.03] text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
-    <CardContent class="space-y-4 p-5 md:p-6">
+  <Card class="flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.03] text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.05]">
+    <CardContent class="flex flex-1 flex-col space-y-4 p-5 md:p-6">
       <div class="space-y-2">
         <h2 class="text-lg font-semibold text-white">{{ card.title }}</h2>
         <p v-if="card.description" class="text-sm leading-6 text-slate-400">{{ card.description }}</p>
@@ -29,8 +29,8 @@ defineProps<{
       <Button
         v-if="card.actionLabel && card.to"
         as-child
-        variant="outline"
-        class="w-fit"
+        :variant="card.actionVariant || 'outline'"
+        class="mt-auto w-fit"
       >
         <RouterLink :to="card.to" :data-test-id="`connector-index.card.${card.id}.action`">
           {{ card.actionLabel }}
