@@ -15,11 +15,11 @@ const emit = defineEmits<{
 function paletteOf(variant: typeof props.variant) {
   switch (variant) {
     case 'error':
-      return 'border-rose-200 bg-rose-50 text-rose-700'
+      return 'border-destructive/30 bg-destructive/10 text-destructive'
     case 'empty':
-      return 'border-slate-200 border-dashed bg-slate-50 text-slate-500'
+      return 'border-border border-dashed bg-muted/30 text-muted-foreground'
     default:
-      return 'border-slate-200 bg-slate-50 text-slate-500'
+      return 'border-border bg-muted/30 text-muted-foreground'
   }
 }
 </script>

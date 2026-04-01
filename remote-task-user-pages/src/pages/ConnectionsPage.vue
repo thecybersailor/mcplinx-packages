@@ -92,9 +92,9 @@ onMounted(load)
         {{ runtime.t('remoteTaskUser.connections.connectFirst', 'Connect Your First App') }}
       </Button>
     </div>
-    <div v-else class="overflow-hidden rounded-2xl border border-slate-200">
-      <table data-test-id="remote-task-user.connections.table" class="min-w-full bg-white">
-        <thead class="bg-slate-50 text-left text-sm text-slate-500">
+    <div v-else class="overflow-hidden rounded-2xl border border-border">
+      <table data-test-id="remote-task-user.connections.table" class="min-w-full bg-card">
+        <thead class="bg-muted/40 text-left text-sm text-muted-foreground">
           <tr>
             <th class="px-4 py-3 font-medium">Connector</th>
             <th class="px-4 py-3 font-medium">Label</th>
@@ -109,13 +109,13 @@ onMounted(load)
             v-for="connection in connections"
             :key="connection.id"
             :data-test-id="`remote-task-user.connections.row.${connection.id}`"
-            class="border-t border-slate-200"
+            class="border-t border-border"
           >
-            <td class="px-4 py-4 font-medium text-slate-950">{{ connection.package?.name || connection.connector_id || connection.id }}</td>
-            <td class="px-4 py-4 text-slate-600">{{ connection.label || '-' }}</td>
-            <td class="px-4 py-4 text-slate-600">{{ connection.auth_scopes?.join(', ') || '-' }}</td>
-            <td class="px-4 py-4 text-slate-600">{{ connection.status || '-' }}</td>
-            <td class="px-4 py-4 text-slate-600">{{ connection.created_at || '-' }}</td>
+            <td class="px-4 py-4 font-medium text-foreground">{{ connection.package?.name || connection.connector_id || connection.id }}</td>
+            <td class="px-4 py-4 text-muted-foreground">{{ connection.label || '-' }}</td>
+            <td class="px-4 py-4 text-muted-foreground">{{ connection.auth_scopes?.join(', ') || '-' }}</td>
+            <td class="px-4 py-4 text-muted-foreground">{{ connection.status || '-' }}</td>
+            <td class="px-4 py-4 text-muted-foreground">{{ connection.created_at || '-' }}</td>
             <td class="px-4 py-4">
               <div class="flex flex-wrap gap-2">
                 <Button

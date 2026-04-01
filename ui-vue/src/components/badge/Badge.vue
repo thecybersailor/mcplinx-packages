@@ -13,13 +13,13 @@ const props = withDefaults(defineProps<{
 const variantClass = computed(() => {
   switch (props.variant) {
     case 'outline':
-      return 'border-white/10 bg-black/20 text-slate-300'
+      return 'border-border text-foreground'
     case 'secondary':
-      return 'border-amber-400/20 bg-amber-500/10 text-amber-100'
+      return 'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80'
     case 'destructive':
-      return 'border-rose-400/20 bg-rose-500/10 text-rose-100'
+      return 'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80'
     default:
-      return 'border-emerald-400/20 bg-emerald-500/10 text-emerald-100'
+      return 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80'
   }
 })
 </script>

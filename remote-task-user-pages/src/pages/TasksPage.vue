@@ -56,9 +56,9 @@ onMounted(load)
     <BundleState v-else-if="error" variant="error" :message="error" />
     <BundleState v-else-if="!tasks?.length" variant="empty" :message="runtime.t('remoteTaskUser.tasks.empty', 'No tasks yet.')" />
     <div v-else class="space-y-4">
-      <div class="overflow-hidden rounded-2xl border border-slate-200">
-        <table data-test-id="remote-task-user.tasks.table" class="min-w-full bg-white">
-          <thead class="bg-slate-50 text-left text-sm text-slate-500">
+      <div class="overflow-hidden rounded-2xl border border-border">
+        <table data-test-id="remote-task-user.tasks.table" class="min-w-full bg-card">
+          <thead class="bg-muted/40 text-left text-sm text-muted-foreground">
             <tr>
               <th class="px-4 py-3 font-medium">Action</th>
               <th class="px-4 py-3 font-medium">Status</th>
@@ -67,10 +67,10 @@ onMounted(load)
             </tr>
           </thead>
           <tbody>
-            <tr v-for="task in tasks" :key="task.id" :data-test-id="`remote-task-user.tasks.row.${task.id}`" class="border-t border-slate-200">
-              <td class="px-4 py-4 font-medium text-slate-950">{{ task.action_name || task.action_key || task.id }}</td>
-              <td class="px-4 py-4 text-slate-600">{{ task.status || '-' }}</td>
-              <td class="px-4 py-4 text-slate-600">{{ task.created_at || '-' }}</td>
+            <tr v-for="task in tasks" :key="task.id" :data-test-id="`remote-task-user.tasks.row.${task.id}`" class="border-t border-border">
+              <td class="px-4 py-4 font-medium text-foreground">{{ task.action_name || task.action_key || task.id }}</td>
+              <td class="px-4 py-4 text-muted-foreground">{{ task.status || '-' }}</td>
+              <td class="px-4 py-4 text-muted-foreground">{{ task.created_at || '-' }}</td>
               <td class="px-4 py-4">
                 <div class="flex flex-wrap gap-2">
                   <Button variant="outline" size="sm" @click="openTask(task.id)">{{ runtime.t('remoteTaskUser.tasks.detail', 'Task detail') }}</Button>

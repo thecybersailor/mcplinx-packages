@@ -67,18 +67,18 @@ onMounted(load)
           v-for="config in configs"
           :key="config.id"
           :data-test-id="`remote-task-management.config.row.${config.id}`"
-          class="flex items-center justify-between border-b border-slate-200 px-4 py-3 last:border-b-0"
+          class="flex items-center justify-between border-b border-border px-4 py-3 last:border-b-0"
         >
           <div>
-            <div class="font-medium text-slate-950">{{ config.name || config.id }}</div>
-            <div class="text-sm text-slate-500">{{ config.status || '-' }}</div>
+            <div class="font-medium text-foreground">{{ config.name || config.id }}</div>
+            <div class="text-sm text-muted-foreground">{{ config.status || '-' }}</div>
           </div>
           <Button variant="outline" size="sm" @click="select(config.id)">{{ runtime.t('remoteTaskManagement.common.edit', 'Edit') }}</Button>
         </div>
       </BundlePanel>
       <BundlePanel class="space-y-3">
-        <div class="text-sm text-slate-500">{{ runtime.t('remoteTaskManagement.config.connectorId', 'Connector ID') }}: {{ selectedId || '-' }}</div>
-        <textarea v-model="editor" data-test-id="remote-task-management.config.editor" class="min-h-96 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 font-mono text-xs text-slate-900" />
+        <div class="text-sm text-muted-foreground">{{ runtime.t('remoteTaskManagement.config.connectorId', 'Connector ID') }}: {{ selectedId || '-' }}</div>
+        <textarea v-model="editor" data-test-id="remote-task-management.config.editor" class="min-h-96 w-full rounded-xl border border-input bg-background px-3 py-2 font-mono text-xs text-foreground" />
         <Button data-test-id="remote-task-management.config.save" :disabled="saving || !selectedId" @click="save">
           {{ saving ? runtime.t('remoteTaskManagement.common.saving', 'Saving...') : runtime.t('remoteTaskManagement.config.saveConfig', 'Save config') }}
         </Button>

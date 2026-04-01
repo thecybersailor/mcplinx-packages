@@ -23,6 +23,8 @@
   },
   "dependencies": {
     "@vueuse/core": "^14.2.1",
-    "reka-ui": "^2.9.2"
+    "clsx": "^2.1.1",
+    "reka-ui": "^2.9.2",
+    "tailwind-merge": "^3.5.0"
   }
 }

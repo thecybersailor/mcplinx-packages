@@ -10,7 +10,7 @@
     <div class="space-y-4">
       <div>
         <h3 class="mb-2 text-sm font-semibold text-foreground">1. Create a new connector project</h3>
-        <pre class="overflow-x-auto rounded-xl border border-white/10 bg-slate-950/80 p-3 text-xs leading-6 text-slate-100"><code>npm create cybersailor-connector@latest my-connector --ai cursor
+        <pre class="overflow-x-auto rounded-xl border border-border bg-muted p-3 text-xs leading-6 text-foreground"><code>npm create cybersailor-connector@latest my-connector --ai cursor
 cd my-connector</code></pre>
       </div>
 

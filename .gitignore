@@ -3,3 +3,6 @@ dist/
 coverage/
 .DS_Store
 *.log
+
+# Local example connector (not tracked)
+remote-connector-examples/connector-spbj/

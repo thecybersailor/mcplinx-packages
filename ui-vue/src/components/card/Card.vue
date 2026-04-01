@@ -9,7 +9,7 @@ const props = defineProps<{
 <template>
   <section
     data-slot="card"
-    :class="['rounded-lg border border-white/10 bg-white/[0.03]', props.class]"
+    :class="['rounded-lg border border-border bg-card text-card-foreground shadow-sm', props.class]"
   >
     <slot />
   </section>

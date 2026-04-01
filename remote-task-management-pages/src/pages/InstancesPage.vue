@@ -52,13 +52,13 @@ function ownerLabelOf(instance: RemoteInstance) {
 function statusClassOf(instance: RemoteInstance) {
   switch (instance.status) {
     case 'active':
-      return 'border-emerald-400/25 bg-emerald-500/10 text-emerald-100'
+      return 'border-emerald-500/30 bg-emerald-500/10 text-emerald-800 dark:text-emerald-100'
     case 'pending_review':
-      return 'border-amber-400/25 bg-amber-500/10 text-amber-100'
+      return 'border-amber-500/30 bg-amber-500/10 text-amber-800 dark:text-amber-100'
     case 'rejected':
-      return 'border-rose-400/25 bg-rose-500/10 text-rose-100'
+      return 'border-rose-500/30 bg-rose-500/10 text-rose-800 dark:text-rose-100'
     default:
-      return 'border-white/10 bg-black/20 text-slate-300'
+      return 'border-border bg-muted text-muted-foreground'
   }
 }
 

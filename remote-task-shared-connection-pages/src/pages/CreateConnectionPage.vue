@@ -85,9 +85,9 @@ async function submitAuth() {
     description="Use the same shared-connection creation form in every host."
   >
     <BundlePanel>
-      <div class="mb-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-        <h2 class="text-base font-semibold text-slate-950">What happens next</h2>
-        <ul class="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-slate-600">
+      <div class="mb-5 rounded-2xl border border-border bg-muted/30 p-4">
+        <h2 class="text-base font-semibold text-foreground">What happens next</h2>
+        <ul class="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-muted-foreground">
           <li>Save creates the shared connection record immediately.</li>
           <li>Start auth opens the provider flow when authorization is required.</li>
           <li>If the provider returns extra fields, complete them below before retrying.</li>
@@ -95,26 +95,26 @@ async function submitAuth() {
       </div>
       <form class="space-y-3" @submit.prevent="saveDraft">
         <label class="block text-sm">
-          <span class="font-medium text-slate-700">{{ runtime.t('sharedConnections.connectorId', 'Connector ID') }}</span>
-          <input v-model="form.connector_id" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-slate-900" data-test-id="shared-connections.create.connector-id">
+          <span class="font-medium text-foreground">{{ runtime.t('sharedConnections.connectorId', 'Connector ID') }}</span>
+          <input v-model="form.connector_id" class="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2 text-foreground" data-test-id="shared-connections.create.connector-id">
         </label>
         <label class="block text-sm">
-          <span class="font-medium text-slate-700">{{ runtime.t('sharedConnections.label', 'Label') }}</span>
-          <input v-model="form.label" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-slate-900" data-test-id="shared-connections.create.label">
+          <span class="font-medium text-foreground">{{ runtime.t('sharedConnections.label', 'Label') }}</span>
+          <input v-model="form.label" class="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2 text-foreground" data-test-id="shared-connections.create.label">
         </label>
         <label class="block text-sm">
-          <span class="font-medium text-slate-700">{{ runtime.t('sharedConnections.principalPattern', 'Principal Pattern') }}</span>
-          <input v-model="form.principal_pattern" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-slate-900" data-test-id="shared-connections.create.principal-pattern">
+          <span class="font-medium text-foreground">{{ runtime.t('sharedConnections.principalPattern', 'Principal Pattern') }}</span>
+          <input v-model="form.principal_pattern" class="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2 text-foreground" data-test-id="shared-connections.create.principal-pattern">
         </label>
         <label class="block text-sm">
-          <span class="font-medium text-slate-700">{{ runtime.t('sharedConnections.inheritsTo', 'Inherits To') }}</span>
-          <input v-model="form.inherits_to" class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-slate-900" data-test-id="shared-connections.create.inherits-to">
+          <span class="font-medium text-foreground">{{ runtime.t('sharedConnections.inheritsTo', 'Inherits To') }}</span>
+          <input v-model="form.inherits_to" class="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2 text-foreground" data-test-id="shared-connections.create.inherits-to">
         </label>
         <div class="flex flex-wrap gap-2">
-          <button class="inline-flex items-center justify-center rounded-xl bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800" :disabled="saving" data-test-id="shared-connections.create.submit">
+          <button class="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90" :disabled="saving" data-test-id="shared-connections.create.submit">
             {{ saving ? runtime.t('sharedConnections.saving', 'Saving...') : runtime.t('sharedConnections.save', 'Save') }}
           </button>
-          <button type="button" class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100" :disabled="authPending" data-test-id="shared-connections.create.start-auth" @click="startAuth">
+          <button type="button" class="inline-flex items-center justify-center rounded-xl border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition hover:bg-accent hover:text-accent-foreground" :disabled="authPending" data-test-id="shared-connections.create.start-auth" @click="startAuth">
             {{ authPending ? runtime.t('sharedConnections.authorizing', 'Authorizing...') : runtime.t('sharedConnections.startAuth', 'Start auth') }}
           </button>
         </div>
@@ -123,19 +123,19 @@ async function submitAuth() {
 
     <BundlePanel v-if="authSession && authFields.length" data-test-id="shared-connections.create.auth-form">
       <div class="space-y-3">
-        <div class="text-sm text-slate-600">{{ runtime.t('sharedConnections.authPrompt', 'Complete the required authorization fields to finish creating this shared connection.') }}</div>
+        <div class="text-sm text-muted-foreground">{{ runtime.t('sharedConnections.authPrompt', 'Complete the required authorization fields to finish creating this shared connection.') }}</div>
         <label v-for="field in authFields" :key="String(field.label ?? field.name ?? field.key ?? '')" class="block text-sm">
-          <span class="font-medium text-slate-700">{{ String(field.label ?? field.name ?? field.key ?? 'Field') }}</span>
+          <span class="font-medium text-foreground">{{ String(field.label ?? field.name ?? field.key ?? 'Field') }}</span>
           <input
             v-model="authData[String(field.label ?? field.name ?? field.key ?? 'field')]"
-            class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-slate-900"
+            class="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2 text-foreground"
             :data-test-id="`shared-connections.create.auth-field.${String(field.name ?? field.key ?? field.label ?? 'field')}`"
           >
         </label>
-        <button class="inline-flex items-center justify-center rounded-xl bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800" :disabled="authPending" data-test-id="shared-connections.create.submit-auth" @click="submitAuth">
+        <button class="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90" :disabled="authPending" data-test-id="shared-connections.create.submit-auth" @click="submitAuth">
           {{ authPending ? runtime.t('sharedConnections.authorizing', 'Authorizing...') : runtime.t('sharedConnections.submitAuth', 'Submit auth') }}
         </button>
-        <p class="text-xs leading-5 text-slate-500">Keep the connection fields unchanged, then retry after checking the provider response.</p>
+        <p class="text-xs leading-5 text-muted-foreground">Keep the connection fields unchanged, then retry after checking the provider response.</p>
       </div>
     </BundlePanel>
   </BundlePage>

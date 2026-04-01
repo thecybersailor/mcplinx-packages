@@ -122,12 +122,12 @@ onMounted(load)
       <BundlePanel>
         <div class="mb-4 flex items-start justify-between gap-4">
           <div>
-            <h2 class="text-base font-semibold text-white">{{ runtime.t('remoteTaskManagement.instances.activeDeployment', 'Active Deployment') }}</h2>
-            <p class="mt-1 text-sm text-slate-400">{{ runtime.t('remoteTaskManagement.instances.activeDeploymentDesc', 'Active deployment shows the version that is currently serving traffic.') }}</p>
+            <h2 class="text-base font-semibold text-foreground">{{ runtime.t('remoteTaskManagement.instances.activeDeployment', 'Active Deployment') }}</h2>
+            <p class="mt-1 text-sm text-muted-foreground">{{ runtime.t('remoteTaskManagement.instances.activeDeploymentDesc', 'Active deployment shows the version that is currently serving traffic.') }}</p>
           </div>
         </div>
-        <div class="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
-          <div class="flex items-center justify-between border-b border-white/10 px-4 py-3 text-xs text-slate-400">
+        <div class="overflow-hidden rounded-2xl border border-border bg-muted/30">
+          <div class="flex items-center justify-between border-b border-border px-4 py-3 text-xs text-muted-foreground">
             <span>{{ runtime.t('remoteTaskManagement.instances.deployedAt', 'Deployed {time}', { time: instance.updatedAt || '-' }) }}</span>
             <span>via Syntool</span>
           </div>
@@ -136,16 +136,16 @@ onMounted(load)
               <div class="h-10 w-1 rounded-full bg-emerald-400"></div>
               <div>
                 <div class="flex items-center gap-2">
-                  <span class="font-mono font-medium text-white">{{ instance.activeVersion || '-' }}</span>
-                  <span class="rounded-full border border-emerald-400/20 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-200">{{ runtime.t('remoteTaskManagement.instances.latest', 'Latest') }}</span>
+                  <span class="font-mono font-medium text-foreground">{{ instance.activeVersion || '-' }}</span>
+                  <span class="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-800 dark:text-emerald-200">{{ runtime.t('remoteTaskManagement.instances.latest', 'Latest') }}</span>
                 </div>
-                <div class="mt-2 text-sm text-slate-400">{{ instance.status || '-' }}</div>
+                <div class="mt-2 text-sm text-muted-foreground">{{ instance.status || '-' }}</div>
               </div>
             </div>
-            <div class="space-y-2 text-right text-sm text-slate-400">
+            <div class="space-y-2 text-right text-sm text-muted-foreground">
               <div>{{ instance.visibility || 'private' }}</div>
               <div v-if="instance.oauthCallbackURL" class="break-all">
-                {{ runtime.t('remoteTaskManagement.instances.callback', 'Callback') }}: <code class="rounded bg-slate-950 px-1.5 py-0.5 text-xs text-slate-100">{{ instance.oauthCallbackURL }}</code>
+                {{ runtime.t('remoteTaskManagement.instances.callback', 'Callback') }}: <code class="rounded bg-muted px-1.5 py-0.5 text-xs text-foreground">{{ instance.oauthCallbackURL }}</code>
               </div>
             </div>
           </div>
@@ -154,25 +154,25 @@ onMounted(load)
       <BundlePanel class="space-y-4">
         <div class="flex items-center justify-between gap-4">
           <div>
-            <h2 class="text-base font-semibold text-white">{{ runtime.t('remoteTaskManagement.instances.vars', 'Variables') }}</h2>
-            <p class="mt-1 text-sm text-slate-400">{{ runtime.t('remoteTaskManagement.instances.varsDesc', 'Non-sensitive configuration values.') }}</p>
+            <h2 class="text-base font-semibold text-foreground">{{ runtime.t('remoteTaskManagement.instances.vars', 'Variables') }}</h2>
+            <p class="mt-1 text-sm text-muted-foreground">{{ runtime.t('remoteTaskManagement.instances.varsDesc', 'Non-sensitive configuration values.') }}</p>
           </div>
           <Button :disabled="savingConfig" @click="saveConfig">
             {{ savingConfig ? runtime.t('remoteTaskManagement.common.saving', 'Saving...') : runtime.t('remoteTaskManagement.common.saveChanges', 'Save Changes') }}
           </Button>
         </div>
-        <div class="overflow-hidden rounded-2xl border border-white/10">
+        <div class="overflow-hidden rounded-2xl border border-border">
           <Table>
-            <TableHeader class="bg-white/[0.02]"><TableRow class="border-white/10 hover:bg-transparent"><TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.common.key', 'Key') }}</TableHead><TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.common.value', 'Value') }}</TableHead><TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.common.actions', 'Actions') }}</TableHead></TableRow></TableHeader>
+            <TableHeader class="bg-muted/30"><TableRow class="border-border hover:bg-transparent"><TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.common.key', 'Key') }}</TableHead><TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.common.value', 'Value') }}</TableHead><TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.common.actions', 'Actions') }}</TableHead></TableRow></TableHeader>
             <TableBody>
-              <TableRow v-for="(item, index) in envVars" :key="`${item.key}-${index}`" class="border-t border-white/10 hover:bg-transparent">
-                <TableCell><input v-model="item.key" class="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-slate-100 outline-none" placeholder="KEY_NAME" /></TableCell>
-                <TableCell><input v-model="item.value" class="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-slate-100 outline-none" placeholder="value" /></TableCell>
+              <TableRow v-for="(item, index) in envVars" :key="`${item.key}-${index}`" class="border-t border-border hover:bg-transparent">
+                <TableCell><input v-model="item.key" class="w-full rounded-xl border border-input bg-background px-3 py-2 text-xs text-foreground outline-none" placeholder="KEY_NAME" /></TableCell>
+                <TableCell><input v-model="item.value" class="w-full rounded-xl border border-input bg-background px-3 py-2 text-xs text-foreground outline-none" placeholder="value" /></TableCell>
                 <TableCell><Button variant="outline" size="sm" @click="removeEnvVar(index)">{{ runtime.t('remoteTaskManagement.common.delete', 'Delete') }}</Button></TableCell>
               </TableRow>
-              <TableRow class="border-t border-white/10 hover:bg-transparent">
+              <TableRow class="border-t border-border hover:bg-transparent">
                 <TableCell colspan="3">
-                  <Button variant="outline" class="w-full border-dashed border-white/12" @click="addEnvVar">
+                  <Button variant="outline" class="w-full border-dashed border-border" @click="addEnvVar">
                     {{ runtime.t('remoteTaskManagement.instances.addVar', 'Add Variable') }}
                   </Button>
                 </TableCell>
@@ -183,21 +183,21 @@ onMounted(load)
       </BundlePanel>
       <BundlePanel class="space-y-4">
         <div>
-          <h2 class="text-base font-semibold text-white">{{ runtime.t('remoteTaskManagement.instances.secrets', 'Secrets') }}</h2>
-          <p class="mt-1 text-sm text-slate-400">{{ runtime.t('remoteTaskManagement.instances.secretsDesc', 'Sensitive values remain masked in the detail surface.') }}</p>
+          <h2 class="text-base font-semibold text-foreground">{{ runtime.t('remoteTaskManagement.instances.secrets', 'Secrets') }}</h2>
+          <p class="mt-1 text-sm text-muted-foreground">{{ runtime.t('remoteTaskManagement.instances.secretsDesc', 'Sensitive values remain masked in the detail surface.') }}</p>
         </div>
-        <div class="overflow-hidden rounded-2xl border border-white/10">
+        <div class="overflow-hidden rounded-2xl border border-border">
           <Table>
-            <TableHeader class="bg-white/[0.02]"><TableRow class="border-white/10 hover:bg-transparent"><TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.common.key', 'Key') }}</TableHead><TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.common.value', 'Value') }}</TableHead><TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.common.actions', 'Actions') }}</TableHead></TableRow></TableHeader>
+            <TableHeader class="bg-muted/30"><TableRow class="border-border hover:bg-transparent"><TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.common.key', 'Key') }}</TableHead><TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.common.value', 'Value') }}</TableHead><TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.common.actions', 'Actions') }}</TableHead></TableRow></TableHeader>
             <TableBody>
-              <TableRow v-for="(item, index) in secretVars" :key="`${item.key}-${index}`" class="border-t border-white/10 hover:bg-transparent">
-                <TableCell><input v-model="item.key" class="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-slate-100 outline-none" placeholder="SECRET_KEY" /></TableCell>
-                <TableCell><input v-model="item.value" type="password" class="w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-slate-100 outline-none" :placeholder="item.configured && !item.value ? runtime.t('remoteTaskManagement.instances.secretSet', '••••••• (Set)') : runtime.t('remoteTask मैनेजमेंट.instances.secretVal', 'secret value')" /></TableCell>
+              <TableRow v-for="(item, index) in secretVars" :key="`${item.key}-${index}`" class="border-t border-border hover:bg-transparent">
+                <TableCell><input v-model="item.key" class="w-full rounded-xl border border-input bg-background px-3 py-2 text-xs text-foreground outline-none" placeholder="SECRET_KEY" /></TableCell>
+                <TableCell><input v-model="item.value" type="password" class="w-full rounded-xl border border-input bg-background px-3 py-2 text-xs text-foreground outline-none" :placeholder="item.configured && !item.value ? runtime.t('remoteTaskManagement.instances.secretSet', '••••••• (Set)') : runtime.t('remoteTaskManagement.instances.secretVal', 'secret value')" /></TableCell>
                 <TableCell><Button variant="outline" size="sm" @click="removeSecretVar(index)">{{ runtime.t('remoteTaskManagement.common.delete', 'Delete') }}</Button></TableCell>
               </TableRow>
-              <TableRow class="border-t border-white/10 hover:bg-transparent">
+              <TableRow class="border-t border-border hover:bg-transparent">
                 <TableCell colspan="3">
-                  <Button variant="outline" class="w-full border-dashed border-white/12" @click="addSecretVar">
+                  <Button variant="outline" class="w-full border-dashed border-border" @click="addSecretVar">
                     {{ runtime.t('remoteTaskManagement.instances.addSecret', 'Add Secret') }}
                   </Button>
                 </TableCell>
@@ -209,29 +209,29 @@ onMounted(load)
       <BundlePanel>
         <div class="mb-4 flex items-center justify-between gap-4">
           <div>
-            <h2 class="text-base font-semibold text-white">{{ runtime.t('remoteTaskManagement.instances.versionHistory', 'Version History') }}</h2>
-            <p class="mt-1 text-sm text-slate-400">{{ runtime.t('remoteTaskManagement.instances.versionHistoryDesc', 'Version history tracks code and configuration changes for this instance.') }}</p>
+            <h2 class="text-base font-semibold text-foreground">{{ runtime.t('remoteTaskManagement.instances.versionHistory', 'Version History') }}</h2>
+            <p class="mt-1 text-sm text-muted-foreground">{{ runtime.t('remoteTaskManagement.instances.versionHistoryDesc', 'Version history tracks code and configuration changes for this instance.') }}</p>
           </div>
           <Button variant="outline">{{ runtime.t('remoteTaskManagement.instances.deployVersion', 'Deploy version') }}</Button>
         </div>
-        <div v-if="instance.versions?.length" class="overflow-hidden rounded-2xl border border-slate-200">
+        <div v-if="instance.versions?.length" class="overflow-hidden rounded-2xl border border-border">
           <Table>
-            <TableHeader class="bg-white/[0.02]"><TableRow class="border-white/10 hover:bg-transparent"><TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.common.version', 'Version') }}</TableHead><TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.common.tools', 'Tools') }}</TableHead><TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.common.created', 'Created') }}</TableHead></TableRow></TableHeader>
+            <TableHeader class="bg-muted/30"><TableRow class="border-border hover:bg-transparent"><TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.common.version', 'Version') }}</TableHead><TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.common.tools', 'Tools') }}</TableHead><TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.common.created', 'Created') }}</TableHead></TableRow></TableHeader>
             <TableBody>
-              <TableRow v-for="version in instance.versions" :key="version.id || version.version" class="border-white/10 hover:bg-[rgba(255,255,255,0.02)]" :class="{ 'bg-white/[0.03]': version.version === instance.activeVersion }">
-                <TableCell class="text-slate-100">{{ version.version || '-' }}</TableCell>
-                <TableCell class="text-slate-300">{{ version.toolCount || 0 }}</TableCell>
-                <TableCell class="text-slate-300">{{ version.createdAt || '-' }}</TableCell>
+              <TableRow v-for="version in instance.versions" :key="version.id || version.version" class="border-border hover:bg-muted/25" :class="{ 'bg-muted/40': version.version === instance.activeVersion }">
+                <TableCell class="text-foreground">{{ version.version || '-' }}</TableCell>
+                <TableCell class="text-muted-foreground">{{ version.toolCount || 0 }}</TableCell>
+                <TableCell class="text-muted-foreground">{{ version.createdAt || '-' }}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
         </div>
-        <p v-else class="text-sm text-slate-400">{{ runtime.t('remoteTaskManagement.instances.noHistory', 'No version history available.') }}</p>
+        <p v-else class="text-sm text-muted-foreground">{{ runtime.t('remoteTaskManagement.instances.noHistory', 'No version history available.') }}</p>
       </BundlePanel>
       <BundlePanel v-if="canModerate" class="space-y-3">
         <label class="grid gap-2">
-          <span class="text-sm font-medium text-slate-700">{{ runtime.t('remoteTaskManagement.instances.reviewReason', 'Review reason') }}</span>
-          <textarea v-model="reviewReason" data-test-id="remote-task-management.instance-detail.reason" class="min-h-24 rounded-xl border border-slate-300 bg-white px-3 py-2 text-slate-900" />
+          <span class="text-sm font-medium text-foreground">{{ runtime.t('remoteTaskManagement.instances.reviewReason', 'Review reason') }}</span>
+          <textarea v-model="reviewReason" data-test-id="remote-task-management.instance-detail.reason" class="min-h-24 rounded-xl border border-input bg-background px-3 py-2 text-foreground" />
         </label>
         <div class="flex flex-wrap gap-2">
           <Button data-test-id="remote-task-management.instance-detail.approve" @click="review('approve')">{{ runtime.t('remoteTaskManagement.instances.approve', 'Approve') }}</Button>

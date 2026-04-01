@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 text-slate-950 md:p-5">
+  <div class="rounded-2xl border border-border bg-muted/30 p-4 text-foreground md:p-5">
     <slot />
   </div>
 </template>

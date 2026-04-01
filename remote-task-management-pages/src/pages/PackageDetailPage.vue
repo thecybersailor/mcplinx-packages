@@ -141,14 +141,14 @@ onMounted(load)
 
     <BundleState v-if="loading" variant="loading" :message="runtime.t('remoteTaskManagement.common.loading', 'Loading...')" />
     <BundleState v-else-if="error" variant="error" :message="error" />
-    <div v-else-if="pkg" class="space-y-4">
-      <div class="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
-        <div class="space-y-4">
+    <div v-else-if="pkg" class="space-y-6">
+      <div class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
+        <div class="space-y-6">
           <BundlePanel>
             <div class="mb-4 flex items-center justify-between gap-4">
               <div>
-                <h2 class="text-base font-semibold text-white">{{ runtime.t('remoteTaskManagement.packages.deployment', 'Deployment') }}</h2>
-                <p class="mt-1 text-sm text-slate-400">{{ runtime.t('remoteTaskManagement.packages.deploymentDesc', 'Create and manage deployable instances for this connector package.') }}</p>
+                <h2 class="text-base font-semibold text-foreground">{{ runtime.t('remoteTaskManagement.packages.deployment', 'Deployment') }}</h2>
+                <p class="mt-1 text-sm text-muted-foreground">{{ runtime.t('remoteTaskManagement.packages.deploymentDesc', 'Create and manage deployable instances for this connector package.') }}</p>
               </div>
               <Button
                 v-if="runtime.facade.createInstance"
@@ -173,78 +173,78 @@ onMounted(load)
                 <button
                   :data-test-id="`remote-task-management.package-detail.instances.row.${instance.id}.detail`"
                   type="button"
-                  class="w-full rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left transition hover:border-cyan-400/30 hover:bg-white/[0.06]"
+                  class="w-full rounded-2xl border border-border bg-muted/50 p-4 text-left transition hover:border-primary/50 hover:bg-muted/60"
                   @click="openInstanceDetail(instance.id)"
                 >
                   <div class="mb-2 flex items-start justify-between gap-3">
                     <div>
-                      <div class="text-sm font-semibold text-white">{{ instance.name || instance.id }}</div>
-                      <div class="mt-1 text-xs text-slate-400">ID: {{ instance.id }}</div>
+                      <div class="text-sm font-semibold text-foreground">{{ instance.name || instance.id }}</div>
+                      <div class="mt-1 text-xs text-muted-foreground">ID: {{ instance.id }}</div>
                     </div>
                     <div class="flex flex-wrap gap-2 text-xs">
-                      <span class="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-slate-200">{{ instance.visibility || 'private' }}</span>
-                      <span class="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-slate-200">{{ instance.status || '-' }}</span>
+                      <span class="rounded-full border border-border bg-muted/40 px-2.5 py-1 text-muted-foreground">{{ instance.visibility || 'private' }}</span>
+                      <span class="rounded-full border border-border bg-muted/40 px-2.5 py-1 text-muted-foreground">{{ instance.status || '-' }}</span>
                     </div>
                   </div>
-                  <div class="flex items-center justify-between text-sm text-slate-400">
+                  <div class="flex items-center justify-between text-sm text-muted-foreground">
                     <span>{{ runtime.t('remoteTaskManagement.common.version', 'Version') }}: {{ instance.activeVersion || '-' }}</span>
-                    <span v-if="instance.status === 'pending_review'" class="text-amber-300">{{ runtime.t('remoteTaskManagement.instances.awaitingApproval', 'Awaiting admin approval') }}</span>
+                    <span v-if="instance.status === 'pending_review'" class="text-amber-700 dark:text-amber-300">{{ runtime.t('remoteTaskManagement.instances.awaitingApproval', 'Awaiting admin approval') }}</span>
                   </div>
                 </button>
               </div>
             </div>
-            <div v-else class="rounded-2xl border border-dashed border-white/12 bg-white/[0.02] px-4 py-8 text-center">
-              <div class="text-sm font-medium text-white">{{ runtime.t('remoteTaskManagement.packages.noInstances', 'No instances created yet') }}</div>
-              <div class="mt-2 text-xs text-slate-400">{{ runtime.t('remoteTaskManagement.packages.runDeploy', 'Run `syntool deploy` to get started.') }}</div>
+            <div v-else class="rounded-2xl border border-dashed border-border bg-muted/30 px-4 py-8 text-center">
+              <div class="text-sm font-medium text-foreground">{{ runtime.t('remoteTaskManagement.packages.noInstances', 'No instances created yet') }}</div>
+              <div class="mt-2 text-xs text-muted-foreground">{{ runtime.t('remoteTaskManagement.packages.runDeploy', 'Run `syntool deploy` to get started.') }}</div>
             </div>
           </BundlePanel>
 
           <BundlePanel>
-            <h2 class="mb-3 text-base font-semibold text-white">{{ runtime.t('remoteTaskManagement.packages.availableTools', 'Available Tools - Latest Version') }}</h2>
+            <h2 class="mb-3 text-base font-semibold text-foreground">{{ runtime.t('remoteTaskManagement.packages.availableTools', 'Available Tools - Latest Version') }}</h2>
             <div v-if="versions[0]" class="space-y-2">
-              <div class="text-sm text-slate-300">{{ runtime.t('remoteTaskManagement.common.version', 'Version') }} {{ versions[0].version || '-' }}</div>
-              <div class="rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-4 text-sm text-slate-400">
+              <div class="text-sm text-muted-foreground">{{ runtime.t('remoteTaskManagement.common.version', 'Version') }} {{ versions[0].version || '-' }}</div>
+              <div class="rounded-2xl border border-border bg-muted/30 px-4 py-4 text-sm text-muted-foreground">
                 {{ runtime.t('remoteTaskManagement.packages.toolsAvailable', '{count} tool(s) are available in the latest package version.', { count: versions[0].toolCount || 0 }) }}
               </div>
             </div>
-            <p v-else class="text-sm text-slate-400">{{ runtime.t('remoteTaskManagement.packages.noTools', 'No tools available yet.') }}</p>
+            <p v-else class="text-sm text-muted-foreground">{{ runtime.t('remoteTaskManagement.packages.noTools', 'No tools available yet.') }}</p>
           </BundlePanel>
 
           <BundlePanel>
-            <h2 class="mb-3 text-base font-semibold text-white">{{ runtime.t('remoteTaskManagement.packages.allVersions', 'All Versions ({count})', { count: versions.length }) }}</h2>
-            <div v-if="versions.length" class="overflow-hidden rounded-2xl border border-white/10">
+            <h2 class="mb-3 text-base font-semibold text-foreground">{{ runtime.t('remoteTaskManagement.packages.allVersions', 'All Versions ({count})', { count: versions.length }) }}</h2>
+            <div v-if="versions.length" class="overflow-hidden rounded-2xl border border-border">
               <Table>
-                <TableHeader class="bg-white/[0.02]"><TableRow class="border-white/10 hover:bg-transparent"><TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.common.version', 'Version') }}</TableHead><TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.common.tools', 'Tools') }}</TableHead><TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.common.created', 'Created') }}</TableHead></TableRow></TableHeader>
+                <TableHeader class="bg-muted/30"><TableRow class="border-border hover:bg-transparent"><TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.common.version', 'Version') }}</TableHead><TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.common.tools', 'Tools') }}</TableHead><TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.common.created', 'Created') }}</TableHead></TableRow></TableHeader>
                 <TableBody>
-                  <TableRow v-for="version in versions" :key="version.id || version.version" class="border-t border-white/10 hover:bg-[rgba(255,255,255,0.02)]">
-                    <TableCell class="text-slate-100">{{ version.version || '-' }}</TableCell>
-                    <TableCell class="text-slate-300">{{ version.toolCount || 0 }}</TableCell>
-                    <TableCell class="text-slate-300">{{ version.createdAt || '-' }}</TableCell>
+                  <TableRow v-for="version in versions" :key="version.id || version.version" class="border-t border-border hover:bg-muted/25">
+                    <TableCell class="text-foreground">{{ version.version || '-' }}</TableCell>
+                    <TableCell class="text-muted-foreground">{{ version.toolCount || 0 }}</TableCell>
+                    <TableCell class="text-muted-foreground">{{ version.createdAt || '-' }}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
             </div>
-            <div v-else class="rounded-2xl border border-dashed border-white/12 bg-white/[0.02] px-4 py-8 text-center text-sm text-slate-400">
+            <div v-else class="rounded-2xl border border-dashed border-border bg-muted/30 px-4 py-8 text-center text-sm text-muted-foreground">
               {{ runtime.t('remoteTaskManagement.packages.publishOrDeploy', 'Publish or deploy with the CLI to add the first version for this connector package.') }}
             </div>
           </BundlePanel>
         </div>
 
-        <div class="space-y-4">
+        <div class="space-y-6">
           <BundlePanel>
-            <h2 class="mb-3 text-base font-semibold text-white">{{ runtime.t('remoteTaskManagement.packages.basicInfo', 'Basic Info') }}</h2>
+            <h2 class="mb-3 text-base font-semibold text-foreground">{{ runtime.t('remoteTaskManagement.packages.basicInfo', 'Basic Info') }}</h2>
             <dl class="grid gap-3">
               <div>
-                <dt class="text-xs uppercase tracking-wide text-slate-500">{{ runtime.t('remoteTaskManagement.common.name', 'Name') }}</dt>
-                <dd class="mt-1 text-sm text-slate-100">{{ pkg.name || '-' }}</dd>
+                <dt class="text-xs uppercase tracking-wide text-muted-foreground">{{ runtime.t('remoteTaskManagement.common.name', 'Name') }}</dt>
+                <dd class="mt-1 text-sm text-foreground">{{ pkg.name || '-' }}</dd>
               </div>
               <div>
-                <dt class="text-xs uppercase tracking-wide text-slate-500">{{ runtime.t('remoteTaskManagement.packages.packageId', 'Package ID') }}</dt>
-                <dd class="mt-1 break-all text-sm text-slate-300">{{ pkg.hashID || pkg.id || '-' }}</dd>
+                <dt class="text-xs uppercase tracking-wide text-muted-foreground">{{ runtime.t('remoteTaskManagement.packages.packageId', 'Package ID') }}</dt>
+                <dd class="mt-1 break-all text-sm text-muted-foreground">{{ pkg.hashID || pkg.id || '-' }}</dd>
               </div>
               <div>
-                <dt class="text-xs uppercase tracking-wide text-slate-500">{{ runtime.t('remoteTaskManagement.common.description', 'Description') }}</dt>
-                <dd class="mt-1 text-sm text-slate-300">{{ pkg.package_description || '-' }}</dd>
+                <dt class="text-xs uppercase tracking-wide text-muted-foreground">{{ runtime.t('remoteTaskManagement.common.description', 'Description') }}</dt>
+                <dd class="mt-1 text-sm text-muted-foreground">{{ pkg.package_description || '-' }}</dd>
               </div>
             </dl>
           </BundlePanel>
@@ -252,8 +252,8 @@ onMounted(load)
           <BundlePanel v-if="runtime.sharedConnectionRoutePrefix">
             <div class="flex items-center justify-between gap-4">
               <div>
-                <h2 class="text-base font-semibold text-white">{{ runtime.t('remoteTaskManagement.packages.sharedConnections', 'Shared Connections') }}</h2>
-                <p class="mt-1 text-sm text-slate-400">{{ runtime.t('remoteTaskManagement.packages.sharedConnectionsDesc', 'View the shared connections for this connector.') }}</p>
+                <h2 class="text-base font-semibold text-foreground">{{ runtime.t('remoteTaskManagement.packages.sharedConnections', 'Shared Connections') }}</h2>
+                <p class="mt-1 text-sm text-muted-foreground">{{ runtime.t('remoteTaskManagement.packages.sharedConnectionsDesc', 'View the shared connections for this connector.') }}</p>
               </div>
               <Button
                 data-test-id="remote-task-management.package-detail.shared-connections"
@@ -266,23 +266,23 @@ onMounted(load)
           </BundlePanel>
 
           <BundlePanel>
-            <h2 class="mb-3 text-base font-semibold text-white">{{ runtime.t('remoteTaskManagement.packages.statistics', 'Package Statistics') }}</h2>
+            <h2 class="mb-3 text-base font-semibold text-foreground">{{ runtime.t('remoteTaskManagement.packages.statistics', 'Package Statistics') }}</h2>
             <div class="grid gap-3">
-              <div class="rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-4">
-                <div class="text-xs font-medium uppercase tracking-wide text-slate-500">{{ runtime.t('remoteTaskManagement.packages.totalInstances', 'Total Instances') }}</div>
-                <div class="mt-2 text-2xl font-semibold text-white">{{ pkg.totalInstances ?? 0 }}</div>
+              <div class="rounded-2xl border border-border bg-muted/30 px-4 py-4">
+                <div class="text-xs font-medium uppercase tracking-wide text-muted-foreground">{{ runtime.t('remoteTaskManagement.packages.totalInstances', 'Total Instances') }}</div>
+                <div class="mt-2 text-2xl font-semibold text-foreground">{{ pkg.totalInstances ?? 0 }}</div>
               </div>
-              <div class="rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-4">
-                <div class="text-xs font-medium uppercase tracking-wide text-slate-500">{{ runtime.t('remoteTaskManagement.packages.activeInstances', 'Active Instances') }}</div>
-                <div class="mt-2 text-2xl font-semibold text-white">{{ pkg.activeInstances ?? 0 }}</div>
+              <div class="rounded-2xl border border-border bg-muted/30 px-4 py-4">
+                <div class="text-xs font-medium uppercase tracking-wide text-muted-foreground">{{ runtime.t('remoteTaskManagement.packages.activeInstances', 'Active Instances') }}</div>
+                <div class="mt-2 text-2xl font-semibold text-foreground">{{ pkg.activeInstances ?? 0 }}</div>
               </div>
-              <div class="rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-4">
-                <div class="text-xs font-medium uppercase tracking-wide text-slate-500">{{ runtime.t('remoteTaskManagement.packages.publicInstances', 'Public Instances') }}</div>
-                <div class="mt-2 text-2xl font-semibold text-white">{{ pkg.publicInstances ?? 0 }}</div>
+              <div class="rounded-2xl border border-border bg-muted/30 px-4 py-4">
+                <div class="text-xs font-medium uppercase tracking-wide text-muted-foreground">{{ runtime.t('remoteTaskManagement.packages.publicInstances', 'Public Instances') }}</div>
+                <div class="mt-2 text-2xl font-semibold text-foreground">{{ pkg.publicInstances ?? 0 }}</div>
               </div>
-              <div class="rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-4">
-                <div class="text-xs font-medium uppercase tracking-wide text-slate-500">{{ runtime.t('remoteTaskManagement.packages.pendingReviews', 'Pending Reviews') }}</div>
-                <div class="mt-2 text-2xl font-semibold text-white">{{ pkg.pendingReviews ?? 0 }}</div>
+              <div class="rounded-2xl border border-border bg-muted/30 px-4 py-4">
+                <div class="text-xs font-medium uppercase tracking-wide text-muted-foreground">{{ runtime.t('remoteTaskManagement.packages.pendingReviews', 'Pending Reviews') }}</div>
+                <div class="mt-2 text-2xl font-semibold text-foreground">{{ pkg.pendingReviews ?? 0 }}</div>
               </div>
             </div>
           </BundlePanel>
@@ -293,49 +293,49 @@ onMounted(load)
         <SheetContent
           side="right"
           data-test-id="remote-task-management.package-detail.create-instance.sheet"
-          class="h-full w-full max-w-xl overflow-y-auto border-white/10 bg-slate-950 px-6 py-6 text-slate-100 sm:max-w-xl"
+          class="h-full w-full max-w-xl overflow-y-auto border-border bg-card px-6 py-6 text-card-foreground sm:max-w-xl"
         >
           <SheetHeader class="mb-2 px-0 pr-10">
-            <SheetTitle class="text-xl text-white">{{ runtime.t('remoteTaskManagement.packages.createNewInstance', 'Create New Instance') }}</SheetTitle>
-            <SheetDescription class="mt-1 text-slate-400">
+            <SheetTitle class="text-xl text-foreground">{{ runtime.t('remoteTaskManagement.packages.createNewInstance', 'Create New Instance') }}</SheetTitle>
+            <SheetDescription class="mt-1 text-muted-foreground">
               {{ runtime.t('remoteTaskManagement.packages.createNewInstanceDesc', 'Create a deployable connector instance from this package.') }}
             </SheetDescription>
           </SheetHeader>
 
           <div class="space-y-4">
             <div class="grid gap-2">
-              <Label for="create-instance-name" class="font-medium text-slate-200">Name</Label>
+              <Label for="create-instance-name" class="font-medium text-foreground">Name</Label>
               <Input
                 id="create-instance-name"
                 v-model="newInstanceForm.name"
                 data-test-id="remote-task-management.package-detail.create-instance.name"
-                class="border-white/10 bg-white/[0.03] text-slate-100"
+                class="border-input bg-background text-foreground"
                 placeholder="My Connector Instance"
               />
             </div>
 
             <div class="grid gap-2">
-              <Label for="create-instance-description" class="font-medium text-slate-200">Description</Label>
+              <Label for="create-instance-description" class="font-medium text-foreground">Description</Label>
               <Textarea
                 id="create-instance-description"
                 v-model="newInstanceForm.description"
                 data-test-id="remote-task-management.package-detail.create-instance.description"
-                class="min-h-24 border-white/10 bg-white/[0.03] text-slate-100"
+                class="min-h-24 border-input bg-background text-foreground"
                 placeholder="Description for this instance"
               />
             </div>
 
             <div class="grid gap-2">
-              <Label for="create-instance-version" class="font-medium text-slate-200">Version</Label>
+              <Label for="create-instance-version" class="font-medium text-foreground">Version</Label>
               <Select v-model="newInstanceForm.version">
                 <SelectTrigger
                   id="create-instance-version"
                   data-test-id="remote-task-management.package-detail.create-instance.version.trigger"
-                  class="w-full border-white/10 bg-white/[0.03] text-slate-100"
+                  class="w-full border-input bg-background text-foreground"
                 >
                   <SelectValue placeholder="Select a version" />
                 </SelectTrigger>
-                <SelectContent class="border-white/10 bg-slate-950 text-slate-100">
+                <SelectContent class="border border-border bg-popover text-popover-foreground">
                   <SelectItem
                     v-for="version in versions"
                     :key="String(version.version || '')"
@@ -349,16 +349,16 @@ onMounted(load)
             </div>
 
             <div class="grid gap-2">
-              <Label for="create-instance-visibility" class="font-medium text-slate-200">Visibility</Label>
+              <Label for="create-instance-visibility" class="font-medium text-foreground">Visibility</Label>
               <Select v-model="newInstanceForm.visibility">
                 <SelectTrigger
                   id="create-instance-visibility"
                   data-test-id="remote-task-management.package-detail.create-instance.visibility.trigger"
-                  class="w-full border-white/10 bg-white/[0.03] text-slate-100"
+                  class="w-full border-input bg-background text-foreground"
                 >
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent class="border-white/10 bg-slate-950 text-slate-100">
+                <SelectContent class="border border-border bg-popover text-popover-foreground">
                   <SelectItem
                     value="private"
                     data-test-id="remote-task-management.package-detail.create-instance.visibility.option.private"
@@ -375,10 +375,11 @@ onMounted(load)
               </Select>
             </div>
 
-            <p v-if="createInstanceError" class="rounded-xl border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">{{ createInstanceError }}</p>
+            <p v-if="createInstanceError" class="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">{{ createInstanceError }}</p>
           </div>
 
-          <SheetFooter class="mt-6 flex-row items-center justify-start px-0">
+          <SheetFooter class="mt-6 flex flex-row flex-wrap items-center justify-end gap-2 border-t border-border px-0 pt-4">
+            <Button variant="outline" class="border-border bg-background text-foreground" @click="showCreateInstanceDrawer = false">{{ runtime.t('remoteTaskManagement.common.cancel', 'Cancel') }}</Button>
             <Button
               data-test-id="remote-task-management.package-detail.create-instance.submit"
               :disabled="creatingInstance || !newInstanceForm.version"
@@ -386,7 +387,6 @@ onMounted(load)
             >
               {{ creatingInstance ? runtime.t('remoteTaskManagement.common.creating', 'Creating...') : runtime.t('remoteTaskManagement.packages.createInstance', 'Create Instance') }}
             </Button>
-            <Button variant="outline" @click="showCreateInstanceDrawer = false">{{ runtime.t('remoteTaskManagement.common.cancel', 'Cancel') }}</Button>
           </SheetFooter>
         </SheetContent>
       </Sheet>

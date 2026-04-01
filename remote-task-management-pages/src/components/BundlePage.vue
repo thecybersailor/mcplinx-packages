@@ -39,7 +39,7 @@ withDefaults(defineProps<{
   <Card
     v-else
     :data-test-id="dataTestId"
-    class="space-y-6 rounded-[28px] border border-white/10 bg-white/[0.03] p-6 text-foreground shadow-[0_18px_50px_rgba(2,6,23,0.24)] backdrop-blur-sm md:p-8"
+    class="space-y-6 rounded-[28px] border border-border bg-card p-6 text-foreground shadow-sm md:p-8"
   >
     <CardHeader class="border-b-0 px-0 py-0">
       <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
