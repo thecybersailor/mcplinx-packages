@@ -66,14 +66,18 @@ onMounted(load)
 </script>
 
 <template>
-  <BundlePage :data-test-id="pageTestId" :title="runtime.t('remoteTaskManagement.instances.title', 'Connector Instances')">
+  <BundlePage
+    :data-test-id="pageTestId"
+    borderless
+    :title="runtime.t('remoteTaskManagement.instances.title', 'Connector Instances')"
+  >
     <template #actions>
       <Button variant="outline" @click="load">{{ runtime.t('remoteTaskManagement.instances.refresh', 'Refresh') }}</Button>
       <Select v-model="status" @update:modelValue="load">
-        <SelectTrigger data-test-id="remote-task-management.instances.status" class="w-[150px] rounded-xl border-white/12 bg-white/[0.04] text-slate-100 hover:border-white/20">
+        <SelectTrigger data-test-id="remote-task-management.instances.status" class="w-[150px] rounded-xl border-input bg-background text-foreground hover:bg-accent/50">
           <SelectValue :placeholder="runtime.t('remoteTaskManagement.instances.statusAll', 'All Status')" />
         </SelectTrigger>
-        <SelectContent class="border-white/10 bg-slate-950 text-slate-100">
+        <SelectContent class="border-border bg-popover text-popover-foreground">
           <SelectItem value="all">{{ runtime.t('remoteTaskManagement.instances.statusAll', 'All Status') }}</SelectItem>
           <SelectItem value="active">{{ runtime.t('remoteTaskManagement.instances.statusActive', 'Active') }}</SelectItem>
           <SelectItem value="pending_review">{{ runtime.t('remoteTaskManagement.instances.statusPending', 'Pending Review') }}</SelectItem>
@@ -82,10 +86,10 @@ onMounted(load)
         </SelectContent>
       </Select>
       <Select v-model="visibility">
-        <SelectTrigger data-test-id="remote-task-management.instances.visibility" class="w-[140px] rounded-xl border-white/12 bg-white/[0.04] text-slate-100 hover:border-white/20">
+        <SelectTrigger data-test-id="remote-task-management.instances.visibility" class="w-[140px] rounded-xl border-input bg-background text-foreground hover:bg-accent/50">
           <SelectValue :placeholder="runtime.t('remoteTaskManagement.instances.visibilityAll', 'All Visibility')" />
         </SelectTrigger>
-        <SelectContent class="border-white/10 bg-slate-950 text-slate-100">
+        <SelectContent class="border-border bg-popover text-popover-foreground">
           <SelectItem value="all">{{ runtime.t('remoteTaskManagement.instances.visibilityAll', 'All Visibility') }}</SelectItem>
           <SelectItem value="public">{{ runtime.t('remoteTaskManagement.instances.visibilityPublic', 'Public') }}</SelectItem>
           <SelectItem value="private">{{ runtime.t('remoteTaskManagement.instances.visibilityPrivate', 'Private') }}</SelectItem>
@@ -95,20 +99,20 @@ onMounted(load)
 
     <BundleState v-if="loading" variant="loading" :message="runtime.t('remoteTaskManagement.instances.loading', 'Loading instances...')" />
     <BundleState v-else-if="error" variant="error" :message="error" :action-label="runtime.t('remoteTaskManagement.instances.refresh', 'Refresh')" @action="load" />
-    <div v-else-if="!filteredInstances.length" class="rounded-2xl border border-dashed border-white/12 bg-white/[0.03] px-6 py-10 text-center">
-      <div class="text-lg font-semibold text-white">{{ runtime.t('remoteTaskManagement.instances.empty', 'No instances found') }}</div>
+    <div v-else-if="!filteredInstances.length" class="rounded-2xl border border-dashed border-border bg-muted/20 px-6 py-10 text-center">
+      <div class="text-lg font-semibold text-foreground">{{ runtime.t('remoteTaskManagement.instances.empty', 'No instances found') }}</div>
     </div>
-    <div v-else class="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+    <div v-else class="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
       <Table data-test-id="remote-task-management.instances.table">
-        <TableHeader class="bg-white/[0.02]">
-          <TableRow class="border-white/10 hover:bg-transparent">
-            <TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.instances.instance', 'Instance') }}</TableHead>
-            <TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.instances.package', 'Package') }}</TableHead>
-            <TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.instances.owner', 'Owner') }}</TableHead>
-            <TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.instances.visibility', 'Visibility') }}</TableHead>
-            <TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.instances.status', 'Status') }}</TableHead>
-            <TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.instances.version', 'Version') }}</TableHead>
-            <TableHead class="text-slate-400">{{ runtime.t('remoteTaskManagement.instances.actions', 'Actions') }}</TableHead>
+        <TableHeader class="bg-muted/30">
+          <TableRow class="border-border hover:bg-transparent">
+            <TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.instances.instance', 'Instance') }}</TableHead>
+            <TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.instances.package', 'Package') }}</TableHead>
+            <TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.instances.owner', 'Owner') }}</TableHead>
+            <TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.instances.visibility', 'Visibility') }}</TableHead>
+            <TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.instances.status', 'Status') }}</TableHead>
+            <TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.instances.version', 'Version') }}</TableHead>
+            <TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.instances.actions', 'Actions') }}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -116,21 +120,21 @@ onMounted(load)
           v-for="instance in filteredInstances"
           :key="instance.id"
           :data-test-id="`remote-task-management.instances.row.${instance.id}`"
-          class="cursor-pointer border-white/10 transition hover:bg-white/[0.04]"
+          class="cursor-pointer border-border transition hover:bg-muted/50"
         >
             <TableCell @click="detail(instance.id)">
-              <div class="font-medium text-white">{{ instance.name || instance.id }}</div>
-              <div class="text-sm leading-6 text-slate-400">{{ instance.instance_description || '-' }}</div>
+              <div class="font-medium text-foreground">{{ instance.name || instance.id }}</div>
+              <div class="text-sm leading-6 text-muted-foreground">{{ instance.instance_description || '-' }}</div>
             </TableCell>
-            <TableCell class="text-slate-300">{{ instance.pkgName || instance.pkg_id || '-' }}</TableCell>
-            <TableCell class="text-slate-300">{{ ownerLabelOf(instance) }}</TableCell>
-            <TableCell class="text-slate-300">{{ instance.visibility || '-' }}</TableCell>
+            <TableCell class="text-foreground">{{ instance.pkgName || instance.pkg_id || '-' }}</TableCell>
+            <TableCell class="text-foreground">{{ ownerLabelOf(instance) }}</TableCell>
+            <TableCell class="text-foreground">{{ instance.visibility || '-' }}</TableCell>
             <TableCell>
               <span class="rounded-full border px-3 py-1 text-xs font-medium" :class="statusClassOf(instance)">
                 {{ instance.status || 'unknown' }}
               </span>
             </TableCell>
-            <TableCell class="text-slate-300">{{ instance.activeVersion || '-' }}</TableCell>
+            <TableCell class="text-muted-foreground">{{ instance.activeVersion || '-' }}</TableCell>
             <TableCell>
               <Button variant="outline" size="sm" @click="detail(instance.id)">
                 {{ runtime.t('remoteTaskManagement.instances.details', 'Details') }}

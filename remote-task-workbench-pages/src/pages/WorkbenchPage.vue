@@ -26,9 +26,10 @@ const loginUrl = computed(() => {
   return `${origin}/team/${teamId.value}/linktool-login`
 })
 
-const loginCommand = computed(() => `linktool login --login-url ${loginUrl.value || '<login-url>'}`)
-const buildCommand = computed(() => 'linktool build')
-const deployCommand = computed(() => 'linktool deploy')
+const loginCommand = computed(() => `syntool login --login-url ${loginUrl.value || '<login-url>'}`)
+const buildCommand = computed(() => 'syntool build')
+const publishCommand = computed(() => 'syntool publish')
+const deployCommand = computed(() => 'syntool deploy --payload \'{"name":"<package>","version":"<version>"}\'')
 
 const rows = computed<ConnectorWorkbenchCard[]>(() => {
   return [...(workbench.value.available_connectors ?? []), ...(workbench.value.discoverable_connectors ?? [])]
@@ -95,6 +96,9 @@ onMounted(load)
         </div>
         <div class="space-y-2">
           <pre class="overflow-x-auto rounded-2xl border border-border bg-muted/30 p-3 text-xs leading-6 text-foreground"><code>{{ buildCommand }}</code></pre>
+        </div>
+        <div class="space-y-2">
+          <pre class="overflow-x-auto rounded-2xl border border-border bg-muted/30 p-3 text-xs leading-6 text-foreground"><code>{{ publishCommand }}</code></pre>
         </div>
         <div class="space-y-2">
           <pre class="overflow-x-auto rounded-2xl border border-border bg-muted/30 p-3 text-xs leading-6 text-foreground"><code>{{ deployCommand }}</code></pre>
