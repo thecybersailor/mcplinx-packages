@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import type { LinktoolCoreContext } from './types.js';
 import { buildBundle, loadConfigFromYaml } from '../lib/bundle-builder.js';
 import { loadConnector } from '../lib/connector-loader.js';
@@ -268,10 +269,14 @@ async function buildOAuthAuthorizeUrl(
         }
         params.set('redirect_uri', redirectUri);
         const { vars } = loadConfigFromYaml(ctx.cwd);
+        if (vars.APP_KEY) {
+            params.set('app_key', String(vars.APP_KEY));
+        }
         if (vars.CLIENT_ID) {
             params.set('client_id', String(vars.CLIENT_ID));
         }
         params.set('response_type', 'code');
+        params.set('state', randomUUID());
         return `${authConfig.authorizeUrl.url}?${params.toString()}`;
     }
 

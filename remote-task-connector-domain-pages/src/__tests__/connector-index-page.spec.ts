@@ -30,7 +30,7 @@ describe('ConnectorIndexPage', () => {
         cards,
         cliHintTitle: 'CLI Hint',
         cliHintDescription: 'Use the CLI for package operations.',
-        cliCommands: ['linktool login --login-url <login-url>', 'linktool build'],
+        cliCommands: ['syntool login --login-url <login-url>', 'syntool build', 'syntool publish'],
       },
       global: {
         stubs: {
@@ -49,8 +49,9 @@ describe('ConnectorIndexPage', () => {
     expect(wrapper.text()).toContain('Open Connections')
     expect(wrapper.text()).toContain('CLI Hint')
     expect(wrapper.text()).toContain('Use the CLI for package operations.')
-    expect(wrapper.text()).toContain('linktool login --login-url <login-url>')
-    expect(wrapper.text()).toContain('linktool build')
+    expect(wrapper.text()).toContain('syntool login --login-url <login-url>')
+    expect(wrapper.text()).toContain('syntool build')
+    expect(wrapper.text()).toContain('syntool publish')
   })
 
   it('supports slot override for the header region', () => {

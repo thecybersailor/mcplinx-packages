@@ -15,11 +15,11 @@ const emit = defineEmits<{
 function paletteOf(variant: typeof props.variant) {
   switch (variant) {
     case 'error':
-      return 'border-rose-500/30 bg-rose-500/10 text-rose-100'
+      return 'border-rose-600/30 bg-rose-50 text-rose-900 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-100'
     case 'empty':
-      return 'border-white/12 border-dashed bg-white/[0.02] text-slate-300'
+      return 'border-border border-dashed bg-muted/30 text-muted-foreground'
     default:
-      return 'border-white/10 bg-white/[0.03] text-slate-300'
+      return 'border-border bg-muted/20 text-muted-foreground'
   }
 }
 
@@ -37,11 +37,11 @@ function badgeVariantOf(variant: typeof props.variant) {
 
 <template>
   <div v-if="variant === 'loading'" :data-test-id="dataTestId" class="space-y-4">
-    <Skeleton class="h-8 w-[250px] bg-white/10" />
-    <Skeleton class="h-[125px] w-full rounded-2xl bg-white/10" />
+    <Skeleton class="h-8 w-[250px] bg-muted" />
+    <Skeleton class="h-[125px] w-full rounded-2xl bg-muted" />
     <div class="space-y-2">
-      <Skeleton class="h-4 w-[250px] bg-white/10" />
-      <Skeleton class="h-4 w-[200px] bg-white/10" />
+      <Skeleton class="h-4 w-[250px] bg-muted" />
+      <Skeleton class="h-4 w-[200px] bg-muted" />
     </div>
   </div>
   <Card
@@ -55,7 +55,7 @@ function badgeVariantOf(variant: typeof props.variant) {
         <Badge :variant="badgeVariantOf(variant)" class="uppercase tracking-wide">
           {{ variant }}
         </Badge>
-        <p class="leading-6">{{ message }}</p>
+        <p class="leading-6 text-inherit">{{ message }}</p>
       </div>
       <Button
         v-if="actionLabel"

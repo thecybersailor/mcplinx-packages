@@ -16,8 +16,9 @@ export function listCommand() {
 
                 if (connectors.length === 0) {
                     console.log(chalk.yellow('\nNo connectors found. Publish your first connector with:'));
-                    console.log(chalk.gray('  linktool build'));
-                    console.log(chalk.gray('  linktool remote publish'));
+                    console.log(chalk.gray('  syntool build'));
+                    console.log(chalk.gray('  syntool publish'));
+                    console.log(chalk.gray('  (Registry-only) linktool remote publish'));
                     process.exit(0);
                 }
 
