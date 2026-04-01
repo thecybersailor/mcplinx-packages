@@ -51,10 +51,10 @@ function statusTone(item: SharedConnectionRecord): 'default' | 'destructive' | '
 
 function statusClass(item: SharedConnectionRecord) {
   const tone = statusTone(item)
-  if (tone === 'destructive') return 'border-rose-400/20 bg-rose-500/10 text-rose-100'
-  if (tone === 'secondary') return 'border-amber-400/20 bg-amber-500/10 text-amber-100'
-  if (tone === 'outline') return 'border-white/12 bg-white/[0.03] text-slate-300'
-  return 'border-emerald-400/20 bg-emerald-500/10 text-emerald-100'
+  if (tone === 'destructive') return 'border-rose-500/30 bg-rose-500/10 text-rose-800 dark:text-rose-100'
+  if (tone === 'secondary') return 'border-amber-500/30 bg-amber-500/10 text-amber-800 dark:text-amber-100'
+  if (tone === 'outline') return 'border-border bg-muted text-muted-foreground'
+  return 'border-emerald-500/30 bg-emerald-500/10 text-emerald-800 dark:text-emerald-100'
 }
 
 function statusText(item: SharedConnectionRecord) {
@@ -122,17 +122,17 @@ function formatDate(dateStr?: string) {
 </script>
 
 <template>
-  <div data-test-id="shared-connections.page" class="space-y-6 p-6 py-8">
+  <div data-test-id="shared-connections.page" class="space-y-6 p-6 py-8 text-foreground">
     <div class="flex items-center justify-between gap-4">
       <div class="space-y-2">
-        <h1 class="text-3xl font-bold text-white">{{ runtime.t('sharedConnections.title', 'Connections') }}</h1>
-        <p class="text-sm text-slate-400">{{ runtime.t('sharedConnections.scope', 'Scope: {scope}', { scope: runtime.scope }) }}</p>
-        <p v-if="connectorId" class="text-sm text-slate-400">
+        <h1 class="text-3xl font-bold text-foreground">{{ runtime.t('sharedConnections.title', 'Connections') }}</h1>
+        <p class="text-sm text-muted-foreground">{{ runtime.t('sharedConnections.scope', 'Scope: {scope}', { scope: runtime.scope }) }}</p>
+        <p v-if="connectorId" class="text-sm text-muted-foreground">
           {{ runtime.t('sharedConnections.filteredByConnector', 'Filtered by connector: {connectorId}', { connectorId }) }}
         </p>
       </div>
       <button
-        class="inline-flex items-center justify-center rounded-md border border-white/12 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-white/20 hover:bg-white/[0.08]"
+        class="inline-flex items-center justify-center rounded-md border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition hover:bg-accent hover:text-accent-foreground"
         data-test-id="shared-connections.create-link"
         @click="router.push({ name: `${runtime.routePrefix}-create`, query: connectorId ? { connector_id: connectorId } : undefined })"
       >
@@ -141,12 +141,12 @@ function formatDate(dateStr?: string) {
     </div>
 
     <div v-if="loading" class="flex justify-center py-8">
-      <span class="text-slate-400">{{ runtime.t('sharedConnections.loading', 'Loading...') }}</span>
+      <span class="text-muted-foreground">{{ runtime.t('sharedConnections.loading', 'Loading...') }}</span>
     </div>
 
     <div
       v-else-if="error"
-      class="rounded-md border border-rose-400/20 bg-rose-500/10 p-4 text-rose-100"
+      class="rounded-md border border-destructive/30 bg-destructive/10 p-4 text-destructive"
       data-test-id="shared-connections.error"
     >
       <span>{{ error }}</span>
@@ -155,27 +155,27 @@ function formatDate(dateStr?: string) {
     <div
       v-else-if="connections.length === 0"
       data-test-id="shared-connections.empty"
-      class="rounded-lg border-2 border-dashed border-white/10 bg-white/[0.03] py-12 text-center"
+      class="rounded-lg border-2 border-dashed border-border bg-muted/30 py-12 text-center"
     >
-      <p class="mb-4 text-slate-400">{{ runtime.t('sharedConnections.empty', "You haven't connected any apps yet.") }}</p>
+      <p class="mb-4 text-muted-foreground">{{ runtime.t('sharedConnections.empty', "You haven't connected any apps yet.") }}</p>
       <button
-        class="inline-flex items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium text-slate-950 transition hover:bg-slate-200"
+        class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
         @click="router.push({ name: `${runtime.routePrefix}-create`, query: connectorId ? { connector_id: connectorId } : undefined })"
       >
         {{ runtime.t('sharedConnections.connectFirst', 'Connect Your First App') }}
       </button>
     </div>
 
-    <div v-else class="overflow-hidden rounded-md border border-white/10 bg-white/[0.03]">
+    <div v-else class="overflow-hidden rounded-md border border-border bg-card">
       <table class="min-w-full">
         <thead>
-          <tr class="border-b border-white/10 text-left">
-            <th class="px-4 py-3 text-sm font-medium text-slate-300">Connector</th>
-            <th class="px-4 py-3 text-sm font-medium text-slate-300">Label</th>
-            <th class="px-4 py-3 text-sm font-medium text-slate-300">Scopes</th>
-            <th class="px-4 py-3 text-sm font-medium text-slate-300">Status</th>
-            <th class="px-4 py-3 text-sm font-medium text-slate-300">Created</th>
-            <th class="px-4 py-3 text-sm font-medium text-slate-300">Actions</th>
+          <tr class="border-b border-border bg-muted/40 text-left">
+            <th class="px-4 py-3 text-sm font-medium text-muted-foreground">Connector</th>
+            <th class="px-4 py-3 text-sm font-medium text-muted-foreground">Label</th>
+            <th class="px-4 py-3 text-sm font-medium text-muted-foreground">Scopes</th>
+            <th class="px-4 py-3 text-sm font-medium text-muted-foreground">Status</th>
+            <th class="px-4 py-3 text-sm font-medium text-muted-foreground">Created</th>
+            <th class="px-4 py-3 text-sm font-medium text-muted-foreground">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -183,7 +183,7 @@ function formatDate(dateStr?: string) {
             v-for="connection in connections"
             :key="connection.id"
             :data-test-id="`shared-connections.row.${connection.id}`"
-            class="border-b border-white/10 last:border-b-0"
+            class="border-b border-border last:border-b-0"
           >
             <td class="px-4 py-4">
               <div class="flex items-center gap-2">
@@ -193,47 +193,47 @@ function formatDate(dateStr?: string) {
                   :alt="connection.package?.name || connection.connector_id || 'connector icon'"
                   class="h-6 w-6 rounded"
                 >
-                <span class="text-slate-100">{{ connection.package?.name || connection.connector_id || '-' }}</span>
+                <span class="text-foreground">{{ connection.package?.name || connection.connector_id || '-' }}</span>
               </div>
             </td>
-            <td class="px-4 py-4 text-slate-300">{{ connection.label || '-' }}</td>
+            <td class="px-4 py-4 text-muted-foreground">{{ connection.label || '-' }}</td>
             <td class="px-4 py-4">
               <div v-if="connection.auth_scopes && connection.auth_scopes.length > 0" class="flex flex-wrap gap-1">
                 <span
                   v-for="scope in connection.auth_scopes"
                   :key="scope"
-                  class="rounded-full border border-white/10 bg-black/20 px-2.5 py-1 text-xs text-slate-300"
+                  class="rounded-full border border-border bg-muted px-2.5 py-1 text-xs text-muted-foreground"
                 >
                   {{ scope }}
                 </span>
               </div>
-              <span v-else class="text-sm text-slate-500">-</span>
+              <span v-else class="text-sm text-muted-foreground">-</span>
             </td>
             <td class="px-4 py-4">
               <span class="rounded-full border px-3 py-1 text-xs font-medium" :class="statusClass(connection)">
                 {{ statusText(connection) }}
               </span>
             </td>
-            <td class="px-4 py-4 text-slate-300">{{ formatDate(connection.created_at) }}</td>
+            <td class="px-4 py-4 text-muted-foreground">{{ formatDate(connection.created_at) }}</td>
             <td class="px-4 py-4">
               <div class="flex flex-wrap gap-2">
                 <button
                   v-if="shouldShowReauth(connection)"
-                  class="inline-flex items-center justify-center rounded-md border border-white/12 bg-white/[0.04] px-3 py-2 text-sm font-medium text-slate-100 transition hover:border-white/20 hover:bg-white/[0.08] disabled:opacity-60"
+                  class="inline-flex items-center justify-center rounded-md border border-border bg-background px-3 py-2 text-sm font-medium text-foreground transition hover:bg-accent hover:text-accent-foreground disabled:opacity-60"
                   :disabled="pendingId === connection.id"
                   @click="reauth(connection)"
                 >
                   {{ runtime.t('sharedConnections.reauth', 'Reauthorize') }}
                 </button>
                 <button
-                  class="inline-flex items-center justify-center rounded-md border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-sm font-medium text-rose-100 transition hover:bg-rose-500/20 disabled:opacity-60"
+                  class="inline-flex items-center justify-center rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm font-medium text-destructive transition hover:bg-destructive/20 disabled:opacity-60"
                   :disabled="pendingId === connection.id"
                   @click="disconnect(connection)"
                 >
                   {{ runtime.t('sharedConnections.disconnect', 'Disconnect') }}
                 </button>
                 <button
-                  class="inline-flex items-center justify-center rounded-md px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/[0.04] hover:text-white"
+                  class="inline-flex items-center justify-center rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
                   @click="router.push({ name: `${runtime.routePrefix}-detail`, params: { id: connection.id } })"
                 >
                   {{ runtime.t('sharedConnections.details', 'Details') }}

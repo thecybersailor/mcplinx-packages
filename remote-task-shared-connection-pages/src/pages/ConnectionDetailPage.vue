@@ -118,7 +118,7 @@
                   This connection has an error. The authorization may have been revoked.
                 </p>
               </div>
-              <div v-if="connection.resolution_hint" class="mt-4 rounded-md border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+              <div v-if="connection.resolution_hint" class="mt-4 rounded-md border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
                 {{ connection.resolution_hint }}
               </div>
             </CardContent>

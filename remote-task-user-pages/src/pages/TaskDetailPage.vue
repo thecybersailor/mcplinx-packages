@@ -65,15 +65,15 @@ onMounted(load)
     <div v-else-if="task" class="space-y-4">
       <BundlePanel>
         <dl class="grid gap-3 md:grid-cols-2">
-          <div><dt class="text-xs uppercase tracking-wide text-slate-400">ID</dt><dd class="mt-1 text-sm text-slate-800">{{ task.id || '-' }}</dd></div>
-          <div><dt class="text-xs uppercase tracking-wide text-slate-400">Status</dt><dd class="mt-1 text-sm text-slate-800">{{ task.status || '-' }}</dd></div>
-          <div><dt class="text-xs uppercase tracking-wide text-slate-400">Action</dt><dd class="mt-1 text-sm text-slate-800">{{ task.action_name || task.action_key || '-' }}</dd></div>
-          <div><dt class="text-xs uppercase tracking-wide text-slate-400">Created</dt><dd class="mt-1 text-sm text-slate-800">{{ task.created_at || '-' }}</dd></div>
+          <div><dt class="text-xs uppercase tracking-wide text-muted-foreground">ID</dt><dd class="mt-1 text-sm text-foreground">{{ task.id || '-' }}</dd></div>
+          <div><dt class="text-xs uppercase tracking-wide text-muted-foreground">Status</dt><dd class="mt-1 text-sm text-foreground">{{ task.status || '-' }}</dd></div>
+          <div><dt class="text-xs uppercase tracking-wide text-muted-foreground">Action</dt><dd class="mt-1 text-sm text-foreground">{{ task.action_name || task.action_key || '-' }}</dd></div>
+          <div><dt class="text-xs uppercase tracking-wide text-muted-foreground">Created</dt><dd class="mt-1 text-sm text-foreground">{{ task.created_at || '-' }}</dd></div>
         </dl>
       </BundlePanel>
 
       <BundlePanel>
-        <pre data-test-id="remote-task-user.task-detail.json" class="overflow-auto rounded-xl bg-slate-950 p-4 text-xs text-slate-100">{{ JSON.stringify(task, null, 2) }}</pre>
+        <pre data-test-id="remote-task-user.task-detail.json" class="overflow-auto rounded-xl border border-border bg-muted p-4 font-mono text-xs text-foreground">{{ JSON.stringify(task, null, 2) }}</pre>
       </BundlePanel>
 
       <Button

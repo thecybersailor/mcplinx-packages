@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, Skeleton } from '@mcplinx/ui-vue'
+import { Card, CardContent, CardDescription, CardTitle, Skeleton } from '@mcplinx/ui-vue'
 import { ref } from 'vue'
 import ConnectorIndexCard from '../components/ConnectorIndexCard.vue'
 import type { ConnectorIndexCard as ConnectorIndexCardShape } from '../types'
@@ -53,28 +53,28 @@ withDefaults(defineProps<{
 </script>
 
 <template>
-  <Card
-    data-test-id="connector-index.page"
-    class="space-y-6 rounded-[28px] border border-white/10 bg-transparent p-6 text-slate-100 shadow-none md:p-10 lg:p-12 xl:space-y-8"
-  >
-    <CardHeader class="border-b-0 px-0 py-0">
-      <slot name="header">
-        <div class="space-y-2">
-          <CardTitle class="text-3xl font-semibold tracking-tight text-white">{{ title }}</CardTitle>
-          <CardDescription v-if="description" class="max-w-3xl leading-6 text-slate-400">
-            {{ description }}
-          </CardDescription>
-        </div>
-      </slot>
-    </CardHeader>
+  <!-- Plain wrapper: dashboard already provides a content surface; avoid nested card chrome. -->
+  <div data-test-id="connector-index.page" class="space-y-6 p-1 text-foreground md:space-y-7">
+    <slot name="header">
+      <div class="space-y-2">
+        <CardTitle class="text-3xl font-semibold tracking-tight text-foreground">{{ title }}</CardTitle>
+        <CardDescription v-if="description" class="max-w-3xl leading-6 text-muted-foreground">
+          {{ description }}
+        </CardDescription>
+      </div>
+    </slot>
 
-    <CardContent class="space-y-4 px-0 py-0">
+    <div class="space-y-4">
       <div v-if="loading" class="space-y-4" data-test-id="connector-index.loading">
-        <Skeleton class="h-8 w-[250px] bg-white/10" />
-        <Skeleton class="h-[125px] w-full rounded-2xl bg-white/10" />
+        <Skeleton class="h-8 w-[250px] bg-muted" />
+        <Skeleton class="h-[125px] w-full rounded-2xl bg-muted" />
       </div>
 
-      <div v-else-if="error" data-test-id="connector-index.error" class="rounded-2xl border border-rose-400/20 bg-rose-500/10 px-5 py-6 text-sm text-rose-100">
+      <div
+        v-else-if="error"
+        data-test-id="connector-index.error"
+        class="rounded-2xl border border-rose-600/30 bg-rose-50 px-5 py-6 text-sm text-rose-900 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-100"
+      >
         {{ error }}
       </div>
 
@@ -92,9 +92,8 @@ withDefaults(defineProps<{
         v-if="cliHintTitle || cliHintDescription || cliCommands.length"
         name="cli-hint"
       >
-        <Card class="overflow-hidden rounded-2xl border border-white/10 bg-zinc-950 text-slate-100 shadow-xl">
-          <!-- macOS terminal style header -->
-          <div class="flex items-center border-b border-white/10 bg-zinc-900/50 px-4 py-3">
+        <Card class="overflow-hidden rounded-2xl border border-border bg-zinc-950 text-slate-100 shadow-xl">
+          <div class="flex items-center border-b border-white/10 bg-zinc-900/60 px-4 py-3">
             <div class="mr-4 flex gap-2">
               <div class="h-3 w-3 rounded-full bg-rose-500/80"></div>
               <div class="h-3 w-3 rounded-full bg-amber-500/80"></div>
@@ -105,8 +104,8 @@ withDefaults(defineProps<{
           <CardContent class="space-y-4 p-5 md:p-6">
             <p v-if="cliHintDescription" class="text-sm leading-6 text-slate-400">{{ cliHintDescription }}</p>
             <div v-if="cliCommands.length" class="space-y-3">
-              <div 
-                v-for="(command, index) in cliCommands" 
+              <div
+                v-for="(command, index) in cliCommands"
                 :key="command"
                 class="group relative flex items-center justify-between overflow-hidden rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs leading-6 text-slate-300 transition-colors hover:bg-white/[0.04]"
               >
@@ -128,6 +127,6 @@ withDefaults(defineProps<{
           </CardContent>
         </Card>
       </slot>
-    </CardContent>
-  </Card>
+    </div>
+  </div>
 </template>

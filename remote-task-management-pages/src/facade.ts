@@ -101,11 +101,14 @@ export interface RemoteTaskManagementRuntime {
 
 export const remoteTaskManagementRuntimeKey: InjectionKey<RemoteTaskManagementRuntime> = Symbol('remote-task-management-runtime')
 
+/** Replace `{name}` placeholders (used by remote-task copy + host fallbacks). Safe to run after vue-i18n.t when locale strings still contain braces. */
+export function interpolateRemoteTaskPlaceholders(text: string, params?: Record<string, unknown>): string {
+  if (!params || Object.keys(params).length === 0) return text
+  return Object.entries(params).reduce((acc, [name, value]) => acc.split(`{${name}}`).join(String(value)), text)
+}
+
 export function defaultTranslate(_key: string, fallback: string, params?: Record<string, unknown>): string {
-  if (!params) return fallback
-  return Object.entries(params).reduce((text, [name, value]) => {
-    return text.split(`{${name}}`).join(String(value))
-  }, fallback)
+  return interpolateRemoteTaskPlaceholders(fallback, params)
 }
 
 export function useRemoteTaskManagementRuntime(): RemoteTaskManagementRuntime {

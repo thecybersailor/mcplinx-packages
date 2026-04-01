@@ -36,14 +36,14 @@ async function submit() {
 <template>
   <BundlePage :data-test-id="pageTestId" :title="runtime.t('remoteTaskManagement.deploy.title', 'Deploy')" :description="runtime.t('remoteTaskManagement.deploy.description', 'Use the same deployment form across every admin host.')">
     <BundlePanel class="space-y-4">
-      <Label class="grid gap-2"><span class="text-sm font-medium text-slate-700">{{ runtime.t('remoteTaskManagement.common.packageName', 'Package name') }}</span><Input v-model="name" data-test-id="remote-task-management.deploy.name" class="border border-slate-300 bg-white text-slate-900" /></Label>
-      <Label class="grid gap-2"><span class="text-sm font-medium text-slate-700">{{ runtime.t('remoteTaskManagement.common.version', 'Version') }}</span><Input v-model="version" data-test-id="remote-task-management.deploy.version" class="border border-slate-300 bg-white text-slate-900" /></Label>
-      <Label class="grid gap-2"><span class="text-sm font-medium text-slate-700">{{ runtime.t('remoteTaskManagement.common.instanceId', 'Instance ID') }}</span><Input v-model="instanceId" data-test-id="remote-task-management.deploy.instance" class="border border-slate-300 bg-white text-slate-900" /></Label>
+      <Label class="grid gap-2"><span class="text-sm font-medium text-foreground">{{ runtime.t('remoteTaskManagement.common.packageName', 'Package name') }}</span><Input v-model="name" data-test-id="remote-task-management.deploy.name" class="border border-input bg-background text-foreground" /></Label>
+      <Label class="grid gap-2"><span class="text-sm font-medium text-foreground">{{ runtime.t('remoteTaskManagement.common.version', 'Version') }}</span><Input v-model="version" data-test-id="remote-task-management.deploy.version" class="border border-input bg-background text-foreground" /></Label>
+      <Label class="grid gap-2"><span class="text-sm font-medium text-foreground">{{ runtime.t('remoteTaskManagement.common.instanceId', 'Instance ID') }}</span><Input v-model="instanceId" data-test-id="remote-task-management.deploy.instance" class="border border-input bg-background text-foreground" /></Label>
       <Button data-test-id="remote-task-management.deploy.submit" :disabled="loading" @click="submit">{{ runtime.t('remoteTaskManagement.deploy.submit', 'Deploy') }}</Button>
     </BundlePanel>
     <BundleState v-if="error" variant="error" :message="error" />
     <BundlePanel v-if="result">
-      <pre data-test-id="remote-task-management.deploy.result" class="overflow-auto rounded-xl bg-slate-950 p-4 text-xs text-slate-100">{{ JSON.stringify(result, null, 2) }}</pre>
+      <pre data-test-id="remote-task-management.deploy.result" class="overflow-auto rounded-xl border border-border bg-muted p-4 text-xs text-foreground">{{ JSON.stringify(result, null, 2) }}</pre>
     </BundlePanel>
   </BundlePage>
 </template>

@@ -111,7 +111,7 @@ describe('PackagesPage', () => {
     expect(wrapper.text()).toContain('Application')
   })
 
-  it('uses dark bundle surfaces instead of light borders on packages page', async () => {
+  it('uses theme border tokens on package table rows (readable on light portal shell)', async () => {
     const { wrapper } = await mountAt('/team/team_1/connectors/packages', 'team')
 
     const page = wrapper.get('[data-test-id="remote-task-management.packages.page"]')
@@ -124,6 +124,6 @@ describe('PackagesPage', () => {
     expect(table.text()).toContain('Version')
 
     const row = wrapper.get('[data-test-id="remote-task-management.packages.row.pkg_1"]')
-    expect(row.classes().join(' ')).toContain('border-white/10')
+    expect(row.classes().join(' ')).toContain('border-border')
   })
 })

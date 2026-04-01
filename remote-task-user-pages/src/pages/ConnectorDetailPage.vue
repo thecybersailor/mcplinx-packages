@@ -58,60 +58,60 @@ onMounted(load)
     <div v-else-if="connector" class="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
       <div class="space-y-4">
         <BundlePanel>
-          <h2 class="mb-3 text-base font-semibold text-slate-950">Connector Information</h2>
+          <h2 class="mb-3 text-base font-semibold text-foreground">Connector Information</h2>
           <dl class="grid gap-3 md:grid-cols-2">
             <div>
-              <dt class="text-xs uppercase tracking-wide text-slate-400">Name</dt>
-              <dd class="mt-1 text-sm text-slate-800">{{ connector.package?.name || connector.id || '-' }}</dd>
+              <dt class="text-xs uppercase tracking-wide text-muted-foreground">Name</dt>
+              <dd class="mt-1 text-sm text-foreground">{{ connector.package?.name || connector.id || '-' }}</dd>
             </div>
             <div>
-              <dt class="text-xs uppercase tracking-wide text-slate-400">{{ runtime.t('remoteTaskUser.connectorDetail.version', 'Version') }}</dt>
-              <dd class="mt-1 text-sm text-slate-800">{{ connector.version || '-' }}</dd>
+              <dt class="text-xs uppercase tracking-wide text-muted-foreground">{{ runtime.t('remoteTaskUser.connectorDetail.version', 'Version') }}</dt>
+              <dd class="mt-1 text-sm text-foreground">{{ connector.version || '-' }}</dd>
             </div>
             <div class="md:col-span-2">
-              <dt class="text-xs uppercase tracking-wide text-slate-400">Description</dt>
-              <dd class="mt-1 text-sm text-slate-800">{{ connector.package?.package_description || '-' }}</dd>
+              <dt class="text-xs uppercase tracking-wide text-muted-foreground">Description</dt>
+              <dd class="mt-1 text-sm text-foreground">{{ connector.package?.package_description || '-' }}</dd>
             </div>
           </dl>
         </BundlePanel>
 
         <BundlePanel>
-          <h2 class="mb-3 text-base font-semibold text-slate-950">Available Tools</h2>
+          <h2 class="mb-3 text-base font-semibold text-foreground">Available Tools</h2>
           <div v-if="tools.length" class="space-y-3">
-            <div v-for="tool in tools" :key="String(tool.name ?? tool.id ?? tool.description ?? 'tool')" class="rounded-xl border border-slate-200 bg-white px-4 py-3">
+            <div v-for="tool in tools" :key="String(tool.name ?? tool.id ?? tool.description ?? 'tool')" class="rounded-xl border border-border bg-card px-4 py-3">
               <div class="flex items-center gap-2">
-                <div class="text-sm font-semibold text-slate-950">{{ String(tool.name ?? tool.id ?? 'Tool') }}</div>
-                <span class="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-medium text-slate-500">{{ String(tool.kind ?? 'tool') }}</span>
+                <div class="text-sm font-semibold text-foreground">{{ String(tool.name ?? tool.id ?? 'Tool') }}</div>
+                <span class="rounded-full border border-border bg-muted px-2.5 py-1 text-[11px] font-medium text-muted-foreground">{{ String(tool.kind ?? 'tool') }}</span>
               </div>
-              <p class="mt-2 text-sm leading-6 text-slate-600">{{ String(tool.description ?? 'No description available') }}</p>
+              <p class="mt-2 text-sm leading-6 text-muted-foreground">{{ String(tool.description ?? 'No description available') }}</p>
             </div>
           </div>
-          <p v-else class="text-sm text-slate-500">No tools published for this connector yet.</p>
+          <p v-else class="text-sm text-muted-foreground">No tools published for this connector yet.</p>
         </BundlePanel>
       </div>
 
       <div class="space-y-4">
         <BundlePanel>
-          <h2 class="mb-3 text-base font-semibold text-slate-950">Actions</h2>
+          <h2 class="mb-3 text-base font-semibold text-foreground">Actions</h2>
           <Button data-test-id="remote-task-user.connector-detail.connect" class="w-full" @click="connect">
             {{ runtime.t('remoteTaskUser.connectors.connect', 'Connect') }}
           </Button>
         </BundlePanel>
 
         <BundlePanel>
-          <h2 class="mb-3 text-base font-semibold text-slate-950">Metadata</h2>
+          <h2 class="mb-3 text-base font-semibold text-foreground">Metadata</h2>
           <dl class="grid gap-3">
             <div>
-              <dt class="text-xs uppercase tracking-wide text-slate-400">{{ runtime.t('remoteTaskUser.connectorDetail.createdAt', 'Created') }}</dt>
-              <dd class="mt-1 text-sm text-slate-800">{{ connector.created_at || '-' }}</dd>
+              <dt class="text-xs uppercase tracking-wide text-muted-foreground">{{ runtime.t('remoteTaskUser.connectorDetail.createdAt', 'Created') }}</dt>
+              <dd class="mt-1 text-sm text-foreground">{{ connector.created_at || '-' }}</dd>
             </div>
             <div>
-              <dt class="text-xs uppercase tracking-wide text-slate-400">{{ runtime.t('remoteTaskUser.connectorDetail.updatedAt', 'Updated') }}</dt>
-              <dd class="mt-1 text-sm text-slate-800">{{ connector.updated_at || '-' }}</dd>
+              <dt class="text-xs uppercase tracking-wide text-muted-foreground">{{ runtime.t('remoteTaskUser.connectorDetail.updatedAt', 'Updated') }}</dt>
+              <dd class="mt-1 text-sm text-foreground">{{ connector.updated_at || '-' }}</dd>
             </div>
             <div>
-              <dt class="text-xs uppercase tracking-wide text-slate-400">Connector ID</dt>
-              <dd class="mt-1 break-all text-sm text-slate-800">{{ connector.id || '-' }}</dd>
+              <dt class="text-xs uppercase tracking-wide text-muted-foreground">Connector ID</dt>
+              <dd class="mt-1 break-all text-sm text-foreground">{{ connector.id || '-' }}</dd>
             </div>
           </dl>
         </BundlePanel>

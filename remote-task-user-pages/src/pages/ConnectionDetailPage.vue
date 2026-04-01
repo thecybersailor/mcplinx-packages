@@ -67,20 +67,20 @@ onMounted(load)
     <div v-else-if="connection" class="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
       <div class="space-y-4">
         <BundlePanel>
-          <h2 class="mb-3 text-base font-semibold text-slate-950">Connection Information</h2>
+          <h2 class="mb-3 text-base font-semibold text-foreground">Connection Information</h2>
           <dl class="grid gap-3 md:grid-cols-2">
-            <div><dt class="text-xs uppercase tracking-wide text-slate-400">Connection ID</dt><dd class="mt-1 text-sm text-slate-800">{{ connection.id || '-' }}</dd></div>
-            <div><dt class="text-xs uppercase tracking-wide text-slate-400">Connector ID</dt><dd class="mt-1 text-sm text-slate-800">{{ connection.connector_id || '-' }}</dd></div>
-            <div><dt class="text-xs uppercase tracking-wide text-slate-400">Status</dt><dd class="mt-1 text-sm text-slate-800">{{ connection.status || '-' }}</dd></div>
-            <div><dt class="text-xs uppercase tracking-wide text-slate-400">Label</dt><dd class="mt-1 text-sm text-slate-800">{{ connection.label || '-' }}</dd></div>
-            <div><dt class="text-xs uppercase tracking-wide text-slate-400">Created At</dt><dd class="mt-1 text-sm text-slate-800">{{ connection.created_at || '-' }}</dd></div>
-            <div><dt class="text-xs uppercase tracking-wide text-slate-400">Last Used</dt><dd class="mt-1 text-sm text-slate-800">{{ connection.updated_at || '-' }}</dd></div>
+            <div><dt class="text-xs uppercase tracking-wide text-muted-foreground">Connection ID</dt><dd class="mt-1 text-sm text-foreground">{{ connection.id || '-' }}</dd></div>
+            <div><dt class="text-xs uppercase tracking-wide text-muted-foreground">Connector ID</dt><dd class="mt-1 text-sm text-foreground">{{ connection.connector_id || '-' }}</dd></div>
+            <div><dt class="text-xs uppercase tracking-wide text-muted-foreground">Status</dt><dd class="mt-1 text-sm text-foreground">{{ connection.status || '-' }}</dd></div>
+            <div><dt class="text-xs uppercase tracking-wide text-muted-foreground">Label</dt><dd class="mt-1 text-sm text-foreground">{{ connection.label || '-' }}</dd></div>
+            <div><dt class="text-xs uppercase tracking-wide text-muted-foreground">Created At</dt><dd class="mt-1 text-sm text-foreground">{{ connection.created_at || '-' }}</dd></div>
+            <div><dt class="text-xs uppercase tracking-wide text-muted-foreground">Last Used</dt><dd class="mt-1 text-sm text-foreground">{{ connection.updated_at || '-' }}</dd></div>
           </dl>
         </BundlePanel>
 
         <BundlePanel>
-          <h2 class="mb-3 text-base font-semibold text-slate-950">Status Details</h2>
-          <div class="space-y-2 text-sm text-slate-600">
+          <h2 class="mb-3 text-base font-semibold text-foreground">Status Details</h2>
+          <div class="space-y-2 text-sm text-muted-foreground">
             <p v-if="connection.requires_reauth">This connection requires reauthorization.</p>
             <p v-else-if="connection.status === 'expired'">The access token has expired.</p>
             <p v-else-if="connection.status === 'error'">The authorization may have been revoked.</p>
@@ -89,20 +89,20 @@ onMounted(load)
         </BundlePanel>
 
         <BundlePanel>
-          <h2 class="mb-3 text-base font-semibold text-slate-950">Available Tools</h2>
+          <h2 class="mb-3 text-base font-semibold text-foreground">Available Tools</h2>
           <div v-if="connection.tools?.length" class="space-y-3">
-            <div v-for="(tool, index) in connection.tools" :key="String(tool.name ?? tool.id ?? index)" class="rounded-xl border border-slate-200 bg-white px-4 py-3">
-              <div class="text-sm font-semibold text-slate-950">{{ String(tool.name ?? tool.id ?? 'Tool') }}</div>
-              <p class="mt-2 text-sm text-slate-600">{{ String(tool.description ?? 'No description available.') }}</p>
+            <div v-for="(tool, index) in connection.tools" :key="String(tool.name ?? tool.id ?? index)" class="rounded-xl border border-border bg-card px-4 py-3">
+              <div class="text-sm font-semibold text-foreground">{{ String(tool.name ?? tool.id ?? 'Tool') }}</div>
+              <p class="mt-2 text-sm text-muted-foreground">{{ String(tool.description ?? 'No description available.') }}</p>
             </div>
           </div>
-          <p v-else class="text-sm text-slate-500">No tools available for this connector.</p>
+          <p v-else class="text-sm text-muted-foreground">No tools available for this connector.</p>
         </BundlePanel>
       </div>
 
       <div class="space-y-4">
         <BundlePanel>
-          <h2 class="mb-3 text-base font-semibold text-slate-950">Actions</h2>
+          <h2 class="mb-3 text-base font-semibold text-foreground">Actions</h2>
           <div class="flex flex-col gap-2">
             <Button
               data-test-id="remote-task-user.connection-detail.reauth"

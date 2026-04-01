@@ -9,7 +9,7 @@ const props = defineProps<{
 <template>
   <div
     data-slot="card-header"
-    :class="['border-b border-white/10 px-6 py-4', props.class]"
+    :class="['border-b border-border px-6 py-4', props.class]"
   >
     <slot />
   </div>

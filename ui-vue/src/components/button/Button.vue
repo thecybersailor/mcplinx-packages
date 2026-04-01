@@ -15,15 +15,15 @@ const props = withDefaults(defineProps<{
 const variantClass = computed(() => {
   switch (props.variant) {
     case 'ghost':
-      return 'text-slate-300 hover:bg-white/[0.04] hover:text-white'
+      return 'hover:bg-accent hover:text-accent-foreground'
     case 'outline':
-      return 'border border-white/12 bg-white/[0.04] text-slate-100 hover:border-white/20 hover:bg-white/[0.08]'
+      return 'border border-input bg-background hover:bg-accent hover:text-accent-foreground'
     case 'secondary':
-      return 'border border-white/12 bg-white/[0.04] text-slate-100 hover:border-white/20 hover:bg-white/[0.08]'
+      return 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
     case 'destructive':
-      return 'border border-rose-400/20 bg-rose-500/10 text-rose-100 hover:bg-rose-500/20'
+      return 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
     default:
-      return 'bg-white text-slate-950 hover:bg-slate-200'
+      return 'bg-primary text-primary-foreground hover:bg-primary/90'
   }
 })
 </script>
@@ -33,7 +33,7 @@ const variantClass = computed(() => {
     type="button"
     :disabled="disabled"
     :class="[
-      'inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition disabled:opacity-60',
+      'inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
       variantClass,
       props.class,
     ]"

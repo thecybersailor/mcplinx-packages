@@ -15,6 +15,7 @@ export type {
 } from './facade'
 export {
   defaultTranslate,
+  interpolateRemoteTaskPlaceholders,
   remoteTaskManagementRuntimeKey,
   useRemoteTaskManagementRuntime,
 } from './facade'

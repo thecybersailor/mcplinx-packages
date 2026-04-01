@@ -64580,6 +64580,7 @@ var import_node_fs2 = require("node:fs");
 var import_node_path3 = require("node:path");
 
 // src/core/test-auth.ts
+var import_node_crypto2 = require("node:crypto");
 var DEFAULT_TUNNEL_BASE_URL = "https://tun.dev.mcplinx.com";
 function buildDefaultOAuthRedirectUri(tunnelHost, userHashId, packageName) {
   const normalizedHost = String(tunnelHost ?? "").trim().replace(/^https?:\/\//, "").replace(/\/+$/, "");
@@ -64749,10 +64750,14 @@ async function buildOAuthAuthorizeUrl(ctx, oauth2Auth, redirectUri) {
     }
     params.set("redirect_uri", redirectUri);
     const { vars } = loadConfigFromYaml(ctx.cwd);
+    if (vars.APP_KEY) {
+      params.set("app_key", String(vars.APP_KEY));
+    }
     if (vars.CLIENT_ID) {
       params.set("client_id", String(vars.CLIENT_ID));
     }
     params.set("response_type", "code");
+    params.set("state", (0, import_node_crypto2.randomUUID)());
     return `${authConfig.authorizeUrl.url}?${params.toString()}`;
   }
   return String(authConfig.authorizeUrl ?? "");
@@ -64914,8 +64919,9 @@ function listCommand() {
       const connectors = await api.developer.registryConnectorsList();
       if (connectors.length === 0) {
         console.log(source_default.yellow("\nNo connectors found. Publish your first connector with:"));
-        console.log(source_default.gray("  linktool build"));
-        console.log(source_default.gray("  linktool remote publish"));
+        console.log(source_default.gray("  syntool build"));
+        console.log(source_default.gray("  syntool publish"));
+        console.log(source_default.gray("  (Registry-only) linktool remote publish"));
         process.exit(0);
       }
       console.log(source_default.green(`
