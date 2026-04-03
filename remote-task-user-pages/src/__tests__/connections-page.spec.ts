@@ -13,10 +13,20 @@ import {
 function createFacade(): RemoteTaskUserFacade {
   return {
     listConnectors: vi.fn(async () => ({
-      connectors: [{ id: 'examples/github-connector', package: { name: 'GitHub' }, version: '1.0.0' }],
+      connectors: [
+        {
+          id: 'inst_github_shared',
+          name: 'GitHub Tenant Shared',
+          instance_description: 'Shared tenant credential',
+          package: { name: 'GitHub', package_description: 'docs' },
+          version: '1.0.0',
+        },
+      ],
     })),
     getConnector: vi.fn(async () => ({
-      id: 'examples/github-connector',
+      id: 'inst_github_shared',
+      name: 'GitHub Tenant Shared',
+      instance_description: 'Shared tenant credential',
       package: { name: 'GitHub', package_description: 'docs' },
       version: '1.0.0',
       tools: [{ name: 'list_repos', description: 'List repositories' }],
@@ -25,7 +35,7 @@ function createFacade(): RemoteTaskUserFacade {
       connections: [
         {
           id: 'connection_1',
-          connector_id: 'examples/github-connector',
+          connector_id: 'inst_github_shared',
           package: { name: 'GitHub' },
           label: 'GitHub Team',
           auth_scopes: ['repo', 'user:email'],
@@ -37,7 +47,7 @@ function createFacade(): RemoteTaskUserFacade {
     createConnection: vi.fn(async () => ({ id: 'connection_2' })),
     getConnection: vi.fn(async () => ({
       id: 'connection_1',
-      connector_id: 'examples/github-connector',
+      connector_id: 'inst_github_shared',
       package: { name: 'GitHub' },
       label: 'GitHub Team',
       status: 'active',
@@ -87,6 +97,15 @@ async function mountAt(path: string, facade: RemoteTaskUserFacade) {
 }
 
 describe('Connection pages', () => {
+  it('renders connector instance identity before package identity', async () => {
+    const facade = createFacade()
+    const { wrapper } = await mountAt('/integrations/connectors', facade)
+
+    expect(wrapper.text()).toContain('GitHub Tenant Shared')
+    expect(wrapper.text()).toContain('Shared tenant credential')
+    expect(wrapper.text()).toContain('Package: GitHub')
+  })
+
   it('exposes data-test-id based actions for the historical connection task chain', async () => {
     const facade = createFacade()
     const { wrapper, router } = await mountAt('/integrations/connections', facade)
@@ -106,5 +125,15 @@ describe('Connection pages', () => {
     expect(wrapper.find('[data-test-id="remote-task-user.connection-detail.reauth"]').exists()).toBe(true)
     expect(wrapper.find('[data-test-id="remote-task-user.connection-detail.disconnect"]').exists()).toBe(true)
     expect(wrapper.find('[data-test-id="remote-task-user.connection-detail.back"]').exists()).toBe(true)
+  })
+
+  it('routes connector detail by instance id', async () => {
+    const facade = createFacade()
+    const { wrapper } = await mountAt('/integrations/connectors/inst_github_shared', facade)
+
+    expect(facade.getConnector).toHaveBeenCalledWith('inst_github_shared')
+    expect(wrapper.find('[data-test-id="remote-task-user.connector-detail.page"]').exists()).toBe(true)
+    expect(wrapper.text()).toContain('GitHub Tenant Shared')
+    expect(wrapper.text()).toContain('Package')
   })
 })

@@ -86,8 +86,9 @@ onMounted(load)
         <div class="flex h-full flex-col gap-4">
           <div class="flex items-start justify-between gap-3">
             <div class="space-y-1">
-              <h2 class="text-base font-semibold text-foreground">{{ connector.package?.name || connector.id }}</h2>
-              <p class="text-sm leading-6 text-muted-foreground">{{ connector.package?.package_description || '-' }}</p>
+              <h2 class="text-base font-semibold text-foreground">{{ connector.name || connector.package?.name || connector.id }}</h2>
+              <p class="text-sm leading-6 text-muted-foreground">{{ connector.instance_description || connector.package?.package_description || '-' }}</p>
+              <p class="text-xs text-muted-foreground">Package: {{ connector.package?.name || '-' }}</p>
             </div>
             <span class="rounded-full border border-border bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{{ connector.version || '-' }}</span>
           </div>

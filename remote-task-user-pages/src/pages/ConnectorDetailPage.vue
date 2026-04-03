@@ -44,8 +44,8 @@ onMounted(load)
 <template>
   <BundlePage
     data-test-id="remote-task-user.connector-detail.page"
-    :title="connector?.package?.name || connector?.id || runtime.t('remoteTaskUser.connectors.title', 'Connectors')"
-    :description="connector?.package?.package_description || ''"
+    :title="connector?.name || connector?.package?.name || connector?.id || runtime.t('remoteTaskUser.connectors.title', 'Connectors')"
+    :description="connector?.instance_description || connector?.package?.package_description || ''"
   >
     <template #actions>
       <Button variant="outline" @click="router.back()">
@@ -62,15 +62,19 @@ onMounted(load)
           <dl class="grid gap-3 md:grid-cols-2">
             <div>
               <dt class="text-xs uppercase tracking-wide text-muted-foreground">Name</dt>
-              <dd class="mt-1 text-sm text-foreground">{{ connector.package?.name || connector.id || '-' }}</dd>
+              <dd class="mt-1 text-sm text-foreground">{{ connector.name || connector.id || '-' }}</dd>
             </div>
             <div>
               <dt class="text-xs uppercase tracking-wide text-muted-foreground">{{ runtime.t('remoteTaskUser.connectorDetail.version', 'Version') }}</dt>
               <dd class="mt-1 text-sm text-foreground">{{ connector.version || '-' }}</dd>
             </div>
+            <div>
+              <dt class="text-xs uppercase tracking-wide text-muted-foreground">Package</dt>
+              <dd class="mt-1 text-sm text-foreground">{{ connector.package?.name || '-' }}</dd>
+            </div>
             <div class="md:col-span-2">
               <dt class="text-xs uppercase tracking-wide text-muted-foreground">Description</dt>
-              <dd class="mt-1 text-sm text-foreground">{{ connector.package?.package_description || '-' }}</dd>
+              <dd class="mt-1 text-sm text-foreground">{{ connector.instance_description || connector.package?.package_description || '-' }}</dd>
             </div>
           </dl>
         </BundlePanel>

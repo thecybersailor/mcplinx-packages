@@ -36,8 +36,10 @@ export interface AdminCreateInstanceRequest {
   active_version: string;
   description?: string;
   env_config?: Record<string, any>;
+  inherits_to?: string[];
   name: string;
   pkg_id: string;
+  principal_pattern?: string;
   secret_config?: Record<string, any>;
   visibility?: string;
 }

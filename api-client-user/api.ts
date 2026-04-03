@@ -36,8 +36,11 @@ export interface AdminCreateInstanceRequest {
   active_version: string;
   description?: string;
   env_config?: Record<string, any>;
+  inherits_to?: string[];
   name: string;
   pkg_id: string;
+  principal_pattern?: string;
+  secret_config?: Record<string, any>;
   visibility?: string;
 }
 
@@ -146,6 +149,7 @@ export interface V1RemoteTaskSearchToolsRequest {
 export interface V1UpdateScopedRemoteTaskInstanceRequest {
   active_version?: string;
   env_config?: Record<string, any>;
+  secret_config?: Record<string, any>;
 }
 
 export interface V1UpsertConnectorActionsRequest {
@@ -511,7 +515,7 @@ export interface VoLegacyConnectorPkgResponse {
   id?: string;
   name?: string;
   package_description?: string;
-  pkg_key?: string;
+  pkgKey?: string;
   updated_at?: string;
 }
 
@@ -1035,6 +1039,8 @@ export interface VoVoConnectorResponse {
   download_url?: string;
   error_message?: string;
   id?: string;
+  instance_description?: string;
+  name?: string;
   package?: VoVoConnectorPackageBrief;
   relevance?: number;
   tool_count?: number;
