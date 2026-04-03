@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { createRemoteTaskSharedConnectionRoutes } from '../routes'
 import type { RemoteTaskSharedConnectionFacade } from '../facade'
 
+const CONNECTOR_UUID = 'bd8f5828-62f4-5066-8893-d46ecd02a5c2'
+
 const facade: RemoteTaskSharedConnectionFacade = {
   listConnections: vi.fn(async () => ({ items: [] })),
   createConnection: vi.fn(async () => ({ id: 'shared_1' })),
@@ -11,7 +13,7 @@ const facade: RemoteTaskSharedConnectionFacade = {
   updateConnection: vi.fn(async () => ({ id: 'shared_1' })),
   deleteConnection: vi.fn(async () => ({})),
   reauthConnection: vi.fn(async () => ({ connection_id: 'shared_1', fields: [] })),
-  explainFallback: vi.fn(async () => ({ connector_id: 'gmail', candidates: [] })),
+  explainFallback: vi.fn(async () => ({ connector_id: CONNECTOR_UUID, candidates: [] })),
 }
 
 describe('createRemoteTaskSharedConnectionRoutes', () => {

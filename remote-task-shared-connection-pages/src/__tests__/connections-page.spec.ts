@@ -4,9 +4,11 @@ import { createMemoryHistory, createRouter, RouterView, type RouteRecordRaw } fr
 import { describe, expect, it, vi } from 'vitest'
 import { createRemoteTaskSharedConnectionRoutes, type RemoteTaskSharedConnectionFacade } from '../index'
 
+const CONNECTOR_UUID = 'bd8f5828-62f4-5066-8893-d46ecd02a5c2'
+
 function createFacade(): RemoteTaskSharedConnectionFacade {
   return {
-    listConnections: vi.fn(async () => ({ items: [{ id: 'shared_1', connector_id: 'pkg_1', label: 'Shared A' }] })),
+    listConnections: vi.fn(async () => ({ items: [{ id: 'shared_1', connector_id: CONNECTOR_UUID, label: 'Shared A' }] })),
     createConnection: vi.fn(async () => ({ id: 'shared_1' })),
     startAuth: vi.fn(async () => ({ connection_id: 'shared_1', fields: [] })),
     submitAuth: vi.fn(async () => ({ id: 'shared_1' })),
@@ -14,7 +16,7 @@ function createFacade(): RemoteTaskSharedConnectionFacade {
     updateConnection: vi.fn(async () => ({ id: 'shared_1' })),
     deleteConnection: vi.fn(async () => ({})),
     reauthConnection: vi.fn(async () => ({ connection_id: 'shared_1', fields: [] })),
-    explainFallback: vi.fn(async () => ({ connector_id: 'pkg_1', candidates: [] })),
+    explainFallback: vi.fn(async () => ({ connector_id: CONNECTOR_UUID, candidates: [] })),
   }
 }
 
@@ -53,17 +55,17 @@ async function mountAt(path: string, facade: RemoteTaskSharedConnectionFacade) {
 describe('shared connections page', () => {
   it('filters list by connector and carries connector id into create page', async () => {
     const facade = createFacade()
-    const { wrapper, router } = await mountAt('/shared-connections/connections?connector_id=pkg_1', facade)
+    const { wrapper, router } = await mountAt(`/shared-connections/connections?connector_id=${CONNECTOR_UUID}`, facade)
 
     expect(facade.listConnections).toHaveBeenCalledWith({
       scope: 'team',
-      connector_id: 'pkg_1',
+      connector_id: CONNECTOR_UUID,
     })
 
     await wrapper.get('[data-test-id="shared-connections.create-link"]').trigger('click')
     await flushPromises()
 
     expect(router.currentRoute.value.name).toBe('shared-connections-create')
-    expect(router.currentRoute.value.query.connector_id).toBe('pkg_1')
+    expect(router.currentRoute.value.query.connector_id).toBe(CONNECTOR_UUID)
   })
 })

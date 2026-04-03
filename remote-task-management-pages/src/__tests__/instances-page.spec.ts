@@ -10,13 +10,15 @@ import {
   type RemoteTaskManagementFacade,
 } from '../facade'
 
+const PACKAGE_UUID = 'bd8f5828-62f4-5066-8893-d46ecd02a5c2'
+
 function createFacade(): RemoteTaskManagementFacade {
   return {
     listPackages: vi.fn(async () => []),
     getPackage: vi.fn(async () => ({ id: 1 })),
     listPackageVersions: vi.fn(async () => []),
     listPackageInstances: vi.fn(async () => []),
-    listInstances: vi.fn(async () => [{ id: 7, name: 'Tenant Slack', status: 'pending_review', pkg_id: 'pkg_1' } as never]),
+    listInstances: vi.fn(async () => [{ id: 7, name: 'Tenant Slack', status: 'pending_review', pkg_id: PACKAGE_UUID } as never]),
     createInstance: vi.fn(async () => ({ id: 9 })),
     getInstance: vi.fn(async () => ({ id: 7 })),
     updateInstance: vi.fn(async () => ({ id: 7 })),
@@ -82,7 +84,7 @@ describe('InstancesPage', () => {
     await flushPromises()
     expect(facade.listInstances).toHaveBeenCalled()
     expect(wrapper.get('[data-test-id="remote-task-management.instances.row.7"]').text()).toContain('Tenant Slack')
-    expect(wrapper.text()).toContain('pkg_1')
+    expect(wrapper.text()).toContain(PACKAGE_UUID)
     expect(wrapper.find('[data-test-id="remote-task-management.instances.status"]').exists()).toBe(true)
     expect(wrapper.text()).toContain('Visibility')
     expect(wrapper.text()).toContain('Owner')

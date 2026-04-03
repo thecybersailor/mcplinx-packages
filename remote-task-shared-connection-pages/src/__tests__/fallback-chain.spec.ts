@@ -4,6 +4,8 @@ import { createMemoryHistory, createRouter, RouterView, type RouteRecordRaw } fr
 import { describe, expect, it, vi } from 'vitest'
 import { createRemoteTaskSharedConnectionRoutes, type RemoteTaskSharedConnectionFacade } from '../index'
 
+const CONNECTOR_UUID = 'bd8f5828-62f4-5066-8893-d46ecd02a5c2'
+
 function createFacade(): RemoteTaskSharedConnectionFacade {
   return {
     listConnections: vi.fn(async () => ({ items: [] })),
@@ -12,7 +14,7 @@ function createFacade(): RemoteTaskSharedConnectionFacade {
     submitAuth: vi.fn(async () => ({ id: 'shared_1' })),
     getConnection: vi.fn(async () => ({
       id: 'shared_1',
-      connector_id: 'gmail',
+      connector_id: CONNECTOR_UUID,
       label: 'Support Mailbox',
       principal_pattern: 'org/team/team_1',
       inherits_to: ['team'],
@@ -22,10 +24,10 @@ function createFacade(): RemoteTaskSharedConnectionFacade {
     deleteConnection: vi.fn(async () => ({})),
     reauthConnection: vi.fn(async () => ({ connection_id: 'shared_1', fields: [] })),
     explainFallback: vi.fn(async () => ({
-      connector_id: 'gmail',
+      connector_id: CONNECTOR_UUID,
       selected: {
         id: 'shared_1',
-        connector_id: 'gmail',
+        connector_id: CONNECTOR_UUID,
         label: 'Support Mailbox',
       },
       candidates: [
@@ -71,9 +73,9 @@ async function mountAt(path: string, facade: RemoteTaskSharedConnectionFacade) {
 describe('shared connection bundle', () => {
   it('loads fallback explain chain from connector query', async () => {
     const facade = createFacade()
-    const { wrapper } = await mountAt('/shared-connections/fallback-explain?connector_id=gmail', facade)
+    const { wrapper } = await mountAt(`/shared-connections/fallback-explain?connector_id=${CONNECTOR_UUID}`, facade)
 
-    expect(facade.explainFallback).toHaveBeenCalledWith({ connector_id: 'gmail' })
+    expect(facade.explainFallback).toHaveBeenCalledWith({ connector_id: CONNECTOR_UUID })
     expect(wrapper.get('[data-test-id="shared-connections.fallback.selected"]').text()).toContain('Support Mailbox')
     expect(wrapper.get('[data-test-id="shared-connections.fallback.candidate.shared_2"]').text()).toContain('tenant fallback')
   })

@@ -4,6 +4,8 @@ import { createMemoryHistory, createRouter, RouterView, type RouteRecordRaw } fr
 import { describe, expect, it, vi } from 'vitest'
 import { createRemoteTaskSharedConnectionRoutes, type RemoteTaskSharedConnectionFacade } from '../index'
 
+const CONNECTOR_UUID = 'bd8f5828-62f4-5066-8893-d46ecd02a5c2'
+
 function createFacade(): RemoteTaskSharedConnectionFacade {
   return {
     listConnections: vi.fn(async () => ({ items: [] })),
@@ -12,7 +14,7 @@ function createFacade(): RemoteTaskSharedConnectionFacade {
     submitAuth: vi.fn(async () => ({ id: 'shared_1' })),
     getConnection: vi.fn(async () => ({
       id: 'shared_1',
-      connector_id: 'pkg_1',
+      connector_id: CONNECTOR_UUID,
       label: 'Shared Gmail',
       token_expires_at: '2026-04-01T00:00:00Z',
       auth_scopes: ['gmail.read'],
@@ -23,7 +25,7 @@ function createFacade(): RemoteTaskSharedConnectionFacade {
     updateConnection: vi.fn(async () => ({ id: 'shared_1' })),
     deleteConnection: vi.fn(async () => ({})),
     reauthConnection: vi.fn(async () => ({ connection_id: 'shared_1', fields: [] })),
-    explainFallback: vi.fn(async () => ({ connector_id: 'pkg_1', candidates: [] })),
+    explainFallback: vi.fn(async () => ({ connector_id: CONNECTOR_UUID, candidates: [] })),
   }
 }
 

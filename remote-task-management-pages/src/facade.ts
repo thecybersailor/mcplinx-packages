@@ -15,7 +15,6 @@ import type {
 
 export type RemoteTaskManagementPackage = VoAdminConnectorPkgResponse & {
   package_description?: string
-  source_id?: string
   totalInstances?: number
   activeInstances?: number
   publicInstances?: number
@@ -46,6 +45,7 @@ export type RemoteTaskManagementConfigRecord = {
   description?: string
   version?: string
   visibility?: string
+  pkg_id?: string
   env_config?: Record<string, unknown>
   secret_config?: Record<string, boolean>
 }
@@ -101,25 +101,15 @@ export interface RemoteTaskManagementRuntime {
 
 export const remoteTaskManagementRuntimeKey: InjectionKey<RemoteTaskManagementRuntime> = Symbol('remote-task-management-runtime')
 
-/** Replace `{name}` placeholders (used by remote-task copy + host fallbacks). Safe to run after vue-i18n.t when locale strings still contain braces. */
-export function interpolateRemoteTaskPlaceholders(text: string, params?: Record<string, unknown>): string {
-  if (!params || Object.keys(params).length === 0) return text
-  return Object.entries(params).reduce((acc, [name, value]) => acc.split(`{${name}}`).join(String(value)), text)
-}
-
 export function defaultTranslate(_key: string, fallback: string, params?: Record<string, unknown>): string {
-  return interpolateRemoteTaskPlaceholders(fallback, params)
+  if (!params) return fallback
+  return Object.entries(params).reduce((text, [name, value]) => {
+    return text.split(`{${name}}`).join(String(value))
+  }, fallback)
 }
 
 export function useRemoteTaskManagementRuntime(): RemoteTaskManagementRuntime {
   const runtime = inject(remoteTaskManagementRuntimeKey)
   if (!runtime) throw new Error('Remote task management runtime is missing')
   return runtime
-}
-
-export function remoteTaskManagementPageTestId(runtime: RemoteTaskManagementRuntime, page: string): string {
-  if (runtime.scope === 'team') {
-    return `remote-task-management.${page}.page`
-  }
-  return `remote-task-admin.${page}.page`
 }

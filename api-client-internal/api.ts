@@ -64,12 +64,6 @@ export interface AdminUpdatePkgStatusRequest {
 
 export type GinH = Record<string, any>;
 
-export interface GormDeletedAt {
-  time?: string;
-  /** Valid is true if Time is not NULL */
-  valid?: boolean;
-}
-
 export interface InternalRemoteTaskActivateRequest {
   callback_code?: string;
 }
@@ -86,47 +80,6 @@ export interface InternalRemoteTaskUpdateExecutionRequest {
   error?: any;
   result?: Record<string, any>;
   status: string;
-}
-
-export interface ModelsConnector {
-  /** 关联到 ConnectorPkgVersion.ID，用于精确版本匹配 */
-  activePkgVersionID?: number;
-  /** 使用的版本 (revision) */
-  activeVersion?: string;
-  createdAt?: string;
-  deletedAt?: GormDeletedAt;
-  /** 已处理 Embedding 的版本 */
-  embeddingSyncedVersion?: string;
-  /** JSON (non-sensitive config) */
-  envConfig?: string;
-  /** connector_id (自增) */
-  id?: number;
-  /** 实例拥有者 */
-  ownerID?: number;
-  /** 关联到 ConnectorPkg */
-  pkg?: ModelsConnectorPkg;
-  /** 关联到 ConnectorPkg.ID */
-  pkgID?: number;
-  /** Encrypted JSON (sensitive secrets) */
-  secretConfig?: string;
-  /** active, disabled, pending_review */
-  status?: string;
-  updatedAt?: string;
-  /** private, public */
-  visibility?: string;
-}
-
-export interface ModelsConnectorPkg {
-  appId?: string;
-  createdAt?: string;
-  hashId?: string;
-  iconUpdatedAt?: string;
-  icon_url?: string;
-  id?: number;
-  name?: string;
-  package_description?: string;
-  pkgKey?: string;
-  updatedAt?: string;
 }
 
 export enum ModelsPaymentPlatform {
@@ -278,7 +231,7 @@ export interface VoAdminConnectorInstanceResponse {
   instance_description?: string;
   name?: string;
   ownerID?: number;
-  pkgID?: number;
+  pkg_id?: string;
   status?: string;
   updatedAt?: string;
   visibility?: string;
@@ -294,9 +247,8 @@ export interface VoAdminConnectorPkgResponse {
   author?: VoAdminConnectorPkgAuthorResponse;
   authorID?: number;
   createdAt?: string;
-  hashID?: string;
   iconUpdatedAt?: string;
-  id?: number;
+  id?: string;
   name?: string;
   package_description?: string;
   updatedAt?: string;
@@ -311,7 +263,7 @@ export interface VoAdminConnectorPkgVersionResponse {
   iconURL?: string;
   id?: number;
   manifest?: string;
-  pkgID?: number;
+  pkg_id?: string;
   r2Path?: string;
   releaseNote?: string;
   toolCount?: number;
@@ -1887,7 +1839,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       },
       params: RequestParams = {},
     ) =>
-      this.request<ModelsConnector[], VoErrorResponse>({
+      this.request<VoAdminConnectorInstanceResponse[], VoErrorResponse>({
         path: `/admin/remote-task/instances`,
         method: "GET",
         query: query,
@@ -1906,7 +1858,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     remoteTaskInstancesCreate: (request: AdminCreateInstanceRequest, params: RequestParams = {}) =>
-      this.request<ModelsConnector, VoErrorResponse>({
+      this.request<VoAdminConnectorInstanceResponse, VoErrorResponse>({
         path: `/admin/remote-task/instances`,
         method: "POST",
         body: request,
@@ -1926,7 +1878,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     remoteTaskInstancesDetail: (instanceId: string, params: RequestParams = {}) =>
-      this.request<ModelsConnector, VoErrorResponse>({
+      this.request<VoAdminConnectorInstanceResponse, VoErrorResponse>({
         path: `/admin/remote-task/instances/${instanceId}`,
         method: "GET",
         secure: true,
@@ -1944,7 +1896,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     remoteTaskInstancesUpdate: (instanceId: string, request: AdminCreateInstanceRequest, params: RequestParams = {}) =>
-      this.request<ModelsConnector, VoErrorResponse>({
+      this.request<VoAdminConnectorInstanceResponse, VoErrorResponse>({
         path: `/admin/remote-task/instances/${instanceId}`,
         method: "PUT",
         body: request,

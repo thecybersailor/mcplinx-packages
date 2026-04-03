@@ -64,96 +64,6 @@ export interface AdminUpdatePkgStatusRequest {
 
 export type GinH = Record<string, any>;
 
-export interface GormDeletedAt {
-  time?: string;
-  /** Valid is true if Time is not NULL */
-  valid?: boolean;
-}
-
-export interface ModelsConnector {
-  /** 关联到 ConnectorPkgVersion.ID，用于精确版本匹配 */
-  activePkgVersionID?: number;
-  /** 使用的版本 (revision) */
-  activeVersion?: string;
-  createdAt?: string;
-  deletedAt?: GormDeletedAt;
-  /** 已处理 Embedding 的版本 */
-  embeddingSyncedVersion?: string;
-  /** JSON (non-sensitive config) */
-  envConfig?: string;
-  /** connector_id (自增) */
-  id?: number;
-  /** 实例拥有者 */
-  ownerID?: number;
-  /** 关联到 ConnectorPkg */
-  pkg?: ModelsConnectorPkg;
-  /** 关联到 ConnectorPkg.ID */
-  pkgID?: number;
-  /** Encrypted JSON (sensitive secrets) */
-  secretConfig?: string;
-  /** active, disabled, pending_review */
-  status?: string;
-  updatedAt?: string;
-  /** private, public */
-  visibility?: string;
-}
-
-export interface ModelsConnectorPkg {
-  app_id?: string;
-  /** 用于 Preload，不在迁移时建立外键约束 */
-  author?: ModelsUser;
-  /** 作者 ID */
-  authorID?: number;
-  createdAt?: string;
-  deletedAt?: GormDeletedAt;
-  description?: string;
-  /** 冗余存储编码后的ID，对外暴露的业务标识符 */
-  hashID?: string;
-  /** 图标最后更新时间，nil 表示没有图标 */
-  iconUpdatedAt?: string;
-  icon_url?: string;
-  /** 自增 ID */
-  id?: number;
-  /** Package 名称，与 AuthorID 组成唯一索引 */
-  name?: string;
-  /** Package 描述 */
-  packageDescription?: string;
-  pkg_key?: string;
-  updatedAt?: string;
-  /** 关联的版本 */
-  versions?: ModelsConnectorPkgVersion[];
-}
-
-export interface ModelsConnectorPkgVersion {
-  active?: boolean;
-  app_id?: string;
-  /** oauth2, apikey, none */
-  authType?: string;
-  /** 包大小 (bytes) */
-  bundleSize?: number;
-  /** URL (maybe signed or public) */
-  bundleURL?: string;
-  createdAt?: string;
-  deletedAt?: GormDeletedAt;
-  /** Icon URL */
-  iconURL?: string;
-  id?: number;
-  /** 关联到 ConnectorPkg */
-  pkg?: ModelsConnectorPkg;
-  /** 关联到 ConnectorPkg.ID */
-  pkgID?: number;
-  pkg_key?: string;
-  /** S3 存储路径 (字段名保持 R2Path 以兼容数据库) */
-  r2Path?: string;
-  releaseNote?: string;
-  /** 工具数量 */
-  toolCount?: number;
-  /** 上传者 user_id */
-  uploadedBy?: number;
-  /** 版本号(revision)，由后端自动生成，格式: md5(timestamp) 前8位 */
-  version?: string;
-}
-
 export enum ModelsPaymentPlatform {
   PaymentPlatformStripe = "STRIPE",
   PaymentPlatformAppStore = "APP_STORE",
@@ -197,37 +107,6 @@ export interface ModelsProviderKeysEntry {
   keys?: ModelsProviderKeyItem[];
 }
 
-export interface ModelsUser {
-  /** 激活时间 */
-  activated_at?: string;
-  createdAt?: string;
-  created_at?: string;
-  deletedAt?: GormDeletedAt;
-  email?: string;
-  id?: number;
-  /** 使用的邀请码（冗余） */
-  invite_code_used?: string;
-  /** 邀请人的 User.ID */
-  invited_by?: number;
-  /** 邀请码相关字段 */
-  is_activated?: boolean;
-  /** MCP Token 安全策略 */
-  mcp_token?: string;
-  name?: string;
-  /** Pay-and-Go 功能 */
-  pay_and_go_enabled?: boolean;
-  /** Pay-and-Go 配额 */
-  pay_and_go_quota?: number;
-  /** Pay-and-Go 已使用额度 */
-  pay_and_go_used?: number;
-  /** Stripe Customer ID */
-  stripe_customer_id?: string;
-  supabase_id?: string;
-  updatedAt?: string;
-  /** hashid for user.ID (允许为空，创建后再填充) */
-  user_code?: string;
-}
-
 export interface PinResponse {
   data?: any;
   error?: PinResponseError;
@@ -262,6 +141,11 @@ export interface V1RemoteTaskSearchToolsRequest {
   limit?: number;
   offset?: number;
   query?: string;
+}
+
+export interface V1UpdateScopedRemoteTaskInstanceRequest {
+  active_version?: string;
+  env_config?: Record<string, any>;
 }
 
 export interface V1UpsertConnectorActionsRequest {
@@ -379,7 +263,7 @@ export interface VoAdminConnectorInstanceResponse {
   instance_description?: string;
   name?: string;
   ownerID?: number;
-  pkgID?: number;
+  pkg_id?: string;
   status?: string;
   updatedAt?: string;
   visibility?: string;
@@ -395,9 +279,8 @@ export interface VoAdminConnectorPkgResponse {
   author?: VoAdminConnectorPkgAuthorResponse;
   authorID?: number;
   createdAt?: string;
-  hashID?: string;
   iconUpdatedAt?: string;
-  id?: number;
+  id?: string;
   name?: string;
   package_description?: string;
   updatedAt?: string;
@@ -412,7 +295,7 @@ export interface VoAdminConnectorPkgVersionResponse {
   iconURL?: string;
   id?: number;
   manifest?: string;
-  pkgID?: number;
+  pkg_id?: string;
   r2Path?: string;
   releaseNote?: string;
   toolCount?: number;
@@ -620,6 +503,24 @@ export interface VoIssueInviteRequest {
 export interface VoIssueInviteResponse {
   codes?: VoInviteCodeResponse[];
   target_user?: VoInviteUserInfo;
+}
+
+export interface VoLegacyConnectorPkgResponse {
+  created_at?: string;
+  icon_url?: string;
+  id?: string;
+  name?: string;
+  package_description?: string;
+  pkg_key?: string;
+  updated_at?: string;
+}
+
+export interface VoLegacyConnectorPkgVersionResponse {
+  active?: boolean;
+  created_at?: string;
+  id?: number;
+  pkg_id?: string;
+  version?: string;
 }
 
 export interface VoMcpCompatActionDetails {
@@ -882,6 +783,41 @@ export interface VoRawProviderInfo {
   models?: Record<string, VoRawModelInfo>;
   name?: string;
   npm?: string;
+}
+
+export interface VoRemoteTaskCancelExecutionResponse {
+  execution_id?: string;
+  status?: string;
+}
+
+export interface VoRemoteTaskExecution {
+  action_description?: string;
+  action_key?: string;
+  action_name?: string;
+  connection_id?: string;
+  connector_key?: string;
+  created_at?: any;
+  error?: any;
+  external_task_id?: string;
+  finished_at?: any;
+  id?: string;
+  input?: any;
+  kind?: string;
+  meta?: any;
+  result?: any;
+  started_at?: any;
+  status?: string;
+  task_id?: string;
+  task_info_url?: string;
+  updated_at?: any;
+  webhook_supported?: boolean;
+}
+
+export interface VoRemoteTaskExecutionListResponse {
+  executions?: VoRemoteTaskExecution[];
+  limit?: number;
+  offset?: number;
+  total?: number;
 }
 
 export interface VoRemoteTaskStartAuthRequest {
@@ -2209,7 +2145,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       },
       params: RequestParams = {},
     ) =>
-      this.request<ModelsConnector[], VoErrorResponse>({
+      this.request<VoAdminConnectorInstanceResponse[], VoErrorResponse>({
         path: `/admin/remote-task/instances`,
         method: "GET",
         query: query,
@@ -2228,7 +2164,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     remoteTaskInstancesCreate: (request: AdminCreateInstanceRequest, params: RequestParams = {}) =>
-      this.request<ModelsConnector, VoErrorResponse>({
+      this.request<VoAdminConnectorInstanceResponse, VoErrorResponse>({
         path: `/admin/remote-task/instances`,
         method: "POST",
         body: request,
@@ -2248,7 +2184,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     remoteTaskInstancesDetail: (instanceId: string, params: RequestParams = {}) =>
-      this.request<ModelsConnector, VoErrorResponse>({
+      this.request<VoAdminConnectorInstanceResponse, VoErrorResponse>({
         path: `/admin/remote-task/instances/${instanceId}`,
         method: "GET",
         secure: true,
@@ -2266,7 +2202,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     remoteTaskInstancesUpdate: (instanceId: string, request: AdminCreateInstanceRequest, params: RequestParams = {}) =>
-      this.request<ModelsConnector, VoErrorResponse>({
+      this.request<VoAdminConnectorInstanceResponse, VoErrorResponse>({
         path: `/admin/remote-task/instances/${instanceId}`,
         method: "PUT",
         body: request,
@@ -3330,7 +3266,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     connectorsPkgsCreate: (body: V1UpsertConnectorPkgRequest, params: RequestParams = {}) =>
-      this.request<ModelsConnectorPkg, PinResponse>({
+      this.request<VoLegacyConnectorPkgResponse, PinResponse>({
         path: `/v1/connectors/pkgs`,
         method: "POST",
         body: body,
@@ -3350,7 +3286,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     connectorsPkgsVersionsCreate: (pkgKey: string, body: V1UpsertConnectorVersionRequest, params: RequestParams = {}) =>
-      this.request<ModelsConnectorPkgVersion, PinResponse>({
+      this.request<VoLegacyConnectorPkgVersionResponse, PinResponse>({
         path: `/v1/connectors/pkgs/${pkgKey}/versions`,
         method: "POST",
         body: body,
@@ -3421,7 +3357,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       },
       params: RequestParams = {},
     ) =>
-      this.request<GinH, PinResponse>({
+      this.request<VoRemoteTaskExecutionListResponse, PinResponse>({
         path: `/v1/executions`,
         method: "GET",
         query: query,
@@ -3440,7 +3376,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     executionsDetail: (id: string, params: RequestParams = {}) =>
-      this.request<GinH, PinResponse>({
+      this.request<VoRemoteTaskExecution, PinResponse>({
         path: `/v1/executions/${id}`,
         method: "GET",
         secure: true,
@@ -3449,16 +3385,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description Delete execution record by execution public ID.
+     * @description Cancel execution record by execution public ID while preserving history.
      *
      * @tags User
      * @name ExecutionsDelete
-     * @summary Delete execution
+     * @summary Cancel execution
      * @request DELETE:/v1/executions/{id}
      * @secure
      */
     executionsDelete: (id: string, params: RequestParams = {}) =>
-      this.request<GinH, PinResponse>({
+      this.request<VoRemoteTaskCancelExecutionResponse, PinResponse>({
         path: `/v1/executions/${id}`,
         method: "DELETE",
         secure: true,
@@ -3506,6 +3442,73 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         path: `/v1/me`,
         method: "GET",
         secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description List remote-task connector instances visible to the current scoped user token.
+     *
+     * @tags User
+     * @name RemoteTaskInstancesList
+     * @summary List user-resource remote-task instances
+     * @request GET:/v1/remote-task/instances
+     * @secure
+     */
+    remoteTaskInstancesList: (
+      query?: {
+        /** Filter by status (active/disabled/pending_review) */
+        status?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<VoAdminConnectorInstanceResponse[], PinResponse>({
+        path: `/v1/remote-task/instances`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Get a scoped remote-task connector instance detail.
+     *
+     * @tags User
+     * @name RemoteTaskInstancesDetail
+     * @summary Get user-resource remote-task instance detail
+     * @request GET:/v1/remote-task/instances/{instance_id}
+     * @secure
+     */
+    remoteTaskInstancesDetail: (instanceId: string, params: RequestParams = {}) =>
+      this.request<VoAdminConnectorInstanceResponse, PinResponse>({
+        path: `/v1/remote-task/instances/${instanceId}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Update a scoped remote-task connector instance.
+     *
+     * @tags User
+     * @name RemoteTaskInstancesUpdate
+     * @summary Update user-resource remote-task instance config
+     * @request PUT:/v1/remote-task/instances/{instance_id}
+     * @secure
+     */
+    remoteTaskInstancesUpdate: (
+      instanceId: string,
+      request: V1UpdateScopedRemoteTaskInstanceRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<VoAdminConnectorInstanceResponse, PinResponse>({
+        path: `/v1/remote-task/instances/${instanceId}`,
+        method: "PUT",
+        body: request,
+        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),

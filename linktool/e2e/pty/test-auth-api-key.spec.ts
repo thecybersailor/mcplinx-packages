@@ -11,6 +11,16 @@ function mkTempDir(prefix: string) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix))
 }
 
+async function waitForFile(filePath: string, timeoutMs = 5_000): Promise<void> {
+  const startedAt = Date.now()
+  while (!fs.existsSync(filePath)) {
+    if (Date.now() - startedAt > timeoutMs) {
+      throw new Error(`timeout waiting for file: ${filePath}`)
+    }
+    await new Promise((resolve) => setTimeout(resolve, 50))
+  }
+}
+
 const repoLayout = resolveRepoLayout()
 const canRunLocalIssuer = process.env.MCPLINX_E2E_EXTERNAL === '1' || !!repoLayout?.localIssuerEntrypoint
 const canRunSuite = !!repoLayout?.linktoolEntrypoint && !!repoLayout?.connectorExampleApiKeyDir && canRunLocalIssuer
@@ -146,8 +156,12 @@ d('linktool api-key auth + run (pty)', () => {
     stops.push(() => auth.kill())
     await auth.waitFor(/API Key/i, 30_000)
     auth.write('test_api_key_12345\r')
-    await auth.waitFor(/Authentication test passed/i, 30_000)
-    await auth.waitFor(/Connection saved/i, 30_000)
+    await auth.waitFor(/\[ctx\] GET .*\/api-key\/me/i, 30_000)
+    const connectionFile = path.join(connectorDir, '.linktool', 'connection.json')
+    await waitForFile(connectionFile, 5_000)
+    const savedConnection = JSON.parse(fs.readFileSync(connectionFile, 'utf8'))
+    expect(savedConnection.authData).toEqual({ api_key: 'test_api_key_12345' })
+    expect(savedConnection.name).toBe('api_test_user')
     expect(auth.output()).not.toContain('mock.dev.mcplinx.com')
 
     // 4) linktool test run sync_task

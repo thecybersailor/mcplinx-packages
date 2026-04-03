@@ -4,6 +4,8 @@ import { createMemoryHistory, createRouter, RouterView, type RouteRecordRaw } fr
 import { describe, expect, it, vi } from 'vitest'
 import { createRemoteTaskSharedConnectionRoutes, type RemoteTaskSharedConnectionFacade } from '../index'
 
+const CONNECTOR_UUID = 'bd8f5828-62f4-5066-8893-d46ecd02a5c2'
+
 function createFacade(): RemoteTaskSharedConnectionFacade {
   return {
     listConnections: vi.fn(async () => ({ items: [] })),
@@ -16,7 +18,7 @@ function createFacade(): RemoteTaskSharedConnectionFacade {
     submitAuth: vi.fn(async () => ({ id: 'shared_1', label: 'Support Mailbox' })),
     getConnection: vi.fn(async () => ({
       id: 'shared_1',
-      connector_id: 'gmail',
+      connector_id: CONNECTOR_UUID,
       label: 'Support Mailbox',
       requires_reauth: true,
       principal_pattern: 'org/team/team_1',
@@ -30,7 +32,7 @@ function createFacade(): RemoteTaskSharedConnectionFacade {
       type: 'api_key',
       fields: [{ name: 'api_key', label: 'API Key' }],
     })),
-    explainFallback: vi.fn(async () => ({ connector_id: 'gmail', candidates: [] })),
+    explainFallback: vi.fn(async () => ({ connector_id: CONNECTOR_UUID, candidates: [] })),
   }
 }
 
@@ -71,7 +73,7 @@ describe('shared connection auth flow', () => {
     const facade = createFacade()
     const { wrapper, router } = await mountAt('/shared-connections/connections/new', facade)
 
-    await wrapper.get('[data-test-id="shared-connections.create.connector-id"]').setValue('gmail')
+    await wrapper.get('[data-test-id="shared-connections.create.connector-id"]').setValue(CONNECTOR_UUID)
     await wrapper.get('[data-test-id="shared-connections.create.label"]').setValue('Support Mailbox')
     await wrapper.get('[data-test-id="shared-connections.create.principal-pattern"]').setValue('org/team/team_1')
     await wrapper.get('[data-test-id="shared-connections.create.start-auth"]').trigger('click')
@@ -93,9 +95,9 @@ describe('shared connection auth flow', () => {
 
   it('prefills connector id from query on create page', async () => {
     const facade = createFacade()
-    const { wrapper } = await mountAt('/shared-connections/connections/new?connector_id=pkg_1', facade)
+    const { wrapper } = await mountAt(`/shared-connections/connections/new?connector_id=${CONNECTOR_UUID}`, facade)
 
-    expect((wrapper.get('[data-test-id="shared-connections.create.connector-id"]').element as HTMLInputElement).value).toBe('pkg_1')
+    expect((wrapper.get('[data-test-id="shared-connections.create.connector-id"]').element as HTMLInputElement).value).toBe(CONNECTOR_UUID)
   })
 
   it('shows reauth form from detail page', async () => {

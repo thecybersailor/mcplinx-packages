@@ -9,6 +9,8 @@ import {
   type RemoteTaskManagementFacade,
 } from '../facade'
 
+const PACKAGE_UUID = 'bd8f5828-62f4-5066-8893-d46ecd02a5c2'
+
 function createFacade(): RemoteTaskManagementFacade {
   return {
     listPackages: vi.fn(async () => []),
@@ -24,7 +26,7 @@ function createFacade(): RemoteTaskManagementFacade {
         status: 'active',
         visibility: 'tenant',
         activeVersion: '1.2.3',
-        pkg_id: 'pkg_1',
+        pkg_id: PACKAGE_UUID,
         envConfig: { CLIENT_ID: 'initial-client' },
         secretConfig: { CLIENT_SECRET: true },
       }) as never,
@@ -131,7 +133,7 @@ describe('InstanceDetailPage', () => {
     await flushPromises()
 
     expect(facade.updateInstance).toHaveBeenCalledWith('7', {
-      pkg_id: 'pkg_1',
+      pkg_id: PACKAGE_UUID,
       name: 'Tenant Slack',
       active_version: '1.2.3',
       description: undefined,

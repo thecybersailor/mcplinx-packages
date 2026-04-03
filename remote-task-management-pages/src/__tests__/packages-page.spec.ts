@@ -10,9 +10,11 @@ import {
   type RemoteTaskManagementScope,
 } from '../facade'
 
+const PACKAGE_UUID = 'bd8f5828-62f4-5066-8893-d46ecd02a5c2'
+
 function createFacade(): RemoteTaskManagementFacade {
   return {
-    listPackages: vi.fn(async () => [{ id: 1, hashID: 'pkg_1', name: 'WeCom Docs', package_description: 'desc', versions: [] }]),
+    listPackages: vi.fn(async () => [{ id: PACKAGE_UUID, name: 'WeCom Docs', package_description: 'desc', versions: [] }]),
     getPackage: vi.fn(async () => ({ id: 1 })),
     listPackageVersions: vi.fn(async () => []),
     listPackageInstances: vi.fn(async () => []),
@@ -111,19 +113,17 @@ describe('PackagesPage', () => {
     expect(wrapper.text()).toContain('Application')
   })
 
-  it('uses theme border tokens on package table rows (readable on light portal shell)', async () => {
+  it('uses dark bundle surfaces instead of light borders on packages page', async () => {
     const { wrapper } = await mountAt('/team/team_1/connectors/packages', 'team')
 
     const page = wrapper.get('[data-test-id="remote-task-management.packages.page"]')
-    expect(page.exists()).toBe(true)
-    expect(wrapper.find('[data-test-id="remote-task-management.packages.table"]').exists()).toBe(true)
-    expect(wrapper.find('[data-test-id="remote-task-management.packages.cli-hint"]').exists()).toBe(true)
+    expect(page.classes().join(' ')).toContain('bg-transparent')
+    expect(page.classes().join(' ')).toContain('border-transparent')
 
     const table = wrapper.get('[data-test-id="remote-task-management.packages.table"]')
-    expect(table.text()).toContain('Application')
-    expect(table.text()).toContain('Version')
+    expect(table.classes().join(' ')).toContain('bg-transparent')
 
-    const row = wrapper.get('[data-test-id="remote-task-management.packages.row.pkg_1"]')
-    expect(row.classes().join(' ')).toContain('border-border')
+    const row = wrapper.get(`[data-test-id="remote-task-management.packages.row.${PACKAGE_UUID}"]`)
+    expect(row.classes().join(' ')).toContain('border-white/10')
   })
 })

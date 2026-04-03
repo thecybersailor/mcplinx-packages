@@ -102,96 +102,6 @@ export interface DeveloperUploadURLResponse {
 
 export type GinH = Record<string, any>;
 
-export interface GormDeletedAt {
-  time?: string;
-  /** Valid is true if Time is not NULL */
-  valid?: boolean;
-}
-
-export interface ModelsConnector {
-  /** 关联到 ConnectorPkgVersion.ID，用于精确版本匹配 */
-  activePkgVersionID?: number;
-  /** 使用的版本 (revision) */
-  activeVersion?: string;
-  createdAt?: string;
-  deletedAt?: GormDeletedAt;
-  /** 已处理 Embedding 的版本 */
-  embeddingSyncedVersion?: string;
-  /** JSON (non-sensitive config) */
-  envConfig?: string;
-  /** connector_id (自增) */
-  id?: number;
-  /** 实例拥有者 */
-  ownerID?: number;
-  /** 关联到 ConnectorPkg */
-  pkg?: ModelsConnectorPkg;
-  /** 关联到 ConnectorPkg.ID */
-  pkgID?: number;
-  /** Encrypted JSON (sensitive secrets) */
-  secretConfig?: string;
-  /** active, disabled, pending_review */
-  status?: string;
-  updatedAt?: string;
-  /** private, public */
-  visibility?: string;
-}
-
-export interface ModelsConnectorPkg {
-  app_id?: string;
-  /** 用于 Preload，不在迁移时建立外键约束 */
-  author?: ModelsUser;
-  /** 作者 ID */
-  authorID?: number;
-  createdAt?: string;
-  deletedAt?: GormDeletedAt;
-  description?: string;
-  /** 冗余存储编码后的ID，对外暴露的业务标识符 */
-  hashID?: string;
-  /** 图标最后更新时间，nil 表示没有图标 */
-  iconUpdatedAt?: string;
-  icon_url?: string;
-  /** 自增 ID */
-  id?: number;
-  /** Package 名称，与 AuthorID 组成唯一索引 */
-  name?: string;
-  /** Package 描述 */
-  packageDescription?: string;
-  pkg_key?: string;
-  updatedAt?: string;
-  /** 关联的版本 */
-  versions?: ModelsConnectorPkgVersion[];
-}
-
-export interface ModelsConnectorPkgVersion {
-  active?: boolean;
-  app_id?: string;
-  /** oauth2, apikey, none */
-  authType?: string;
-  /** 包大小 (bytes) */
-  bundleSize?: number;
-  /** URL (maybe signed or public) */
-  bundleURL?: string;
-  createdAt?: string;
-  deletedAt?: GormDeletedAt;
-  /** Icon URL */
-  iconURL?: string;
-  id?: number;
-  /** 关联到 ConnectorPkg */
-  pkg?: ModelsConnectorPkg;
-  /** 关联到 ConnectorPkg.ID */
-  pkgID?: number;
-  pkg_key?: string;
-  /** S3 存储路径 (字段名保持 R2Path 以兼容数据库) */
-  r2Path?: string;
-  releaseNote?: string;
-  /** 工具数量 */
-  toolCount?: number;
-  /** 上传者 user_id */
-  uploadedBy?: number;
-  /** 版本号(revision)，由后端自动生成，格式: md5(timestamp) 前8位 */
-  version?: string;
-}
-
 export enum ModelsPaymentPlatform {
   PaymentPlatformStripe = "STRIPE",
   PaymentPlatformAppStore = "APP_STORE",
@@ -239,7 +149,7 @@ export interface ModelsRegistryConnectorPkg {
   activeVersion?: string;
   createdAt?: string;
   description?: string;
-  /** Stable external identifier: same as package.json "name". */
+  /** Stable external identifier: route UUID for all non-CLI surfaces. */
   id?: string;
   /** display name */
   name?: string;
@@ -259,37 +169,6 @@ export interface ModelsRegistryConnectorVersion {
   toolCount?: number;
   updatedAt?: string;
   version?: string;
-}
-
-export interface ModelsUser {
-  /** 激活时间 */
-  activated_at?: string;
-  createdAt?: string;
-  created_at?: string;
-  deletedAt?: GormDeletedAt;
-  email?: string;
-  id?: number;
-  /** 使用的邀请码（冗余） */
-  invite_code_used?: string;
-  /** 邀请人的 User.ID */
-  invited_by?: number;
-  /** 邀请码相关字段 */
-  is_activated?: boolean;
-  /** MCP Token 安全策略 */
-  mcp_token?: string;
-  name?: string;
-  /** Pay-and-Go 功能 */
-  pay_and_go_enabled?: boolean;
-  /** Pay-and-Go 配额 */
-  pay_and_go_quota?: number;
-  /** Pay-and-Go 已使用额度 */
-  pay_and_go_used?: number;
-  /** Stripe Customer ID */
-  stripe_customer_id?: string;
-  supabase_id?: string;
-  updatedAt?: string;
-  /** hashid for user.ID (允许为空，创建后再填充) */
-  user_code?: string;
 }
 
 export interface PinResponse {
@@ -398,7 +277,7 @@ export interface VoAdminConnectorInstanceResponse {
   instance_description?: string;
   name?: string;
   ownerID?: number;
-  pkgID?: number;
+  pkg_id?: string;
   status?: string;
   updatedAt?: string;
   visibility?: string;
@@ -414,9 +293,8 @@ export interface VoAdminConnectorPkgResponse {
   author?: VoAdminConnectorPkgAuthorResponse;
   authorID?: number;
   createdAt?: string;
-  hashID?: string;
   iconUpdatedAt?: string;
-  id?: number;
+  id?: string;
   name?: string;
   package_description?: string;
   updatedAt?: string;
@@ -431,7 +309,7 @@ export interface VoAdminConnectorPkgVersionResponse {
   iconURL?: string;
   id?: number;
   manifest?: string;
-  pkgID?: number;
+  pkg_id?: string;
   r2Path?: string;
   releaseNote?: string;
   toolCount?: number;
@@ -2007,7 +1885,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       },
       params: RequestParams = {},
     ) =>
-      this.request<ModelsConnector[], VoErrorResponse>({
+      this.request<VoAdminConnectorInstanceResponse[], VoErrorResponse>({
         path: `/admin/remote-task/instances`,
         method: "GET",
         query: query,
@@ -2026,7 +1904,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     remoteTaskInstancesCreate: (request: AdminCreateInstanceRequest, params: RequestParams = {}) =>
-      this.request<ModelsConnector, VoErrorResponse>({
+      this.request<VoAdminConnectorInstanceResponse, VoErrorResponse>({
         path: `/admin/remote-task/instances`,
         method: "POST",
         body: request,
@@ -2046,7 +1924,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     remoteTaskInstancesDetail: (instanceId: string, params: RequestParams = {}) =>
-      this.request<ModelsConnector, VoErrorResponse>({
+      this.request<VoAdminConnectorInstanceResponse, VoErrorResponse>({
         path: `/admin/remote-task/instances/${instanceId}`,
         method: "GET",
         secure: true,
@@ -2064,7 +1942,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     remoteTaskInstancesUpdate: (instanceId: string, request: AdminCreateInstanceRequest, params: RequestParams = {}) =>
-      this.request<ModelsConnector, VoErrorResponse>({
+      this.request<VoAdminConnectorInstanceResponse, VoErrorResponse>({
         path: `/admin/remote-task/instances/${instanceId}`,
         method: "PUT",
         body: request,

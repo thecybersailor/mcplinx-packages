@@ -9,6 +9,8 @@ import {
   type RemoteTaskManagementFacade,
 } from '../facade'
 
+const PACKAGE_UUID = 'bd8f5828-62f4-5066-8893-d46ecd02a5c2'
+
 function deferred<T>() {
   let resolve!: (value: T) => void
   let reject!: (reason?: unknown) => void
@@ -63,7 +65,7 @@ const RuntimeProvider = defineComponent({
 
 describe('PackageDetailPage', () => {
   it('exposes page test id only after package detail finishes loading', async () => {
-    const pkg = deferred<{ id: string; hashID: string; name: string; package_description: string }>()
+    const pkg = deferred<{ id: string; name: string; package_description: string }>()
     const facade = createFacade(pkg.promise)
     const router = createRouter({
       history: createMemoryHistory(),
@@ -82,7 +84,7 @@ describe('PackageDetailPage', () => {
       ],
     })
 
-    await router.push('/packages/pkg_1')
+    await router.push(`/packages/${PACKAGE_UUID}`)
     await router.isReady()
 
     const wrapper = mount(defineComponent(() => () => h(RouterView)), {
@@ -92,12 +94,11 @@ describe('PackageDetailPage', () => {
     })
 
     await flushPromises()
-    expect(facade.getPackage).toHaveBeenCalledWith('pkg_1')
+    expect(facade.getPackage).toHaveBeenCalledWith(PACKAGE_UUID)
     expect(wrapper.find('[data-test-id="remote-task-management.package-detail.page"]').exists()).toBe(false)
 
     pkg.resolve({
-      id: 'pkg_1',
-      hashID: 'pkg_1',
+      id: PACKAGE_UUID,
       name: 'WeCom Docs',
       package_description: 'desc',
     })
@@ -109,7 +110,7 @@ describe('PackageDetailPage', () => {
     await wrapper.get('[data-test-id="remote-task-management.package-detail.shared-connections"]').trigger('click')
     await flushPromises()
     expect(router.currentRoute.value.name).toBe('team-shared-connections')
-    expect(router.currentRoute.value.query.connector_id).toBe('pkg_1')
+    expect(router.currentRoute.value.query.connector_id).toBe(PACKAGE_UUID)
   })
 
   it('opens create-instance sheet with shared sheet structure', async () => {
