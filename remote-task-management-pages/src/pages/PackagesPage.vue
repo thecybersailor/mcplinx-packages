@@ -3,7 +3,6 @@ import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import BundlePage from '../components/BundlePage.vue'
 import BundleState from '../components/BundleState.vue'
-import ConnectorGettingStarted from '../components/ConnectorGettingStarted.vue'
 import { useRemoteTaskManagementRuntime } from '../facade'
 
 const runtime = useRemoteTaskManagementRuntime()
@@ -54,6 +53,10 @@ const latestToolCountOf = (pkg: (typeof packages.value)[number]) => {
   })[0]?.toolCount || 0
 }
 
+const instanceCountOf = (pkg: (typeof packages.value)[number]) => {
+  return pkg.totalInstances ?? 0
+}
+
 onMounted(load)
 </script>
 
@@ -80,7 +83,6 @@ onMounted(load)
 
     <BundleState v-if="loading" variant="loading" message="Loading packages..." />
     <BundleState v-else-if="error" variant="error" :message="error" action-label="Refresh" @action="load" />
-    <ConnectorGettingStarted data-test-id="remote-task-management.packages.cli-hint" />
     <div v-if="!loading && !error && !packages.length" class="rounded-2xl border border-dashed border-border bg-muted/20 px-6 py-10 text-center">
       <div class="text-lg font-semibold text-foreground">You haven&apos;t published any connectors yet.</div>
       <div class="mt-2 text-sm text-muted-foreground">Use the CLI commands above to publish your first connector.</div>
@@ -92,6 +94,7 @@ onMounted(load)
             <th class="px-4 py-3 font-medium">Application</th>
             <th class="px-4 py-3 font-medium">Version</th>
             <th class="px-4 py-3 font-medium">Tools</th>
+            <th class="px-4 py-3 font-medium">Instances</th>
             <th class="px-4 py-3 font-medium">Last Updated</th>
             <th class="px-4 py-3 font-medium">Actions</th>
           </tr>
@@ -113,6 +116,7 @@ onMounted(load)
               </span>
             </td>
             <td class="px-4 py-4 text-foreground">{{ latestToolCountOf(pkg) }}</td>
+            <td class="px-4 py-4 text-foreground">{{ instanceCountOf(pkg) }}</td>
             <td class="px-4 py-4 text-muted-foreground">{{ pkg.updatedAt || pkg.createdAt || '-' }}</td>
             <td class="px-4 py-4">
               <button class="inline-flex items-center justify-center rounded-xl border border-border bg-background px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted" @click="openDetail(String(pkg.id || ''))">Manage</button>

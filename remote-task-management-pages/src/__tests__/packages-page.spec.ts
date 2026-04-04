@@ -14,7 +14,7 @@ const PACKAGE_UUID = 'bd8f5828-62f4-5066-8893-d46ecd02a5c2'
 
 function createFacade(): RemoteTaskManagementFacade {
   return {
-    listPackages: vi.fn(async () => [{ id: PACKAGE_UUID, name: 'WeCom Docs', package_description: 'desc', versions: [] }]),
+    listPackages: vi.fn(async () => [{ id: PACKAGE_UUID, name: 'WeCom Docs', package_description: 'desc', versions: [], totalInstances: 3 }]),
     getPackage: vi.fn(async () => ({ id: 1 })),
     listPackageVersions: vi.fn(async () => []),
     listPackageInstances: vi.fn(async () => []),
@@ -95,12 +95,13 @@ describe('PackagesPage', () => {
     const { wrapper } = await mountAt('/team/team_1/connectors/packages', 'team')
 
     expect(wrapper.text()).toContain('My Connector Packages')
-    expect(wrapper.text()).toContain('Getting Started')
     expect(wrapper.text()).toContain('Application')
     expect(wrapper.text()).toContain('Version')
     expect(wrapper.text()).toContain('Tools')
+    expect(wrapper.text()).toContain('Instances')
     expect(wrapper.text()).toContain('Last Updated')
-    expect(wrapper.find('[data-test-id="remote-task-management.packages.cli-hint"]').exists()).toBe(true)
+    expect(wrapper.text()).toContain('3')
+    expect(wrapper.find('[data-test-id="remote-task-management.packages.cli-hint"]').exists()).toBe(false)
     const actionTexts = wrapper.findAll('button').map((node) => node.text())
     expect(actionTexts).not.toContain('Publish')
     expect(actionTexts).not.toContain('Deploy')
@@ -141,7 +142,7 @@ describe('PackagesPage', () => {
     expect(cells[0]?.find('.font-medium').classes().join(' ')).not.toContain('text-white')
     expect(cells[0]?.find('.text-sm').classes().join(' ')).toContain('text-muted-foreground')
     expect(cells[0]?.find('.text-sm').classes().join(' ')).not.toContain('text-slate-400')
-    expect(cells[4]?.find('button').classes().join(' ')).toContain('text-foreground')
-    expect(cells[4]?.find('button').classes().join(' ')).not.toContain('text-slate-100')
+    expect(cells[5]?.find('button').classes().join(' ')).toContain('text-foreground')
+    expect(cells[5]?.find('button').classes().join(' ')).not.toContain('text-slate-100')
   })
 })
