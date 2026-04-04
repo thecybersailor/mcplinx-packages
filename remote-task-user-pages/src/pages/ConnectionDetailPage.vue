@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Button } from '@mcplinx/ui-vue'
-import BundlePage from '../components/BundlePage.vue'
-import BundlePanel from '../components/BundlePanel.vue'
-import BundleState from '../components/BundleState.vue'
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Skeleton } from '@mcplinx/ui-vue'
+import ConnectionActionRunner from '../components/ConnectionActionRunner.vue'
+import type { RemoteTaskConnectionActionDetail } from '../facade'
 import { useRemoteTaskUserRuntime } from '../facade'
 import { openAuthTaskWindow, type AuthTaskWindowController } from '../authTaskWindow'
 
@@ -15,7 +14,20 @@ const loading = ref(true)
 const error = ref('')
 const manualAuthUrl = ref('')
 const connection = ref<Awaited<ReturnType<typeof runtime.facade.getConnection>> | null>(null)
+const actionRunnerOpen = ref(false)
+const actionLoading = ref(false)
+const actionSubmitting = ref(false)
+const actionError = ref('')
+const actionResult = ref<Record<string, unknown> | null>(null)
+const selectedAction = ref<Record<string, unknown> | null>(null)
+const actionDetail = ref<RemoteTaskConnectionActionDetail | null>(null)
 const connectionId = computed(() => String(route.params.id ?? ''))
+const availableActions = computed(() => {
+  const raw = connection.value?.available_actions ?? connection.value?.tools ?? []
+  return Array.isArray(raw)
+    ? raw.filter((entry): entry is Record<string, unknown> => Boolean(entry) && typeof entry === 'object')
+    : []
+})
 let authController: AuthTaskWindowController | null = null
 
 async function load() {
@@ -57,6 +69,71 @@ async function reauth() {
   }
 }
 
+function actionKeyOf(action: Record<string, unknown>): string {
+  return String(action.key ?? action.action_key ?? action.id ?? '')
+}
+
+function actionNameOf(action: Record<string, unknown>): string {
+  return String(action.name ?? action.title ?? action.key ?? action.action_key ?? 'Tool')
+}
+
+async function openActionRunner(action: Record<string, unknown>) {
+  const actionKey = actionKeyOf(action)
+  if (!connectionId.value || !actionKey) return
+  selectedAction.value = action
+  actionRunnerOpen.value = true
+  actionLoading.value = true
+  actionError.value = ''
+  actionResult.value = null
+  actionDetail.value = null
+  try {
+    actionDetail.value = await runtime.facade.getConnectionAction(connectionId.value, actionKey)
+  } catch (err) {
+    actionError.value = err instanceof Error ? err.message : runtime.t('remoteTaskUser.common.errorPrefix', 'Request failed')
+  } finally {
+    actionLoading.value = false
+  }
+}
+
+async function executeAction(body: Record<string, unknown>) {
+  const action = selectedAction.value
+  const actionKey = action ? actionKeyOf(action) : ''
+  if (!connectionId.value || !actionKey) return
+  actionSubmitting.value = true
+  actionError.value = ''
+  actionResult.value = null
+  try {
+    const result = await runtime.facade.executeConnectionAction(connectionId.value, actionKey, body)
+    const selectedActionKind = action ? String(action.kind ?? '') : ''
+    const resultKind = String(result.kind ?? actionDetail.value?.kind ?? selectedActionKind)
+    const isSyncResult =
+      resultKind === 'sync' ||
+      Object.prototype.hasOwnProperty.call(result, 'result') ||
+      Object.prototype.hasOwnProperty.call(result, 'success') ||
+      Object.prototype.hasOwnProperty.call(result, 'executed_at')
+    if (isSyncResult) {
+      actionResult.value = result.result && typeof result.result === 'object'
+        ? result.result
+        : result as Record<string, unknown>
+      return
+    }
+    const executionId = String(result.execution_id ?? '')
+    if (executionId) {
+      actionRunnerOpen.value = false
+      await router.push({
+        name: `${runtime.routePrefix}-task-detail`,
+        params: { ...route.params, id: executionId },
+      })
+      return
+    }
+    actionError.value = 'Missing execution id'
+  } catch (err) {
+    actionError.value = err instanceof Error ? err.message : runtime.t('remoteTaskUser.common.errorPrefix', 'Request failed')
+  } finally {
+    actionSubmitting.value = false
+  }
+}
+
 onMounted(load)
 
 onUnmounted(() => {
@@ -66,12 +143,20 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <BundlePage
+  <section
     data-test-id="remote-task-user.connection-detail.page"
-    :title="connection?.package?.name || connection?.connector_id || runtime.t('remoteTaskUser.connectionDetail.title', 'Connection Detail')"
-    :description="`Connection ID: ${connection?.id || connectionId}`"
+    class="space-y-6 rounded-[28px] border border-border bg-card p-6 text-card-foreground shadow-sm md:p-8"
   >
-    <template #actions>
+    <header class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div class="space-y-2">
+        <h1 class="text-3xl font-semibold tracking-tight text-foreground">
+          {{ connection?.package?.name || connection?.connector_id || runtime.t('remoteTaskUser.connectionDetail.title', 'Connection Detail') }}
+        </h1>
+        <p class="max-w-3xl text-sm leading-6 text-muted-foreground">
+          {{ `Connection ID: ${connection?.id || connectionId}` }}
+        </p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
       <Button
         data-test-id="remote-task-user.connection-detail.back"
         variant="outline"
@@ -79,14 +164,30 @@ onUnmounted(() => {
       >
         {{ runtime.t('remoteTaskUser.common.backToList', 'Back to list') }}
       </Button>
-    </template>
+      </div>
+    </header>
 
-    <BundleState v-if="loading" variant="loading" :message="runtime.t('remoteTaskUser.common.loading', 'Loading...')" />
-    <BundleState v-else-if="error" variant="error" :message="error" />
+    <div v-if="loading" class="space-y-4">
+      <Skeleton class="h-8 w-[250px]" />
+      <Skeleton class="h-[125px] w-full rounded-xl" />
+      <div class="space-y-2">
+        <Skeleton class="h-4 w-[250px]" />
+        <Skeleton class="h-4 w-[200px]" />
+      </div>
+    </div>
+    <div
+      v-else-if="error"
+      class="rounded-2xl border border-destructive/30 bg-destructive/10 px-5 py-6 text-sm text-destructive"
+    >
+      {{ error }}
+    </div>
     <div v-else-if="connection" class="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
       <div class="space-y-4">
-        <BundlePanel>
-          <h2 class="mb-3 text-base font-semibold text-foreground">Connection Information</h2>
+        <Card class="bg-muted/30 shadow-none">
+          <CardHeader>
+            <CardTitle class="text-base">Connection Information</CardTitle>
+          </CardHeader>
+          <CardContent class="pt-0">
           <dl class="grid gap-3 md:grid-cols-2">
             <div><dt class="text-xs uppercase tracking-wide text-muted-foreground">Connection ID</dt><dd class="mt-1 text-sm text-foreground">{{ connection.id || '-' }}</dd></div>
             <div><dt class="text-xs uppercase tracking-wide text-muted-foreground">Connector ID</dt><dd class="mt-1 text-sm text-foreground">{{ connection.connector_id || '-' }}</dd></div>
@@ -95,33 +196,44 @@ onUnmounted(() => {
             <div><dt class="text-xs uppercase tracking-wide text-muted-foreground">Created At</dt><dd class="mt-1 text-sm text-foreground">{{ connection.created_at || '-' }}</dd></div>
             <div><dt class="text-xs uppercase tracking-wide text-muted-foreground">Last Used</dt><dd class="mt-1 text-sm text-foreground">{{ connection.updated_at || '-' }}</dd></div>
           </dl>
-        </BundlePanel>
+          </CardContent>
+        </Card>
 
-        <BundlePanel>
-          <h2 class="mb-3 text-base font-semibold text-foreground">Status Details</h2>
-          <div class="space-y-2 text-sm text-muted-foreground">
-            <p v-if="connection.requires_reauth">This connection requires reauthorization.</p>
-            <p v-else-if="connection.status === 'expired'">The access token has expired.</p>
-            <p v-else-if="connection.status === 'error'">The authorization may have been revoked.</p>
-            <p v-else>Connection is healthy.</p>
-          </div>
-        </BundlePanel>
-
-        <BundlePanel>
-          <h2 class="mb-3 text-base font-semibold text-foreground">Available Tools</h2>
-          <div v-if="connection.tools?.length" class="space-y-3">
-            <div v-for="(tool, index) in connection.tools" :key="String(tool.name ?? tool.id ?? index)" class="rounded-xl border border-border bg-card px-4 py-3">
-              <div class="text-sm font-semibold text-foreground">{{ String(tool.name ?? tool.id ?? 'Tool') }}</div>
+        <Card class="bg-muted/30 shadow-none">
+          <CardHeader>
+            <CardTitle class="text-base">Available Tools</CardTitle>
+          </CardHeader>
+          <CardContent class="pt-0">
+          <div v-if="availableActions.length" class="space-y-3">
+            <Button
+              v-for="(tool, index) in availableActions"
+              :key="String(tool.key ?? tool.action_key ?? tool.name ?? tool.id ?? index)"
+              type="button"
+              variant="outline"
+              class="h-auto w-full justify-start rounded-xl bg-card px-4 py-3 text-left transition-colors hover:bg-muted/40"
+              :data-test-id="`remote-task-user.connection-detail.action.${String(tool.key ?? tool.action_key ?? tool.id ?? index)}`"
+              @click="openActionRunner(tool)"
+            >
+              <div class="flex items-center justify-between gap-3">
+                <div class="text-sm font-semibold text-foreground">{{ actionNameOf(tool) }}</div>
+                <Badge variant="outline">
+                  {{ String(tool.kind ?? 'tool') }}
+                </Badge>
+              </div>
               <p class="mt-2 text-sm text-muted-foreground">{{ String(tool.description ?? 'No description available.') }}</p>
-            </div>
+            </Button>
           </div>
           <p v-else class="text-sm text-muted-foreground">No tools available for this connector.</p>
-        </BundlePanel>
+          </CardContent>
+        </Card>
       </div>
 
       <div class="space-y-4">
-        <BundlePanel>
-          <h2 class="mb-3 text-base font-semibold text-foreground">Actions</h2>
+        <Card class="bg-muted/30 shadow-none">
+          <CardHeader>
+            <CardTitle class="text-base">Actions</CardTitle>
+          </CardHeader>
+          <CardContent class="pt-0">
           <div
             v-if="manualAuthUrl"
             data-test-id="remote-task-user.connection-detail.manual-auth"
@@ -153,8 +265,21 @@ onUnmounted(() => {
               Back to Connections
             </Button>
           </div>
-        </BundlePanel>
+          </CardContent>
+        </Card>
       </div>
     </div>
-  </BundlePage>
+
+    <ConnectionActionRunner
+      :open="actionRunnerOpen"
+      :loading="actionLoading"
+      :submitting="actionSubmitting"
+      :detail="actionDetail || selectedAction"
+      :error="actionError"
+      :result="actionResult"
+      data-test-id-prefix="remote-task-user.connection-detail.runner"
+      @update:open="actionRunnerOpen = $event"
+      @submit="executeAction"
+    />
+  </section>
 </template>

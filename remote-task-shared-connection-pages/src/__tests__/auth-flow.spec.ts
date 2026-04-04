@@ -34,6 +34,8 @@ function createFacade(): RemoteTaskSharedConnectionFacade {
       inherits_to: ['team'],
       resolution_hint: 'team -> tenant -> platform',
     })),
+    getConnectionAction: vi.fn(async () => ({ action_key: 'sync_transform' })),
+    executeConnectionAction: vi.fn(async () => ({ execution_id: 'exec_1' })),
     updateConnection: vi.fn(async () => ({ id: 'shared_1' })),
     deleteConnection: vi.fn(async () => ({})),
     reauthConnection: vi.fn(async () => ({

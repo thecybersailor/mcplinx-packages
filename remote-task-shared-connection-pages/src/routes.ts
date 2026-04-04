@@ -20,6 +20,7 @@ export interface CreateRemoteTaskSharedConnectionRoutesOptions {
   facade: RemoteTaskSharedConnectionFacade
   authTaskFacade: ConnectionAuthTaskFacade
   connectAppTarget?: (connectorId?: string) => RouteLocationRaw
+  taskDetailTarget?: (executionId: string) => RouteLocationRaw
   includeFallbackExplain?: boolean
   t?: RemoteTaskSharedConnectionTranslate
 }
@@ -30,6 +31,7 @@ function createShell(
   scope: SharedConnectionScope,
   routePrefix: string,
   connectAppTarget: ((connectorId?: string) => RouteLocationRaw) | undefined,
+  taskDetailTarget: ((executionId: string) => RouteLocationRaw) | undefined,
   t?: RemoteTaskSharedConnectionTranslate,
 ) {
   return defineComponent({
@@ -41,6 +43,7 @@ function createShell(
         scope,
         routePrefix,
         connectAppTarget,
+        taskDetailTarget,
         t: t ?? defaultTranslate,
       })
       return () => h(RouterView)
@@ -64,7 +67,15 @@ export function createRemoteTaskSharedConnectionRoutes(
   return [
     {
       path: options.basePath,
-      component: createShell(options.facade, options.authTaskFacade, options.scope, prefix, options.connectAppTarget, options.t),
+      component: createShell(
+        options.facade,
+        options.authTaskFacade,
+        options.scope,
+        prefix,
+        options.connectAppTarget,
+        options.taskDetailTarget,
+        options.t,
+      ),
       children,
     },
   ]

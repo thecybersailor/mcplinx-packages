@@ -99,7 +99,7 @@ onUnmounted(() => {
       @action="load"
     />
     <div
-      v-if="manualAuthUrl"
+      v-else-if="manualAuthUrl"
       data-test-id="remote-task-user.connections.manual-auth"
       class="rounded-xl border border-border bg-muted/30 p-4 text-sm text-foreground"
     >

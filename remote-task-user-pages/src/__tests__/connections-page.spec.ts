@@ -54,11 +54,14 @@ function createFacade(): RemoteTaskUserFacade {
       created_at: '2026-03-25T00:00:00Z',
       tools: [{ name: 'list_repos', description: 'List repositories' }],
     })),
+    getConnectionAction: vi.fn(async () => ({ action_key: 'list_repos' })),
+    executeConnectionAction: vi.fn(async () => ({ execution_id: 'exec_1' })),
     deleteConnection: vi.fn(async () => ({})),
     reauthConnection: vi.fn(async () => ({ url: 'https://example.com/oauth/start' })),
     listTasks: vi.fn(async () => ({ executions: [] })),
     getTask: vi.fn(async () => ({ id: 'task_1' })),
     cancelTask: vi.fn(async () => ({})),
+    deleteTask: vi.fn(async () => ({})),
   }
 }
 

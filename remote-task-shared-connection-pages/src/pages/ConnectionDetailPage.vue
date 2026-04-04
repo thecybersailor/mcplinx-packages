@@ -139,14 +139,17 @@
                 No tools available for this connector.
               </div>
               <div v-else class="space-y-3">
-                <div
+                <button
                   v-for="tool in tools"
-                  :key="String(tool.id ?? tool.name ?? tool.description ?? 'tool')"
-                  class="rounded-lg border p-4 transition-colors hover:bg-muted/50"
+                  :key="String(tool.key ?? tool.action_key ?? tool.id ?? tool.name ?? 'tool')"
+                  type="button"
+                  class="w-full rounded-lg border p-4 text-left transition-colors hover:bg-muted/50"
+                  :data-test-id="`shared-connections.detail.action.${String(tool.key ?? tool.action_key ?? tool.id ?? tool.name ?? 'tool')}`"
+                  @click="openActionRunner(tool)"
                 >
                   <div class="space-y-2">
                     <div class="flex items-center gap-2">
-                      <h4 class="text-base font-semibold">{{ String(tool.name ?? tool.id ?? 'Tool') }}</h4>
+                      <h4 class="text-base font-semibold">{{ actionNameOf(tool) }}</h4>
                       <Badge variant="outline" class="text-xs">{{ String(tool.kind ?? 'tool') }}</Badge>
                     </div>
                     <div v-if="tool.description" class="text-sm leading-relaxed text-foreground">
@@ -156,7 +159,7 @@
                       No description available
                     </div>
                   </div>
-                </div>
+                </button>
               </div>
             </CardContent>
           </Card>
@@ -206,6 +209,18 @@
           </Card>
         </div>
       </div>
+
+      <ConnectionActionRunner
+        :open="actionRunnerOpen"
+        :loading="actionLoading"
+        :submitting="actionSubmitting"
+        :detail="actionDetail || selectedAction"
+        :error="actionError"
+        :result="actionResult"
+        data-test-id-prefix="shared-connections.detail.runner"
+        @update:open="actionRunnerOpen = $event"
+        @submit="executeAction"
+      />
     </template>
   </div>
 </template>
@@ -214,8 +229,13 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Label } from '@mcplinx/ui-vue'
-import { useRemoteTaskSharedConnectionRuntime, type SharedConnectionRecord } from '../facade'
+import {
+  useRemoteTaskSharedConnectionRuntime,
+  type SharedConnectionActionDetail,
+  type SharedConnectionRecord,
+} from '../facade'
 import ConnectorIcon from '../components/ConnectorIcon.vue'
+import ConnectionActionRunner from '../components/ConnectionActionRunner.vue'
 import { openAuthTaskWindow, type AuthTaskWindowController } from '../authTaskWindow'
 
 const runtime = useRemoteTaskSharedConnectionRuntime()
@@ -232,6 +252,13 @@ const tools = ref<Array<Record<string, unknown>>>([])
 const toolsLoading = ref(false)
 const toolsError = ref('')
 const manualAuthUrl = ref('')
+const actionRunnerOpen = ref(false)
+const actionLoading = ref(false)
+const actionSubmitting = ref(false)
+const actionError = ref('')
+const actionResult = ref<Record<string, unknown> | null>(null)
+const selectedAction = ref<Record<string, unknown> | null>(null)
+const actionDetail = ref<SharedConnectionActionDetail | null>(null)
 let authController: AuthTaskWindowController | null = null
 
 onMounted(async () => {
@@ -244,7 +271,9 @@ async function loadConnection() {
     error.value = ''
     const found = await runtime.facade.getConnection(connectionId.value)
     connection.value = found
-    const rawTools = (found as Record<string, unknown>).available_tools
+    const rawTools =
+      (found as Record<string, unknown>).available_actions ??
+      (found as Record<string, unknown>).available_tools
     tools.value = Array.isArray(rawTools)
       ? rawTools.filter((entry): entry is Record<string, unknown> => Boolean(entry) && typeof entry === 'object')
       : []
@@ -292,6 +321,67 @@ function getExpiryText(expiresAt: string) {
 
 function shouldShowReauth(conn: SharedConnectionRecord) {
   return conn.status === 'expired' || conn.status === 'error' || conn.requires_reauth
+}
+
+function actionKeyOf(action: Record<string, unknown>): string {
+  return String(action.key ?? action.action_key ?? action.id ?? '')
+}
+
+function actionNameOf(action: Record<string, unknown>): string {
+  return String(action.name ?? action.title ?? action.key ?? action.action_key ?? 'Tool')
+}
+
+async function openActionRunner(action: Record<string, unknown>) {
+  const actionKey = actionKeyOf(action)
+  if (!connection.value?.id || !actionKey) return
+  selectedAction.value = action
+  actionRunnerOpen.value = true
+  actionLoading.value = true
+  actionError.value = ''
+  actionResult.value = null
+  actionDetail.value = null
+  try {
+    actionDetail.value = await runtime.facade.getConnectionAction(connection.value.id, actionKey)
+  } catch (e: unknown) {
+    actionError.value = e instanceof Error ? e.message || 'Failed to load action schema' : 'Failed to load action schema'
+  } finally {
+    actionLoading.value = false
+  }
+}
+
+async function executeAction(body: Record<string, unknown>) {
+  if (!connection.value?.id || !selectedAction.value) return
+  const actionKey = actionKeyOf(selectedAction.value)
+  if (!actionKey) return
+  try {
+    actionSubmitting.value = true
+    actionError.value = ''
+    actionResult.value = null
+    const result = await runtime.facade.executeConnectionAction(connection.value.id, actionKey, body)
+    const resultKind = String(result.kind ?? actionDetail.value?.kind ?? selectedAction.value?.kind ?? '')
+    const isSyncResult =
+      resultKind === 'sync' ||
+      Object.prototype.hasOwnProperty.call(result, 'result') ||
+      Object.prototype.hasOwnProperty.call(result, 'success') ||
+      Object.prototype.hasOwnProperty.call(result, 'executed_at')
+    if (isSyncResult) {
+      actionResult.value = result.result && typeof result.result === 'object'
+        ? result.result
+        : result as Record<string, unknown>
+      return
+    }
+    const executionId = String(result.execution_id ?? '')
+    if (executionId && runtime.taskDetailTarget) {
+      actionRunnerOpen.value = false
+      await router.push(runtime.taskDetailTarget(executionId))
+      return
+    }
+    actionError.value = 'Missing execution id'
+  } catch (e: unknown) {
+    actionError.value = e instanceof Error ? e.message || 'Failed to execute action' : 'Failed to execute action'
+  } finally {
+    actionSubmitting.value = false
+  }
 }
 
 async function handleReauth() {

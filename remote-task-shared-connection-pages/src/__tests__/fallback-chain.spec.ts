@@ -10,6 +10,7 @@ function createFacade(): RemoteTaskSharedConnectionFacade {
   return {
     listConnections: vi.fn(async () => ({ items: [] })),
     createConnection: vi.fn(async () => ({ id: 'shared_1' })),
+    createAuthTask: vi.fn(async () => ({ task_id: 'cauth_1', auth_url: 'https://app.example/auth/connection-tasks/cauth_1' })),
     startAuth: vi.fn(async () => ({ connection_id: 'shared_1', fields: [] })),
     submitAuth: vi.fn(async () => ({ id: 'shared_1' })),
     getConnection: vi.fn(async () => ({
@@ -20,6 +21,8 @@ function createFacade(): RemoteTaskSharedConnectionFacade {
       inherits_to: ['team'],
       resolution_hint: 'team -> tenant -> platform',
     })),
+    getConnectionAction: vi.fn(async () => ({ action_key: 'sync_transform' })),
+    executeConnectionAction: vi.fn(async () => ({ execution_id: 'exec_1' })),
     updateConnection: vi.fn(async () => ({ id: 'shared_1' })),
     deleteConnection: vi.fn(async () => ({})),
     reauthConnection: vi.fn(async () => ({ connection_id: 'shared_1', fields: [] })),

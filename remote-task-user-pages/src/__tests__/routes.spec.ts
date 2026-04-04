@@ -8,11 +8,14 @@ const facade: RemoteTaskUserFacade = {
   listConnections: vi.fn(async () => ({ connections: [] })),
   createConnection: vi.fn(async () => ({ id: 'created_1' })),
   getConnection: vi.fn(async () => ({ id: 'connection_1' })),
+  getConnectionAction: vi.fn(async () => ({ action_key: 'sync_transform' })),
+  executeConnectionAction: vi.fn(async () => ({ execution_id: 'exec_1' })),
   deleteConnection: vi.fn(async () => ({})),
   reauthConnection: vi.fn(async () => ({})),
   listTasks: vi.fn(async () => ({ executions: [] })),
   getTask: vi.fn(async () => ({ id: 'task_1' })),
   cancelTask: vi.fn(async () => ({})),
+  deleteTask: vi.fn(async () => ({})),
 }
 
 const authTaskFacade = {

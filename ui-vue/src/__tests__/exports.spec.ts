@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
+  Avatar,
+  AvatarFallback,
   Button,
   Card,
   CardContent,
@@ -19,6 +21,8 @@ import {
 
 describe('ui-vue exports', () => {
   it('exports shared shadcn-vue primitives', () => {
+    expect(Avatar).toBeTruthy()
+    expect(AvatarFallback).toBeTruthy()
     expect(Button).toBeTruthy()
     expect(Card).toBeTruthy()
     expect(CardContent).toBeTruthy()

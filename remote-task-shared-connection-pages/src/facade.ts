@@ -12,6 +12,7 @@ export interface SharedConnectionPackageBrief {
 export interface SharedConnectionRecord {
   id?: string
   connector_id?: string
+  available_actions?: Array<Record<string, unknown>>
   package?: SharedConnectionPackageBrief
   label?: string
   status?: string
@@ -25,6 +26,27 @@ export interface SharedConnectionRecord {
   resolution_hint?: string
   created_at?: string
   updated_at?: string
+}
+
+export interface SharedConnectionActionDetail {
+  description?: string
+  input_schema?: Record<string, unknown>
+  key?: string
+  kind?: string
+  name?: string
+}
+
+export interface SharedConnectionActionExecuteResponse {
+  success?: boolean
+  result?: Record<string, unknown>
+  executed_at?: string
+  execution_id?: string
+  status?: string
+  kind?: string
+  duration?: number
+  message?: string
+  task_id?: string
+  webhook_supported?: boolean
 }
 
 export interface SharedConnectionListResponse {
@@ -95,6 +117,8 @@ export interface RemoteTaskSharedConnectionFacade {
   startAuth(request: SharedConnectionStartAuthRequest): Promise<SharedConnectionStartAuthResponse>
   submitAuth(request: SharedConnectionSubmitAuthRequest): Promise<SharedConnectionRecord>
   getConnection(id: string): Promise<SharedConnectionRecord>
+  getConnectionAction(connectionId: string, actionKey: string): Promise<SharedConnectionActionDetail>
+  executeConnectionAction(connectionId: string, actionKey: string, body: Record<string, unknown>): Promise<SharedConnectionActionExecuteResponse>
   updateConnection(id: string, request: SharedConnectionMutationRequest): Promise<SharedConnectionRecord>
   deleteConnection(id: string): Promise<Record<string, unknown>>
   reauthConnection(id: string, request?: SharedConnectionStartAuthRequest): Promise<SharedConnectionStartAuthResponse>
@@ -107,6 +131,7 @@ export interface RemoteTaskSharedConnectionRuntime {
   scope: SharedConnectionScope
   routePrefix: string
   connectAppTarget?: (connectorId?: string) => RouteLocationRaw
+  taskDetailTarget?: (executionId: string) => RouteLocationRaw
   t: RemoteTaskSharedConnectionTranslate
 }
 

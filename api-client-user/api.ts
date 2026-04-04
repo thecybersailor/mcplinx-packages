@@ -1009,6 +1009,7 @@ export interface VoUserGroupUpdateRequest {
 }
 
 export interface VoVoConnection {
+  auth_type?: string;
   auth_scopes?: string[];
   connector_id?: string;
   created_at?: string;
@@ -1018,6 +1019,7 @@ export interface VoVoConnection {
   package?: VoVoConnectorPackageBrief;
   required_scopes?: string[];
   requires_reauth?: boolean;
+  resolution_hint?: string;
   status?: string;
   token_expires_at?: string;
   updated_at?: string;

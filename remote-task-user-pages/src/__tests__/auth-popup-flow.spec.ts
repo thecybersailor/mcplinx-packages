@@ -19,11 +19,14 @@ function createFacade(): RemoteTaskUserFacade {
     listConnections: vi.fn(async () => ({ connections: [{ id: 'connection_1', connector_id: 'inst_mail_team', label: 'Mailbox', status: 'active' }] })),
     createConnection: vi.fn(async () => ({ url: 'https://app.example/auth/connection-tasks/cauth_1' })),
     getConnection: vi.fn(async () => ({ id: 'connection_1', connector_id: 'inst_mail_team', label: 'Mailbox', status: 'active' })),
+    getConnectionAction: vi.fn(async () => ({ action_key: 'sync_transform' })),
+    executeConnectionAction: vi.fn(async () => ({ execution_id: 'exec_1' })),
     deleteConnection: vi.fn(async () => ({})),
     reauthConnection: vi.fn(async () => ({ url: 'https://app.example/auth/connection-tasks/cauth_2' })),
     listTasks: vi.fn(async () => ({ executions: [] })),
     getTask: vi.fn(async () => ({ id: 'task_1' })),
     cancelTask: vi.fn(async () => ({})),
+    deleteTask: vi.fn(async () => ({})),
   }
 }
 
