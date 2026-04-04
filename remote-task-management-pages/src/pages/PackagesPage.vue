@@ -65,29 +65,29 @@ onMounted(load)
     borderless
   >
     <template #actions>
-      <button class="inline-flex items-center justify-center rounded-xl border border-white/12 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-white/20 hover:bg-white/[0.08]" @click="load">Refresh</button>
+      <button class="inline-flex items-center justify-center rounded-xl border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted" @click="load">Refresh</button>
       <select
         v-model="statusFilter"
         data-test-id="remote-task-management.packages.status"
-        class="rounded-xl border border-white/12 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-100 outline-none transition hover:border-white/20"
+        class="rounded-xl border border-border bg-background px-4 py-2 text-sm font-medium text-foreground outline-none transition hover:bg-muted"
         @change="load"
       >
-        <option class="bg-slate-950 text-slate-100" value="all">All Status</option>
-        <option class="bg-slate-950 text-slate-100" value="active">Active</option>
-        <option class="bg-slate-950 text-slate-100" value="disabled">Disabled</option>
+        <option class="bg-background text-foreground" value="all">All Status</option>
+        <option class="bg-background text-foreground" value="active">Active</option>
+        <option class="bg-background text-foreground" value="disabled">Disabled</option>
       </select>
     </template>
 
     <BundleState v-if="loading" variant="loading" message="Loading packages..." />
     <BundleState v-else-if="error" variant="error" :message="error" action-label="Refresh" @action="load" />
     <ConnectorGettingStarted data-test-id="remote-task-management.packages.cli-hint" />
-    <div v-if="!loading && !error && !packages.length" class="rounded-2xl border border-dashed border-white/12 bg-white/[0.03] px-6 py-10 text-center">
-      <div class="text-lg font-semibold text-white">You haven&apos;t published any connectors yet.</div>
-      <div class="mt-2 text-sm text-slate-400">Use the CLI commands above to publish your first connector.</div>
+    <div v-if="!loading && !error && !packages.length" class="rounded-2xl border border-dashed border-border bg-muted/20 px-6 py-10 text-center">
+      <div class="text-lg font-semibold text-foreground">You haven&apos;t published any connectors yet.</div>
+      <div class="mt-2 text-sm text-muted-foreground">Use the CLI commands above to publish your first connector.</div>
     </div>
-    <div v-else-if="!loading && !error" class="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+    <div v-else-if="!loading && !error" class="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
       <table data-test-id="remote-task-management.packages.table" class="min-w-full bg-transparent">
-        <thead class="bg-white/[0.02] text-left text-sm text-slate-400">
+        <thead class="bg-muted/40 text-left text-sm text-muted-foreground">
           <tr>
             <th class="px-4 py-3 font-medium">Application</th>
             <th class="px-4 py-3 font-medium">Version</th>
@@ -101,21 +101,21 @@ onMounted(load)
           v-for="pkg in packages"
           :key="pkg.id"
           :data-test-id="`remote-task-management.packages.row.${pkg.id}`"
-          class="cursor-pointer border-t border-white/10 transition hover:bg-white/[0.04]"
+          class="cursor-pointer border-t border-border transition hover:bg-muted/30"
         >
             <td class="px-4 py-4" @click="openDetail(String(pkg.id || ''))">
-              <div class="font-medium text-white">{{ pkg.name || pkg.id }}</div>
-              <div class="text-sm leading-6 text-slate-400">{{ pkg.package_description || '-' }}</div>
+              <div class="font-medium text-foreground">{{ pkg.name || pkg.id }}</div>
+              <div class="text-sm leading-6 text-muted-foreground">{{ pkg.package_description || '-' }}</div>
             </td>
             <td class="px-4 py-4">
-              <span class="rounded-full border border-cyan-400/20 bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-100">
+              <span class="rounded-full border border-cyan-500/20 bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-700">
                 {{ latestVersionOf(pkg) }}
               </span>
             </td>
-            <td class="px-4 py-4 text-slate-300">{{ latestToolCountOf(pkg) }}</td>
-            <td class="px-4 py-4 text-slate-300">{{ pkg.updatedAt || pkg.createdAt || '-' }}</td>
+            <td class="px-4 py-4 text-foreground">{{ latestToolCountOf(pkg) }}</td>
+            <td class="px-4 py-4 text-muted-foreground">{{ pkg.updatedAt || pkg.createdAt || '-' }}</td>
             <td class="px-4 py-4">
-              <button class="inline-flex items-center justify-center rounded-xl border border-white/12 bg-white/[0.04] px-3 py-2 text-sm font-medium text-slate-100 transition hover:border-white/20 hover:bg-white/[0.08]" @click="openDetail(String(pkg.id || ''))">Manage</button>
+              <button class="inline-flex items-center justify-center rounded-xl border border-border bg-background px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted" @click="openDetail(String(pkg.id || ''))">Manage</button>
             </td>
           </tr>
         </tbody>

@@ -113,17 +113,35 @@ describe('PackagesPage', () => {
     expect(wrapper.text()).toContain('Application')
   })
 
-  it('uses dark bundle surfaces instead of light borders on packages page', async () => {
+  it('uses bundle table surfaces with theme-token borders on packages page', async () => {
     const { wrapper } = await mountAt('/team/team_1/connectors/packages', 'team')
 
     const page = wrapper.get('[data-test-id="remote-task-management.packages.page"]')
-    expect(page.classes().join(' ')).toContain('bg-transparent')
-    expect(page.classes().join(' ')).toContain('border-transparent')
+    expect(page.classes().join(' ')).toContain('space-y-6')
+    expect(page.classes().join(' ')).toContain('text-foreground')
+
+    const surface = wrapper.get('[data-test-id="remote-task-management.packages.table"]').element.parentElement
+    expect(surface?.className).toContain('border-border')
+    expect(surface?.className).toContain('bg-card')
 
     const table = wrapper.get('[data-test-id="remote-task-management.packages.table"]')
     expect(table.classes().join(' ')).toContain('bg-transparent')
 
     const row = wrapper.get(`[data-test-id="remote-task-management.packages.row.${PACKAGE_UUID}"]`)
-    expect(row.classes().join(' ')).toContain('border-white/10')
+    expect(row.classes().join(' ')).toContain('border-border')
+  })
+
+  it('uses semantic foreground colors so portal light surfaces stay readable', async () => {
+    const { wrapper } = await mountAt('/team/team_1/connectors/packages', 'team')
+
+    const row = wrapper.get(`[data-test-id="remote-task-management.packages.row.${PACKAGE_UUID}"]`)
+    const cells = row.findAll('td')
+
+    expect(cells[0]?.find('.font-medium').classes().join(' ')).toContain('text-foreground')
+    expect(cells[0]?.find('.font-medium').classes().join(' ')).not.toContain('text-white')
+    expect(cells[0]?.find('.text-sm').classes().join(' ')).toContain('text-muted-foreground')
+    expect(cells[0]?.find('.text-sm').classes().join(' ')).not.toContain('text-slate-400')
+    expect(cells[4]?.find('button').classes().join(' ')).toContain('text-foreground')
+    expect(cells[4]?.find('button').classes().join(' ')).not.toContain('text-slate-100')
   })
 })

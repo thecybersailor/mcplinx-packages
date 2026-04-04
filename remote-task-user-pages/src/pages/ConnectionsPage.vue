@@ -62,7 +62,7 @@ onMounted(load)
       <Button variant="outline" @click="load">
         {{ runtime.t('remoteTaskUser.common.retry', 'Retry') }}
       </Button>
-      <Button data-test-id="remote-task-user.connections.connect-app" @click="router.push({ name: nameOf('connectors') })">
+      <Button data-test-id="remote-task-user.connections.connect-app" @click="router.push({ name: nameOf('instances') })">
         {{ runtime.t('remoteTaskUser.connections.connectApp', 'Connect App') }}
       </Button>
     </template>
@@ -87,7 +87,7 @@ onMounted(load)
       <Button
         data-test-id="remote-task-user.connections.connect-first"
         class="w-fit"
-        @click="router.push({ name: nameOf('connectors') })"
+        @click="router.push({ name: nameOf('instances') })"
       >
         {{ runtime.t('remoteTaskUser.connections.connectFirst', 'Connect Your First App') }}
       </Button>

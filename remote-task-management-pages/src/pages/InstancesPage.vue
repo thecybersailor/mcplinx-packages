@@ -15,6 +15,7 @@ type RemoteInstance = Awaited<ReturnType<typeof runtime.facade.listInstances>>[n
 const instances = ref<RemoteInstance[]>([])
 const status = ref<'all' | 'active' | 'pending_review' | 'rejected' | 'disabled'>('all')
 const visibility = ref<'all' | 'public' | 'private'>('all')
+const canConnect = computed(() => runtime.scope === 'team' && typeof runtime.facade.createConnectionForInstance === 'function')
 
 function nameOf(suffix: string) {
   return `${runtime.routePrefix}-${suffix}`
@@ -95,6 +96,14 @@ onMounted(load)
           <SelectItem value="private">{{ runtime.t('remoteTaskManagement.instances.visibilityPrivate', 'Private') }}</SelectItem>
         </SelectContent>
       </Select>
+      <Button
+        v-if="canConnect"
+        data-test-id="remote-task-management.instances.open-connections"
+        variant="outline"
+        @click="router.push({ name: nameOf('connections') })"
+      >
+        {{ runtime.t('remoteTaskManagement.instances.viewConnections', 'View Connections') }}
+      </Button>
     </template>
 
     <BundleState v-if="loading" variant="loading" :message="runtime.t('remoteTaskManagement.instances.loading', 'Loading instances...')" />

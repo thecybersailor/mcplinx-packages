@@ -7,6 +7,19 @@ import BundlePanel from '../components/BundlePanel.vue'
 import BundleState from '../components/BundleState.vue'
 import { useRemoteTaskManagementRuntime } from '../facade'
 
+type EnvVarRow = {
+  id: string
+  key: string
+  value: string
+}
+
+type SecretVarRow = {
+  id: string
+  key: string
+  value: string
+  configured?: boolean
+}
+
 const runtime = useRemoteTaskManagementRuntime()
 const route = useRoute()
 const router = useRouter()
@@ -15,17 +28,27 @@ const error = ref('')
 const reviewReason = ref('')
 const instance = ref<Awaited<ReturnType<typeof runtime.facade.getInstance>> | null>(null)
 const savingConfig = ref(false)
+const connecting = ref(false)
 const instanceId = computed(() => String(route.params.instanceId ?? ''))
 const canModerate = computed(() => runtime.scope !== 'team' && typeof runtime.facade.reviewInstance === 'function')
-const envVars = ref<Array<{ key: string; value: string }>>([])
-const secretVars = ref<Array<{ key: string; value: string; configured?: boolean }>>([])
+const canConnect = computed(() => runtime.scope === 'team' && typeof runtime.facade.createConnectionForInstance === 'function')
+const envVars = ref<EnvVarRow[]>([])
+const secretVars = ref<SecretVarRow[]>([])
+let configRowId = 0
+
+function nextConfigRowId() {
+  configRowId += 1
+  return `config-row-${configRowId}`
+}
 
 function syncConfigState() {
   envVars.value = Object.entries(instance.value?.envConfig || {}).map(([key, value]) => ({
+    id: nextConfigRowId(),
     key,
     value: String(value ?? ''),
   }))
   secretVars.value = Object.entries(instance.value?.secretConfig || {}).map(([key, configured]) => ({
+    id: nextConfigRowId(),
     key,
     value: '',
     configured: Boolean(configured),
@@ -59,7 +82,7 @@ async function review(action: 'approve' | 'reject') {
 }
 
 function addEnvVar() {
-  envVars.value.push({ key: '', value: '' })
+  envVars.value.push({ id: nextConfigRowId(), key: '', value: '' })
 }
 
 function removeEnvVar(index: number) {
@@ -67,7 +90,7 @@ function removeEnvVar(index: number) {
 }
 
 function addSecretVar() {
-  secretVars.value.push({ key: '', value: '', configured: false })
+  secretVars.value.push({ id: nextConfigRowId(), key: '', value: '', configured: false })
 }
 
 function removeSecretVar(index: number) {
@@ -103,6 +126,28 @@ async function saveConfig() {
   }
 }
 
+async function connectInstance() {
+  if (!instance.value || !runtime.facade.createConnectionForInstance) return
+  connecting.value = true
+  error.value = ''
+  try {
+    const response = await runtime.facade.createConnectionForInstance(String(instance.value.id))
+    if (response.url && typeof window !== 'undefined') {
+      window.location.href = response.url
+      return
+    }
+    if (response.id) {
+      await router.push({ name: `${runtime.routePrefix}-connection-detail`, params: { id: response.id } })
+      return
+    }
+    error.value = runtime.t('remoteTaskManagement.instances.connectFailed', 'Failed to create connection.')
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : runtime.t('remoteTaskManagement.instances.connectFailed', 'Failed to create connection.')
+  } finally {
+    connecting.value = false
+  }
+}
+
 onMounted(load)
 </script>
 
@@ -125,6 +170,14 @@ onMounted(load)
             <h2 class="text-base font-semibold text-foreground">{{ runtime.t('remoteTaskManagement.instances.activeDeployment', 'Active Deployment') }}</h2>
             <p class="mt-1 text-sm text-muted-foreground">{{ runtime.t('remoteTaskManagement.instances.activeDeploymentDesc', 'Active deployment shows the version that is currently serving traffic.') }}</p>
           </div>
+          <Button
+            v-if="canConnect"
+            data-test-id="remote-task-management.instance-detail.connect"
+            :disabled="connecting"
+            @click="connectInstance"
+          >
+            {{ connecting ? runtime.t('remoteTaskManagement.instances.connecting', 'Connecting...') : runtime.t('remoteTaskManagement.instances.connect', 'Create Connection') }}
+          </Button>
         </div>
         <div class="overflow-hidden rounded-2xl border border-border bg-muted/30">
           <div class="flex items-center justify-between border-b border-border px-4 py-3 text-xs text-muted-foreground">
@@ -165,7 +218,7 @@ onMounted(load)
           <Table>
             <TableHeader class="bg-muted/30"><TableRow class="border-border hover:bg-transparent"><TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.common.key', 'Key') }}</TableHead><TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.common.value', 'Value') }}</TableHead><TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.common.actions', 'Actions') }}</TableHead></TableRow></TableHeader>
             <TableBody>
-              <TableRow v-for="(item, index) in envVars" :key="`${item.key}-${index}`" class="border-t border-border hover:bg-transparent">
+              <TableRow v-for="(item, index) in envVars" :key="item.id" class="border-t border-border hover:bg-transparent">
                 <TableCell><input v-model="item.key" class="w-full rounded-xl border border-input bg-background px-3 py-2 text-xs text-foreground outline-none" placeholder="KEY_NAME" /></TableCell>
                 <TableCell><input v-model="item.value" class="w-full rounded-xl border border-input bg-background px-3 py-2 text-xs text-foreground outline-none" placeholder="value" /></TableCell>
                 <TableCell><Button variant="outline" size="sm" @click="removeEnvVar(index)">{{ runtime.t('remoteTaskManagement.common.delete', 'Delete') }}</Button></TableCell>
@@ -190,7 +243,7 @@ onMounted(load)
           <Table>
             <TableHeader class="bg-muted/30"><TableRow class="border-border hover:bg-transparent"><TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.common.key', 'Key') }}</TableHead><TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.common.value', 'Value') }}</TableHead><TableHead class="text-muted-foreground">{{ runtime.t('remoteTaskManagement.common.actions', 'Actions') }}</TableHead></TableRow></TableHeader>
             <TableBody>
-              <TableRow v-for="(item, index) in secretVars" :key="`${item.key}-${index}`" class="border-t border-border hover:bg-transparent">
+              <TableRow v-for="(item, index) in secretVars" :key="item.id" class="border-t border-border hover:bg-transparent">
                 <TableCell><input v-model="item.key" class="w-full rounded-xl border border-input bg-background px-3 py-2 text-xs text-foreground outline-none" placeholder="SECRET_KEY" /></TableCell>
                 <TableCell><input v-model="item.value" type="password" class="w-full rounded-xl border border-input bg-background px-3 py-2 text-xs text-foreground outline-none" :placeholder="item.configured && !item.value ? runtime.t('remoteTaskManagement.instances.secretSet', '••••••• (Set)') : runtime.t('remoteTaskManagement.instances.secretVal', 'secret value')" /></TableCell>
                 <TableCell><Button variant="outline" size="sm" @click="removeSecretVar(index)">{{ runtime.t('remoteTaskManagement.common.delete', 'Delete') }}</Button></TableCell>

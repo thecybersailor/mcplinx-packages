@@ -20,6 +20,7 @@ function createFacade(): RemoteTaskManagementFacade {
     listPackageInstances: vi.fn(async () => []),
     listInstances: vi.fn(async () => [{ id: 7, name: 'Tenant Slack', status: 'pending_review', pkg_id: PACKAGE_UUID } as never]),
     createInstance: vi.fn(async () => ({ id: 9 })),
+    createConnectionForInstance: vi.fn(async () => ({ id: 'conn_1', connector_id: '7' })),
     getInstance: vi.fn(async () => ({ id: 7 })),
     updateInstance: vi.fn(async () => ({ id: 7 })),
     reviewInstance: vi.fn(async () => ({})),
@@ -88,6 +89,38 @@ describe('InstancesPage', () => {
     expect(wrapper.find('[data-test-id="remote-task-management.instances.status"]').exists()).toBe(true)
     expect(wrapper.text()).toContain('Visibility')
     expect(wrapper.text()).toContain('Owner')
+  })
+
+  it('shows connections shortcut for team scope', async () => {
+    const facade = createFacade()
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        {
+          path: '/instances',
+          component: RuntimeProvider,
+          props: { facade, scope: 'team' },
+          children: [{ path: '', component: InstancesPage }],
+        },
+        {
+          path: '/connections',
+          name: 'tenant-remote-task-connections',
+          component: defineComponent({ template: '<div data-test-id="connections-page" />' }),
+        },
+      ],
+    })
+
+    await router.push('/instances')
+    await router.isReady()
+
+    const wrapper = mount(defineComponent(() => () => h(RouterView)), {
+      global: {
+        plugins: [router],
+      },
+    })
+
+    await flushPromises()
+    expect(wrapper.find('[data-test-id="remote-task-management.instances.open-connections"]').exists()).toBe(true)
   })
 
   it('hides moderation actions for team scope instance detail', async () => {
