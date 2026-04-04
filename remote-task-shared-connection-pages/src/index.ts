@@ -2,6 +2,8 @@ export { createRemoteTaskSharedConnectionRoutes } from './routes'
 export type {
   RemoteTaskSharedConnectionFacade,
   RemoteTaskSharedConnectionTranslate,
+  SharedConnectionAuthTaskRequest,
+  SharedConnectionAuthTaskResponse,
   SharedConnectionFallbackCandidate,
   SharedConnectionFallbackExplainResponse,
   SharedConnectionListResponse,

@@ -104,8 +104,15 @@ export async function runList(
     options.kind === 'versions'
       ? runtime.listPath ?? defaultListPath
       : (runtime.listPath ?? defaultListPath).replace(/\/versions$/, '/connectors');
+  const query =
+    options.kind === 'versions'
+      ? {
+          ...(options.query ?? {}),
+          connector_id: String(options.query?.connector_id ?? '').trim() || getPackageName(ctx.cwd),
+        }
+      : (options.query ?? {});
 
-  return requestJSON(deps.fetchImpl ?? fetch, runtime.baseUrl, withQuery(listPath, options.query), runtime.accessToken, {
+  return requestJSON(deps.fetchImpl ?? fetch, runtime.baseUrl, withQuery(listPath, query), runtime.accessToken, {
     method: 'GET',
   });
 }

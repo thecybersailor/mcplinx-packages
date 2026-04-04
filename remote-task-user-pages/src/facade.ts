@@ -1,4 +1,5 @@
 import { inject, type InjectionKey } from 'vue'
+import type { ConnectionAuthTaskFacade } from '../../remote-task-connection-auth-pages/src/facade'
 import type {
   V1RemoteTaskCreateConnectionRequest,
   VoRemoteTaskStartAuthResponse,
@@ -53,6 +54,7 @@ export interface RemoteTaskUserFacade {
 
 export interface RemoteTaskUserRuntime {
   facade: RemoteTaskUserFacade
+  authTaskFacade: ConnectionAuthTaskFacade
   routePrefix: string
   t: RemoteTaskUserTranslate
 }

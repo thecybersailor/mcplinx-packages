@@ -26,6 +26,14 @@ async function mountAt(path: string, facade: RemoteTaskSharedConnectionFacade) {
     basePath: 'shared-connections',
     routePrefix: 'shared-connections',
     facade,
+    authTaskFacade: {
+      getTask: vi.fn(),
+      submitTask: vi.fn(),
+      completeCallback: vi.fn(),
+    },
+    connectAppTarget: (connectorId) => connectorId
+      ? { name: 'instance-connect', params: { id: connectorId } }
+      : { name: 'instance-list' },
   }) as unknown as RouteRecordRaw[]
 
   const router = createRouter({
@@ -35,6 +43,16 @@ async function mountAt(path: string, facade: RemoteTaskSharedConnectionFacade) {
         path: '/',
         component: defineComponent({ components: { RouterView }, template: '<RouterView />' }),
         children: [route!],
+      },
+      {
+        path: '/instances',
+        name: 'instance-list',
+        component: defineComponent({ template: '<div data-test-id="instance-list" />' }),
+      },
+      {
+        path: '/instances/:id/connect',
+        name: 'instance-connect',
+        component: defineComponent({ template: '<div data-test-id="instance-connect" />' }),
       },
     ],
   })
@@ -53,7 +71,7 @@ async function mountAt(path: string, facade: RemoteTaskSharedConnectionFacade) {
 }
 
 describe('shared connections page', () => {
-  it('filters list by connector and carries connector id into create page', async () => {
+  it('filters list by connector and routes Connect App through instance semantics', async () => {
     const facade = createFacade()
     const { wrapper, router } = await mountAt(`/shared-connections/connections?connector_id=${CONNECTOR_UUID}`, facade)
 
@@ -65,7 +83,7 @@ describe('shared connections page', () => {
     await wrapper.get('[data-test-id="shared-connections.create-link"]').trigger('click')
     await flushPromises()
 
-    expect(router.currentRoute.value.name).toBe('shared-connections-create')
-    expect(router.currentRoute.value.query.connector_id).toBe(CONNECTOR_UUID)
+    expect(router.currentRoute.value.name).toBe('instance-connect')
+    expect(router.currentRoute.value.params.id).toBe(CONNECTOR_UUID)
   })
 })

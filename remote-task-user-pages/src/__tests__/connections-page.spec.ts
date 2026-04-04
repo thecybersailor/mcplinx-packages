@@ -67,6 +67,11 @@ async function mountAt(path: string, facade: RemoteTaskUserFacade) {
     basePath: 'integrations',
     routePrefix: 'bundle',
     facade,
+    authTaskFacade: {
+      getTask: vi.fn(),
+      submitTask: vi.fn(),
+      completeCallback: vi.fn(),
+    },
   }) as unknown as RouteRecordRaw[]
 
   const router = createRouter({
@@ -87,7 +92,16 @@ async function mountAt(path: string, facade: RemoteTaskUserFacade) {
     global: {
       plugins: [router],
       provide: {
-        [remoteTaskUserRuntimeKey as symbol]: { facade, routePrefix: 'bundle', t: defaultTranslate },
+        [remoteTaskUserRuntimeKey as symbol]: {
+          facade,
+          authTaskFacade: {
+            getTask: vi.fn(),
+            submitTask: vi.fn(),
+            completeCallback: vi.fn(),
+          },
+          routePrefix: 'bundle',
+          t: defaultTranslate,
+        },
       },
     },
   })
@@ -115,6 +129,13 @@ describe('Connection pages', () => {
     expect(wrapper.find('[data-test-id="remote-task-user.connections.row.connection_1.detail"]').exists()).toBe(true)
     expect(wrapper.find('[data-test-id="remote-task-user.connections.row.connection_1.reauth"]').exists()).toBe(true)
     expect(wrapper.find('[data-test-id="remote-task-user.connections.row.connection_1.disconnect"]').exists()).toBe(true)
+
+    await wrapper.get('[data-test-id="remote-task-user.connections.connect-app"]').trigger('click')
+    await flushPromises()
+    expect(router.currentRoute.value.name).toBe('bundle-connectors')
+
+    await router.push('/integrations/connections')
+    await flushPromises()
 
     await wrapper.get('[data-test-id="remote-task-user.connections.row.connection_1.detail"]').trigger('click')
     await flushPromises()

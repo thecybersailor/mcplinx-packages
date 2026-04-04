@@ -33,16 +33,6 @@ function openInstanceDetail(id?: string | number) {
   })
 }
 
-function openSharedConnections() {
-  if (!runtime.sharedConnectionRoutePrefix || !pkg.value) return
-  const connectorId = String(pkg.value.id || '')
-  if (!connectorId) return
-  router.push({
-    name: `${runtime.sharedConnectionRoutePrefix}-connections`,
-    query: { connector_id: connectorId },
-  })
-}
-
 async function load() {
   if (!pkgId.value) return
   loading.value = true
@@ -215,22 +205,6 @@ onMounted(load)
                 <dd class="mt-1 text-sm text-slate-300">{{ pkg.package_description || '-' }}</dd>
               </div>
             </dl>
-          </BundlePanel>
-
-          <BundlePanel v-if="runtime.sharedConnectionRoutePrefix">
-            <div class="flex items-center justify-between gap-4">
-              <div>
-                <h2 class="text-base font-semibold text-white">Shared Connections</h2>
-                <p class="mt-1 text-sm text-slate-400">View the shared connections for this connector.</p>
-              </div>
-              <button
-                data-test-id="remote-task-management.package-detail.shared-connections"
-                class="inline-flex items-center justify-center rounded-xl border border-white/12 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-white/20 hover:bg-white/[0.08]"
-                @click="openSharedConnections"
-              >
-                Open
-              </button>
-            </div>
           </BundlePanel>
 
           <BundlePanel>

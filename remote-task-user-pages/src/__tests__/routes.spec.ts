@@ -15,12 +15,19 @@ const facade: RemoteTaskUserFacade = {
   cancelTask: vi.fn(async () => ({})),
 }
 
+const authTaskFacade = {
+  getTask: vi.fn(),
+  submitTask: vi.fn(),
+  completeCallback: vi.fn(),
+}
+
 describe('createRemoteTaskUserRoutes', () => {
   it('creates the full bundle route set', () => {
     const routes = createRemoteTaskUserRoutes({
       basePath: 'integrations',
       routePrefix: 'team-remote-task',
       facade,
+      authTaskFacade,
     })
 
     expect(routes).toHaveLength(1)

@@ -15,7 +15,8 @@ type RemoteInstance = Awaited<ReturnType<typeof runtime.facade.listInstances>>[n
 const instances = ref<RemoteInstance[]>([])
 const status = ref<'all' | 'active' | 'pending_review' | 'rejected' | 'disabled'>('all')
 const visibility = ref<'all' | 'public' | 'private'>('all')
-const canConnect = computed(() => runtime.scope === 'team' && typeof runtime.facade.createConnectionForInstance === 'function')
+const canViewConnections = computed(() => runtime.scope === 'team' && Boolean(runtime.sharedConnectionRoutePrefix))
+const canCreateConnection = computed(() => Boolean(runtime.sharedConnectionRoutePrefix))
 
 function nameOf(suffix: string) {
   return `${runtime.routePrefix}-${suffix}`
@@ -37,6 +38,14 @@ async function load() {
 function detail(id?: number) {
   if (id == null) return
   void router.push({ name: nameOf('instance-detail'), params: { instanceId: String(id) } })
+}
+
+function connect(id?: number) {
+  if (id == null || !runtime.sharedConnectionRoutePrefix) return
+  void router.push({
+    name: `${runtime.sharedConnectionRoutePrefix}-create`,
+    query: { connector_id: String(id) },
+  })
 }
 
 const filteredInstances = computed(() => {
@@ -97,7 +106,7 @@ onMounted(load)
         </SelectContent>
       </Select>
       <Button
-        v-if="canConnect"
+        v-if="canViewConnections"
         data-test-id="remote-task-management.instances.open-connections"
         variant="outline"
         @click="router.push({ name: nameOf('connections') })"
@@ -145,9 +154,20 @@ onMounted(load)
             </TableCell>
             <TableCell class="text-muted-foreground">{{ instance.activeVersion || '-' }}</TableCell>
             <TableCell>
-              <Button variant="outline" size="sm" @click="detail(instance.id)">
-                {{ runtime.t('remoteTaskManagement.instances.details', 'Details') }}
-              </Button>
+              <div class="flex flex-wrap gap-2">
+                <Button
+                  v-if="canCreateConnection"
+                  :data-test-id="`remote-task-management.instances.connect.${instance.id}`"
+                  variant="outline"
+                  size="sm"
+                  @click="connect(instance.id)"
+                >
+                  {{ runtime.t('remoteTaskManagement.instances.connect', 'Connect') }}
+                </Button>
+                <Button variant="outline" size="sm" @click="detail(instance.id)">
+                  {{ runtime.t('remoteTaskManagement.instances.details', 'Details') }}
+                </Button>
+              </div>
             </TableCell>
           </TableRow>
         </TableBody>

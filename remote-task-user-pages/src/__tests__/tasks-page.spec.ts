@@ -34,6 +34,11 @@ describe('TasksPage', () => {
       basePath: 'integrations',
       routePrefix: 'bundle',
       facade,
+      authTaskFacade: {
+        getTask: vi.fn(),
+        submitTask: vi.fn(),
+        completeCallback: vi.fn(),
+      },
     }) as unknown as RouteRecordRaw[]
     const router = createRouter({
       history: createMemoryHistory(),
@@ -51,7 +56,16 @@ describe('TasksPage', () => {
       global: {
         plugins: [router],
         provide: {
-          [remoteTaskUserRuntimeKey as symbol]: { facade, routePrefix: 'bundle', t: defaultTranslate },
+          [remoteTaskUserRuntimeKey as symbol]: {
+            facade,
+            authTaskFacade: {
+              getTask: vi.fn(),
+              submitTask: vi.fn(),
+              completeCallback: vi.fn(),
+            },
+            routePrefix: 'bundle',
+            t: defaultTranslate,
+          },
         },
       },
     })

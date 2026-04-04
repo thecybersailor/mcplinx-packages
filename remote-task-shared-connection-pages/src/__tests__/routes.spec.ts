@@ -7,6 +7,7 @@ const CONNECTOR_UUID = 'bd8f5828-62f4-5066-8893-d46ecd02a5c2'
 const facade: RemoteTaskSharedConnectionFacade = {
   listConnections: vi.fn(async () => ({ items: [] })),
   createConnection: vi.fn(async () => ({ id: 'shared_1' })),
+  createAuthTask: vi.fn(async () => ({ task_id: 'cauth_1', auth_url: 'https://app.example/auth/connection-tasks/cauth_1' })),
   startAuth: vi.fn(async () => ({ connection_id: 'shared_1', fields: [] })),
   submitAuth: vi.fn(async () => ({ id: 'shared_1' })),
   getConnection: vi.fn(async () => ({ id: 'shared_1' })),
@@ -23,6 +24,11 @@ describe('createRemoteTaskSharedConnectionRoutes', () => {
       basePath: 'shared-connections',
       routePrefix: 'tenant-shared-connections',
       facade,
+      authTaskFacade: {
+        getTask: vi.fn(),
+        submitTask: vi.fn(),
+        completeCallback: vi.fn(),
+      },
     })
 
     expect(routes).toHaveLength(1)

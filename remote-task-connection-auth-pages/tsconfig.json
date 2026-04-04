@@ -17,10 +17,6 @@
     "src/routes.ts",
     "src/facade.ts",
     "src/navigation.ts",
-    "src/components/BundlePage.vue",
-    "src/components/BundlePanel.vue",
-    "src/components/BundleState.vue",
-    "src/components/ConnectorIcon.vue",
     "src/pages/**/*.vue"
   ],
   "exclude": ["src/**/__tests__/**"]

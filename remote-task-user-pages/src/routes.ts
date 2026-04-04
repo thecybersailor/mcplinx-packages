@@ -6,6 +6,7 @@ import {
   type RemoteTaskUserFacade,
   type RemoteTaskUserTranslate,
 } from './facade'
+import type { ConnectionAuthTaskFacade } from '../../remote-task-connection-auth-pages/src/facade'
 import ConnectorsPage from './pages/ConnectorsPage.vue'
 import ConnectorDetailPage from './pages/ConnectorDetailPage.vue'
 import ConnectPage from './pages/ConnectPage.vue'
@@ -18,15 +19,17 @@ export interface CreateRemoteTaskUserRoutesOptions {
   basePath: string
   routePrefix: string
   facade: RemoteTaskUserFacade
+  authTaskFacade: ConnectionAuthTaskFacade
   t?: RemoteTaskUserTranslate
 }
 
-function createShell(facade: RemoteTaskUserFacade, routePrefix: string, t?: RemoteTaskUserTranslate) {
+function createShell(facade: RemoteTaskUserFacade, authTaskFacade: ConnectionAuthTaskFacade, routePrefix: string, t?: RemoteTaskUserTranslate) {
   return defineComponent({
     name: 'RemoteTaskUserShell',
     setup() {
       provide(remoteTaskUserRuntimeKey, {
         facade,
+        authTaskFacade,
         routePrefix,
         t: t ?? defaultTranslate,
       })
@@ -40,7 +43,7 @@ export function createRemoteTaskUserRoutes(options: CreateRemoteTaskUserRoutesOp
   return [
     {
       path: options.basePath,
-      component: createShell(options.facade, prefix, options.t),
+      component: createShell(options.facade, options.authTaskFacade, prefix, options.t),
       children: [
         { path: '', name: `${prefix}-index`, redirect: { name: `${prefix}-connections` } },
         { path: 'connectors', name: `${prefix}-connectors`, component: ConnectorsPage },

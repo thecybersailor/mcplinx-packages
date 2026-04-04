@@ -76,11 +76,6 @@ describe('PackageDetailPage', () => {
           props: { facade },
           children: [{ path: '', component: PackageDetailPage }],
         },
-        {
-          path: '/shared/connections',
-          name: 'team-shared-connections',
-          component: defineComponent({ name: 'SharedConnectionsStub', render: () => h('div', 'shared') }),
-        },
       ],
     })
 
@@ -107,10 +102,7 @@ describe('PackageDetailPage', () => {
     expect(wrapper.get('[data-test-id="remote-task-management.package-detail.page"]').text()).toContain('Versions')
     expect(wrapper.text()).toContain('Package Statistics')
     expect(wrapper.text()).toContain('Total Instances')
-    await wrapper.get('[data-test-id="remote-task-management.package-detail.shared-connections"]').trigger('click')
-    await flushPromises()
-    expect(router.currentRoute.value.name).toBe('team-shared-connections')
-    expect(router.currentRoute.value.query.connector_id).toBe(PACKAGE_UUID)
+    expect(wrapper.find('[data-test-id="remote-task-management.package-detail.shared-connections"]').exists()).toBe(false)
   })
 
   it('opens create-instance sheet with shared sheet structure', async () => {

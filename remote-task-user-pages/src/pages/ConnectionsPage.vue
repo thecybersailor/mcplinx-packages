@@ -1,16 +1,19 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Button } from '@mcplinx/ui-vue'
 import BundlePage from '../components/BundlePage.vue'
 import BundleState from '../components/BundleState.vue'
 import { useRemoteTaskUserRuntime } from '../facade'
+import { openAuthTaskWindow, type AuthTaskWindowController } from '../authTaskWindow'
 
 const runtime = useRemoteTaskUserRuntime()
 const router = useRouter()
 const loading = ref(true)
 const error = ref('')
 const connections = ref<Awaited<ReturnType<typeof runtime.facade.listConnections>>['connections']>([])
+const manualAuthUrl = ref('')
+let authController: AuthTaskWindowController | null = null
 
 function nameOf(suffix: string) {
   return `${runtime.routePrefix}-${suffix}`
@@ -39,8 +42,19 @@ async function disconnect(id?: string) {
 async function reauth(id?: string) {
   if (!id) return
   const response = await runtime.facade.reauthConnection(id)
-  if (response.url && typeof window !== 'undefined') {
-    window.location.href = response.url
+  if (response.url) {
+    manualAuthUrl.value = ''
+    authController?.cleanup()
+    authController = openAuthTaskWindow({
+      authUrl: response.url,
+      authTaskFacade: runtime.authTaskFacade,
+      onTerminal: async () => {
+        await load()
+      },
+    })
+    if (authController.popupBlocked) {
+      manualAuthUrl.value = response.url
+    }
   }
 }
 
@@ -50,6 +64,11 @@ function detail(id?: string) {
 }
 
 onMounted(load)
+
+onUnmounted(() => {
+  authController?.cleanup()
+  authController = null
+})
 </script>
 
 <template>
@@ -62,7 +81,7 @@ onMounted(load)
       <Button variant="outline" @click="load">
         {{ runtime.t('remoteTaskUser.common.retry', 'Retry') }}
       </Button>
-      <Button data-test-id="remote-task-user.connections.connect-app" @click="router.push({ name: nameOf('instances') })">
+      <Button data-test-id="remote-task-user.connections.connect-app" @click="router.push({ name: nameOf('connectors') })">
         {{ runtime.t('remoteTaskUser.connections.connectApp', 'Connect App') }}
       </Button>
     </template>
@@ -79,6 +98,14 @@ onMounted(load)
       :action-label="runtime.t('remoteTaskUser.common.retry', 'Retry')"
       @action="load"
     />
+    <div
+      v-if="manualAuthUrl"
+      data-test-id="remote-task-user.connections.manual-auth"
+      class="rounded-xl border border-border bg-muted/30 p-4 text-sm text-foreground"
+    >
+      <p class="mb-2">The browser blocked the auth popup. Open the auth page manually.</p>
+      <a :href="manualAuthUrl" target="_blank" rel="noreferrer" class="underline">Open Authentication Page</a>
+    </div>
     <div v-else-if="!connections?.length" class="space-y-3">
       <BundleState
         variant="empty"
@@ -87,7 +114,7 @@ onMounted(load)
       <Button
         data-test-id="remote-task-user.connections.connect-first"
         class="w-fit"
-        @click="router.push({ name: nameOf('instances') })"
+        @click="router.push({ name: nameOf('connectors') })"
       >
         {{ runtime.t('remoteTaskUser.connections.connectFirst', 'Connect Your First App') }}
       </Button>

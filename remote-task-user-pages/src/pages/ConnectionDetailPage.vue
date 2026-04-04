@@ -1,19 +1,22 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Button } from '@mcplinx/ui-vue'
 import BundlePage from '../components/BundlePage.vue'
 import BundlePanel from '../components/BundlePanel.vue'
 import BundleState from '../components/BundleState.vue'
 import { useRemoteTaskUserRuntime } from '../facade'
+import { openAuthTaskWindow, type AuthTaskWindowController } from '../authTaskWindow'
 
 const runtime = useRemoteTaskUserRuntime()
 const route = useRoute()
 const router = useRouter()
 const loading = ref(true)
 const error = ref('')
+const manualAuthUrl = ref('')
 const connection = ref<Awaited<ReturnType<typeof runtime.facade.getConnection>> | null>(null)
 const connectionId = computed(() => String(route.params.id ?? ''))
+let authController: AuthTaskWindowController | null = null
 
 async function load() {
   if (!connectionId.value) return
@@ -38,12 +41,28 @@ async function disconnect() {
 async function reauth() {
   if (!connectionId.value) return
   const response = await runtime.facade.reauthConnection(connectionId.value)
-  if (response.url && typeof window !== 'undefined') {
-    window.location.href = response.url
+  if (response.url) {
+    manualAuthUrl.value = ''
+    authController?.cleanup()
+    authController = openAuthTaskWindow({
+      authUrl: response.url,
+      authTaskFacade: runtime.authTaskFacade,
+      onTerminal: async () => {
+        await load()
+      },
+    })
+    if (authController.popupBlocked) {
+      manualAuthUrl.value = response.url
+    }
   }
 }
 
 onMounted(load)
+
+onUnmounted(() => {
+  authController?.cleanup()
+  authController = null
+})
 </script>
 
 <template>
@@ -103,6 +122,14 @@ onMounted(load)
       <div class="space-y-4">
         <BundlePanel>
           <h2 class="mb-3 text-base font-semibold text-foreground">Actions</h2>
+          <div
+            v-if="manualAuthUrl"
+            data-test-id="remote-task-user.connection-detail.manual-auth"
+            class="mb-3 rounded-xl border border-border bg-muted/30 p-3 text-sm text-foreground"
+          >
+            <p class="mb-2">The browser blocked the auth popup. Open the auth page manually.</p>
+            <a :href="manualAuthUrl" target="_blank" rel="noreferrer" class="underline">Open Authentication Page</a>
+          </div>
           <div class="flex flex-col gap-2">
             <Button
               data-test-id="remote-task-user.connection-detail.reauth"

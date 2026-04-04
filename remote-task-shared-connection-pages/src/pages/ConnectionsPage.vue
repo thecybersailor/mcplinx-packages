@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useRemoteTaskSharedConnectionRuntime, type SharedConnectionRecord } from '../facade'
+import { openAuthTaskWindow, type AuthTaskWindowController } from '../authTaskWindow'
 
 const runtime = useRemoteTaskSharedConnectionRuntime()
 const route = useRoute()
@@ -10,6 +11,8 @@ const loading = ref(true)
 const error = ref('')
 const connections = ref<SharedConnectionRecord[]>([])
 const pendingId = ref('')
+const manualAuthUrl = ref('')
+let authController: AuthTaskWindowController | null = null
 
 const connectorId = computed(() => {
   const value = route.query.connector_id
@@ -19,6 +22,16 @@ const connectorId = computed(() => {
 onMounted(async () => {
   await loadConnections()
 })
+
+function connectAppTarget() {
+  if (runtime.connectAppTarget) {
+    return runtime.connectAppTarget(connectorId.value || undefined)
+  }
+  return {
+    name: `${runtime.routePrefix}-create`,
+    query: connectorId.value ? { connector_id: connectorId.value } : undefined,
+  }
+}
 
 async function loadConnections() {
   try {
@@ -58,16 +71,16 @@ function statusClass(item: SharedConnectionRecord) {
 }
 
 function statusText(item: SharedConnectionRecord) {
-  if (item.status === 'expired') return 'Token Expired'
-  if (item.status === 'error') return 'Authorization Revoked'
-  if (item.requires_reauth) return 'Permissions Updated'
-  if (item.status === 'pending') return 'Pending'
+  if (item.status === 'expired') return runtime.t('sharedConnections.status.tokenExpired', 'Token Expired')
+  if (item.status === 'error') return runtime.t('sharedConnections.status.authorizationRevoked', 'Authorization Revoked')
+  if (item.requires_reauth) return runtime.t('sharedConnections.status.permissionsUpdated', 'Permissions Updated')
+  if (item.status === 'pending') return runtime.t('sharedConnections.status.pending', 'Pending')
   if (item.token_expires_at) {
     const expiresAt = new Date(item.token_expires_at)
     const daysUntilExpiry = Math.ceil((expiresAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-    if (daysUntilExpiry < 7) return `Expires in ${daysUntilExpiry} days`
+    if (daysUntilExpiry < 7) return runtime.t('sharedConnections.status.expiresInDays', 'Expires in {days} days', { days: daysUntilExpiry })
   }
-  return 'Connected'
+  return runtime.t('sharedConnections.status.connected', 'Connected')
 }
 
 function shouldShowReauth(item: SharedConnectionRecord) {
@@ -79,15 +92,30 @@ async function reauth(item: SharedConnectionRecord) {
   try {
     pendingId.value = item.id
     error.value = ''
-    const response = await runtime.facade.reauthConnection(item.id, {
+    manualAuthUrl.value = ''
+    const response = await runtime.facade.createAuthTask({
+      connection_id: item.id,
       connector_id: item.connector_id,
       label: item.label,
       scope: item.scope || runtime.scope,
       principal_pattern: item.principal_pattern,
       inherits_to: item.inherits_to,
+      intent: 'reauth',
     })
-    if (response.url && typeof window !== 'undefined') {
-      window.location.href = response.url
+    if (response.auth_url) {
+      authController?.cleanup()
+      authController = openAuthTaskWindow({
+        authUrl: response.auth_url,
+        taskId: response.task_id,
+        authTaskFacade: runtime.authTaskFacade,
+        onTerminal: async () => {
+          pendingId.value = ''
+          await loadConnections()
+        },
+      })
+      if (authController.popupBlocked) {
+        manualAuthUrl.value = response.auth_url
+      }
     }
   } catch (err) {
     console.error('Error reauthorizing connection:', err)
@@ -96,6 +124,11 @@ async function reauth(item: SharedConnectionRecord) {
     pendingId.value = ''
   }
 }
+
+onUnmounted(() => {
+  authController?.cleanup()
+  authController = null
+})
 
 async function disconnect(item: SharedConnectionRecord) {
   if (!item.id) return
@@ -134,14 +167,14 @@ function formatDate(dateStr?: string) {
       <button
         class="inline-flex items-center justify-center rounded-md border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition hover:bg-accent hover:text-accent-foreground"
         data-test-id="shared-connections.create-link"
-        @click="router.push({ name: `${runtime.routePrefix}-create`, query: connectorId ? { connector_id: connectorId } : undefined })"
+        @click="router.push(connectAppTarget())"
       >
         {{ runtime.t('sharedConnections.connectApp', 'Connect App') }}
       </button>
     </div>
 
     <div v-if="loading" class="flex justify-center py-8">
-      <span class="text-muted-foreground">{{ runtime.t('sharedConnections.loading', 'Loading...') }}</span>
+      <span class="text-muted-foreground">{{ runtime.t('sharedConnections.loading', 'Loading shared connections...') }}</span>
     </div>
 
     <div
@@ -153,6 +186,17 @@ function formatDate(dateStr?: string) {
     </div>
 
     <div
+      v-if="manualAuthUrl"
+      data-test-id="shared-connections.manual-auth"
+      class="rounded-md border border-border bg-muted/30 p-4 text-sm text-foreground"
+    >
+      <p class="mb-2">{{ runtime.t('sharedConnections.popupBlocked', 'The browser blocked the auth popup. Open the auth page manually.') }}</p>
+      <a :href="manualAuthUrl" target="_blank" rel="noreferrer" class="underline">
+        {{ runtime.t('sharedConnections.openAuthPage', 'Open Authentication Page') }}
+      </a>
+    </div>
+
+    <div
       v-else-if="connections.length === 0"
       data-test-id="shared-connections.empty"
       class="rounded-lg border-2 border-dashed border-border bg-muted/30 py-12 text-center"
@@ -160,7 +204,7 @@ function formatDate(dateStr?: string) {
       <p class="mb-4 text-muted-foreground">{{ runtime.t('sharedConnections.empty', "You haven't connected any apps yet.") }}</p>
       <button
         class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
-        @click="router.push({ name: `${runtime.routePrefix}-create`, query: connectorId ? { connector_id: connectorId } : undefined })"
+        @click="router.push(connectAppTarget())"
       >
         {{ runtime.t('sharedConnections.connectFirst', 'Connect Your First App') }}
       </button>
@@ -171,11 +215,11 @@ function formatDate(dateStr?: string) {
         <thead>
           <tr class="border-b border-border bg-muted/40 text-left">
             <th class="px-4 py-3 text-sm font-medium text-muted-foreground">Connector</th>
-            <th class="px-4 py-3 text-sm font-medium text-muted-foreground">Label</th>
-            <th class="px-4 py-3 text-sm font-medium text-muted-foreground">Scopes</th>
-            <th class="px-4 py-3 text-sm font-medium text-muted-foreground">Status</th>
-            <th class="px-4 py-3 text-sm font-medium text-muted-foreground">Created</th>
-            <th class="px-4 py-3 text-sm font-medium text-muted-foreground">Actions</th>
+            <th class="px-4 py-3 text-sm font-medium text-muted-foreground">{{ runtime.t('sharedConnections.table.label', 'Label') }}</th>
+            <th class="px-4 py-3 text-sm font-medium text-muted-foreground">{{ runtime.t('sharedConnections.table.scopes', 'Scopes') }}</th>
+            <th class="px-4 py-3 text-sm font-medium text-muted-foreground">{{ runtime.t('sharedConnections.table.status', 'Status') }}</th>
+            <th class="px-4 py-3 text-sm font-medium text-muted-foreground">{{ runtime.t('sharedConnections.table.created', 'Created') }}</th>
+            <th class="px-4 py-3 text-sm font-medium text-muted-foreground">{{ runtime.t('sharedConnections.table.actions', 'Actions') }}</th>
           </tr>
         </thead>
         <tbody>

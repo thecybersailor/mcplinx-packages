@@ -81,7 +81,6 @@ export interface RemoteTaskManagementFacade {
   createInstance?: (request: RemoteTaskManagementCreateInstanceRequest) => Promise<RemoteTaskManagementInstance>
   getInstance(instanceId: string): Promise<RemoteTaskManagementInstance>
   updateInstance?: (instanceId: string, request: RemoteTaskManagementCreateInstanceRequest) => Promise<RemoteTaskManagementInstance>
-  createConnectionForInstance?: (instanceId: string) => Promise<{ id?: string; url?: string; connector_id?: string }>
   reviewInstance?: (instanceId: string, request: RemoteTaskManagementReviewRequest) => Promise<Record<string, unknown>>
   createUploadUrls(request: RemoteTaskManagementUploadURLRequest): Promise<RemoteTaskManagementUploadURLResponse>
   publish(request: RemoteTaskManagementPublishRequest): Promise<Record<string, unknown>>

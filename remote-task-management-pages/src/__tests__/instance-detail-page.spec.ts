@@ -19,7 +19,6 @@ function createFacade(): RemoteTaskManagementFacade {
     listPackageInstances: vi.fn(async () => []),
     listInstances: vi.fn(async () => []),
     createInstance: vi.fn(async () => ({ id: 9 })),
-    createConnectionForInstance: vi.fn(async () => ({ id: 'conn_1', connector_id: '7' })),
     getInstance: vi.fn(async () =>
       ({
         id: 7,
@@ -200,7 +199,7 @@ describe('InstanceDetailPage', () => {
     expect(wrapper.findAll('input')[2]!.element).toBe(secretKeyElement)
   })
 
-  it('shows connect action for team scope and creates connection from canonical instance detail', async () => {
+  it('does not show connect action for team scope instance detail', async () => {
     const facade = createFacade()
     const router = createRouter({
       history: createMemoryHistory(),
@@ -210,11 +209,6 @@ describe('InstanceDetailPage', () => {
           component: RuntimeProvider,
           props: { facade, scope: 'team', routePrefix: 'team-remote-task' },
           children: [{ path: '', component: InstanceDetailPage }],
-        },
-        {
-          path: '/connections/:id',
-          component: defineComponent({ template: '<div data-test-id="connection-detail-page" />' }),
-          name: 'team-remote-task-connection-detail',
         },
       ],
     })
@@ -229,10 +223,6 @@ describe('InstanceDetailPage', () => {
     })
 
     await flushPromises()
-    expect(wrapper.find('[data-test-id="remote-task-management.instance-detail.connect"]').exists()).toBe(true)
-    await wrapper.get('[data-test-id="remote-task-management.instance-detail.connect"]').trigger('click')
-    await flushPromises()
-    expect(facade.createConnectionForInstance).toHaveBeenCalledWith('7')
-    expect(router.currentRoute.value.name).toBe('team-remote-task-connection-detail')
+    expect(wrapper.find('[data-test-id="remote-task-management.instance-detail.connect"]').exists()).toBe(false)
   })
 })

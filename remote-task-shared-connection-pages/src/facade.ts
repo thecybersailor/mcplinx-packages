@@ -1,4 +1,6 @@
 import { inject, type InjectionKey } from 'vue'
+import type { RouteLocationRaw } from 'vue-router'
+import type { ConnectionAuthTaskFacade } from '../../remote-task-connection-auth-pages/src/facade'
 
 export type SharedConnectionScope = 'platform' | 'tenant' | 'team'
 
@@ -42,6 +44,17 @@ export interface SharedConnectionStartAuthRequest extends SharedConnectionMutati
   redirect_url?: string
 }
 
+export interface SharedConnectionAuthTaskRequest extends SharedConnectionMutationRequest {
+  connection_id?: string
+  intent?: 'create' | 'reauth'
+}
+
+export interface SharedConnectionAuthTaskResponse {
+  task_id?: string
+  auth_url?: string
+  expires_at?: string
+}
+
 export interface SharedConnectionStartAuthResponse {
   connection_id?: string
   connection_label?: string
@@ -78,6 +91,7 @@ export type RemoteTaskSharedConnectionTranslate = (
 export interface RemoteTaskSharedConnectionFacade {
   listConnections(query?: { scope?: string; principal_pattern?: string; connector_id?: string }): Promise<SharedConnectionListResponse>
   createConnection(request: SharedConnectionMutationRequest): Promise<SharedConnectionRecord>
+  createAuthTask(request: SharedConnectionAuthTaskRequest): Promise<SharedConnectionAuthTaskResponse>
   startAuth(request: SharedConnectionStartAuthRequest): Promise<SharedConnectionStartAuthResponse>
   submitAuth(request: SharedConnectionSubmitAuthRequest): Promise<SharedConnectionRecord>
   getConnection(id: string): Promise<SharedConnectionRecord>
@@ -89,8 +103,10 @@ export interface RemoteTaskSharedConnectionFacade {
 
 export interface RemoteTaskSharedConnectionRuntime {
   facade: RemoteTaskSharedConnectionFacade
+  authTaskFacade: ConnectionAuthTaskFacade
   scope: SharedConnectionScope
   routePrefix: string
+  connectAppTarget?: (connectorId?: string) => RouteLocationRaw
   t: RemoteTaskSharedConnectionTranslate
 }
 

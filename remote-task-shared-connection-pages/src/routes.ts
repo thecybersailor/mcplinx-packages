@@ -1,4 +1,4 @@
-import { RouterView, type RouteRecordRaw } from 'vue-router'
+import { RouterView, type RouteLocationRaw, type RouteRecordRaw } from 'vue-router'
 import { defineComponent, h, provide } from 'vue'
 import {
   defaultTranslate,
@@ -7,6 +7,7 @@ import {
   type RemoteTaskSharedConnectionTranslate,
   type SharedConnectionScope,
 } from './facade'
+import type { ConnectionAuthTaskFacade } from '../../remote-task-connection-auth-pages/src/facade'
 import ConnectionsPage from './pages/ConnectionsPage.vue'
 import ConnectionDetailPage from './pages/ConnectionDetailPage.vue'
 import CreateConnectionPage from './pages/CreateConnectionPage.vue'
@@ -17,13 +18,18 @@ export interface CreateRemoteTaskSharedConnectionRoutesOptions {
   basePath: string
   routePrefix: string
   facade: RemoteTaskSharedConnectionFacade
+  authTaskFacade: ConnectionAuthTaskFacade
+  connectAppTarget?: (connectorId?: string) => RouteLocationRaw
+  includeFallbackExplain?: boolean
   t?: RemoteTaskSharedConnectionTranslate
 }
 
 function createShell(
   facade: RemoteTaskSharedConnectionFacade,
+  authTaskFacade: ConnectionAuthTaskFacade,
   scope: SharedConnectionScope,
   routePrefix: string,
+  connectAppTarget: ((connectorId?: string) => RouteLocationRaw) | undefined,
   t?: RemoteTaskSharedConnectionTranslate,
 ) {
   return defineComponent({
@@ -31,8 +37,10 @@ function createShell(
     setup() {
       provide(remoteTaskSharedConnectionRuntimeKey, {
         facade,
+        authTaskFacade,
         scope,
         routePrefix,
+        connectAppTarget,
         t: t ?? defaultTranslate,
       })
       return () => h(RouterView)
@@ -44,17 +52,20 @@ export function createRemoteTaskSharedConnectionRoutes(
   options: CreateRemoteTaskSharedConnectionRoutesOptions,
 ): RouteRecordRaw[] {
   const prefix = options.routePrefix
+  const children: RouteRecordRaw[] = [
+    { path: '', name: `${prefix}-index`, redirect: { name: `${prefix}-connections` } },
+    { path: 'connections', name: `${prefix}-connections`, component: ConnectionsPage },
+    { path: 'connections/new', name: `${prefix}-create`, component: CreateConnectionPage },
+    { path: 'connections/:id', name: `${prefix}-detail`, component: ConnectionDetailPage },
+  ]
+  if (options.includeFallbackExplain !== false) {
+    children.push({ path: 'fallback-explain', name: `${prefix}-fallback-explain`, component: FallbackExplainPage })
+  }
   return [
     {
       path: options.basePath,
-      component: createShell(options.facade, options.scope, prefix, options.t),
-      children: [
-        { path: '', name: `${prefix}-index`, redirect: { name: `${prefix}-connections` } },
-        { path: 'connections', name: `${prefix}-connections`, component: ConnectionsPage },
-        { path: 'connections/new', name: `${prefix}-create`, component: CreateConnectionPage },
-        { path: 'connections/:id', name: `${prefix}-detail`, component: ConnectionDetailPage },
-        { path: 'fallback-explain', name: `${prefix}-fallback-explain`, component: FallbackExplainPage },
-      ],
+      component: createShell(options.facade, options.authTaskFacade, options.scope, prefix, options.connectAppTarget, options.t),
+      children,
     },
   ]
 }

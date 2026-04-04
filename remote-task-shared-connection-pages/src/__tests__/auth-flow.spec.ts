@@ -3,6 +3,11 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { createMemoryHistory, createRouter, RouterView, type RouteRecordRaw } from 'vue-router'
 import { describe, expect, it, vi } from 'vitest'
 import { createRemoteTaskSharedConnectionRoutes, type RemoteTaskSharedConnectionFacade } from '../index'
+import { openAuthTaskWindow } from '../authTaskWindow'
+
+vi.mock('../authTaskWindow', () => ({
+  openAuthTaskWindow: vi.fn(() => ({ taskId: 'cauth_1', popupBlocked: false, cleanup: vi.fn() })),
+}))
 
 const CONNECTOR_UUID = 'bd8f5828-62f4-5066-8893-d46ecd02a5c2'
 
@@ -10,6 +15,10 @@ function createFacade(): RemoteTaskSharedConnectionFacade {
   return {
     listConnections: vi.fn(async () => ({ items: [] })),
     createConnection: vi.fn(async () => ({ id: 'shared_1' })),
+    createAuthTask: vi.fn(async () => ({
+      task_id: 'cauth_1',
+      auth_url: 'https://app.example/auth/connection-tasks/cauth_1',
+    })),
     startAuth: vi.fn(async () => ({
       connection_id: 'shared_1',
       type: 'api_key',
@@ -42,6 +51,11 @@ async function mountAt(path: string, facade: RemoteTaskSharedConnectionFacade) {
     basePath: 'shared-connections',
     routePrefix: 'shared-connections',
     facade,
+    authTaskFacade: {
+      getTask: vi.fn(),
+      submitTask: vi.fn(),
+      completeCallback: vi.fn(),
+    },
   }) as unknown as RouteRecordRaw[]
 
   const router = createRouter({
@@ -69,28 +83,26 @@ async function mountAt(path: string, facade: RemoteTaskSharedConnectionFacade) {
 }
 
 describe('shared connection auth flow', () => {
-  it('starts auth and submits auth from create page', async () => {
+  it('creates auth task from create page and opens dedicated auth url in a separate window flow', async () => {
     const facade = createFacade()
     const { wrapper, router } = await mountAt('/shared-connections/connections/new', facade)
 
     await wrapper.get('[data-test-id="shared-connections.create.connector-id"]').setValue(CONNECTOR_UUID)
     await wrapper.get('[data-test-id="shared-connections.create.label"]').setValue('Support Mailbox')
     await wrapper.get('[data-test-id="shared-connections.create.principal-pattern"]').setValue('org/team/team_1')
-    await wrapper.get('[data-test-id="shared-connections.create.start-auth"]').trigger('click')
+    await wrapper.get('[data-test-id="shared-connections.create.continue"]').trigger('submit')
     await flushPromises()
 
-    expect(facade.startAuth).toHaveBeenCalled()
-    expect(wrapper.find('[data-test-id="shared-connections.create.auth-form"]').exists()).toBe(true)
-
-    await wrapper.get('[data-test-id="shared-connections.create.auth-field.api_key"]').setValue('secret')
-    await wrapper.get('[data-test-id="shared-connections.create.submit-auth"]').trigger('click')
-    await flushPromises()
-
-    expect(facade.submitAuth).toHaveBeenCalledWith(expect.objectContaining({
-      connection_id: 'shared_1',
-      auth_data: { 'API Key': 'secret' },
+    expect(facade.createAuthTask).toHaveBeenCalledWith(expect.objectContaining({
+      connector_id: CONNECTOR_UUID,
+      label: 'Support Mailbox',
+      principal_pattern: 'org/team/team_1',
     }))
-    expect(router.currentRoute.value.name).toBe('shared-connections-detail')
+    expect(router.currentRoute.value.name).toBe('shared-connections-create')
+    expect(openAuthTaskWindow).toHaveBeenCalledWith(expect.objectContaining({
+      authUrl: 'https://app.example/auth/connection-tasks/cauth_1',
+      taskId: 'cauth_1',
+    }))
   })
 
   it('prefills connector id from query on create page', async () => {
@@ -100,14 +112,20 @@ describe('shared connection auth flow', () => {
     expect((wrapper.get('[data-test-id="shared-connections.create.connector-id"]').element as HTMLInputElement).value).toBe(CONNECTOR_UUID)
   })
 
-  it('shows reauth form from detail page', async () => {
+  it('starts reauth through dedicated auth task from detail page', async () => {
     const facade = createFacade()
     const { wrapper } = await mountAt('/shared-connections/connections/shared_1', facade)
 
     await wrapper.get('[data-test-id="shared-connections.detail.reauth"]').trigger('click')
     await flushPromises()
-    expect(facade.reauthConnection).toHaveBeenCalledWith('shared_1', expect.objectContaining({
+    expect(facade.createAuthTask).toHaveBeenCalledWith(expect.objectContaining({
+      connection_id: 'shared_1',
       principal_pattern: 'org/team/team_1',
+      intent: 'reauth',
+    }))
+    expect(openAuthTaskWindow).toHaveBeenCalledWith(expect.objectContaining({
+      authUrl: 'https://app.example/auth/connection-tasks/cauth_1',
+      taskId: 'cauth_1',
     }))
   })
 })

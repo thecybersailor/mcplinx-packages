@@ -168,6 +168,14 @@
               <CardTitle>Actions</CardTitle>
             </CardHeader>
             <CardContent class="space-y-4">
+              <div
+                v-if="manualAuthUrl"
+                data-test-id="shared-connections.detail.manual-auth"
+                class="rounded-md border border-border bg-muted/40 p-3 text-sm text-foreground"
+              >
+                <p class="mb-2">The browser blocked the auth popup. Open the auth page manually.</p>
+                <a :href="manualAuthUrl" target="_blank" rel="noreferrer" class="underline">Open Authentication Page</a>
+              </div>
               <Button
                 v-if="shouldShowReauth(connection)"
                 variant="secondary"
@@ -203,11 +211,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Label } from '@mcplinx/ui-vue'
 import { useRemoteTaskSharedConnectionRuntime, type SharedConnectionRecord } from '../facade'
 import ConnectorIcon from '../components/ConnectorIcon.vue'
+import { openAuthTaskWindow, type AuthTaskWindowController } from '../authTaskWindow'
 
 const runtime = useRemoteTaskSharedConnectionRuntime()
 const route = useRoute()
@@ -222,6 +231,8 @@ const disconnectLoading = ref(false)
 const tools = ref<Array<Record<string, unknown>>>([])
 const toolsLoading = ref(false)
 const toolsError = ref('')
+const manualAuthUrl = ref('')
+let authController: AuthTaskWindowController | null = null
 
 onMounted(async () => {
   await loadConnection()
@@ -288,15 +299,28 @@ async function handleReauth() {
   try {
     reauthLoading.value = true
     error.value = ''
-    const data = await runtime.facade.reauthConnection(connection.value.id, {
+    manualAuthUrl.value = ''
+    const data = await runtime.facade.createAuthTask({
+      connection_id: connection.value.id,
       connector_id: connection.value.connector_id,
       label: connection.value.label,
-      scope: connection.value.scope || runtime.scope,
       principal_pattern: connection.value.principal_pattern,
       inherits_to: connection.value.inherits_to,
+      intent: 'reauth',
     })
-    if (data.url) {
-      window.location.href = data.url
+    if (data.auth_url) {
+      authController?.cleanup()
+      authController = openAuthTaskWindow({
+        authUrl: data.auth_url,
+        taskId: data.task_id,
+        authTaskFacade: runtime.authTaskFacade,
+        onTerminal: async () => {
+          await loadConnection()
+        },
+      })
+      if (authController.popupBlocked) {
+        manualAuthUrl.value = data.auth_url
+      }
     }
   } catch (e: unknown) {
     console.error('Error reauthorizing:', e)
@@ -326,4 +350,9 @@ function formatDate(dateStr?: string) {
   if (!dateStr) return '-'
   return new Date(dateStr).toLocaleString()
 }
+
+onUnmounted(() => {
+  authController?.cleanup()
+  authController = null
+})
 </script>

@@ -16,6 +16,7 @@
     "test": "vitest run src/__tests__/*.spec.ts --environment jsdom"
   },
   "dependencies": {
+    "@mcplinx/remote-task-connection-auth-pages": "*",
     "@mcplinx/ui-vue": "*"
   },
   "peerDependencies": {

@@ -15,6 +15,7 @@
     "remote-skill-hub-public-sdk",
     "ui-vue",
     "remote-task-connector-domain-pages",
+    "remote-task-connection-auth-pages",
     "remote-task-management-pages",
     "remote-task-shared-connection-pages",
     "remote-task-user-pages"
@@ -31,8 +32,8 @@
     "vue-tsc": "^3.1.4"
   },
   "scripts": {
-    "build": "npm --workspace @mcplinx/linktool run build && npm --workspace @mcplinx/remote-task-user-pages run build && npm --workspace @mcplinx/remote-task-management-pages run build && npm --workspace @mcplinx/remote-task-shared-connection-pages run build && npm --workspace @mcplinx/remote-task-connector-domain-pages run build",
-    "test": "npm --workspace @mcplinx/linktool run test && npm --workspace @mcplinx/remote-task-user-pages run test && npm --workspace @mcplinx/remote-task-management-pages run test && npm --workspace @mcplinx/remote-task-shared-connection-pages run test && npm --workspace @mcplinx/remote-task-connector-domain-pages run test"
+    "build": "npm --workspace @mcplinx/linktool run build && npm --workspace @mcplinx/remote-task-user-pages run build && npm --workspace @mcplinx/remote-task-management-pages run build && npm --workspace @mcplinx/remote-task-shared-connection-pages run build && npm --workspace @mcplinx/remote-task-connection-auth-pages run build && npm --workspace @mcplinx/remote-task-connector-domain-pages run build",
+    "test": "npm --workspace @mcplinx/linktool run test && npm --workspace @mcplinx/remote-task-user-pages run test && npm --workspace @mcplinx/remote-task-management-pages run test && npm --workspace @mcplinx/remote-task-shared-connection-pages run test && npm --workspace @mcplinx/remote-task-connection-auth-pages run test && npm --workspace @mcplinx/remote-task-connector-domain-pages run test"
   },
   "dependencies": {
     "@vueuse/core": "^14.2.1",

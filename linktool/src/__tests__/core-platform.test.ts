@@ -175,6 +175,46 @@ describe('linktool core platform runners', () => {
     expect(deployResult).toEqual({ ok: true, kind: 'deploy' });
   });
 
+  it('defaults versions listing to the current connector package name', async () => {
+    const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'linktool-list-versions-'));
+    fs.writeFileSync(
+      path.join(cwd, 'package.json'),
+      JSON.stringify({ name: '@examples/demo-connector', version: '0.1.0' }),
+    );
+
+    const fetchImpl = vi.fn().mockResolvedValueOnce(
+      new Response(JSON.stringify({ data: [{ version: '42de82a8' }] }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+
+    const result = await runList(
+      createLinktoolCoreContext({ cwd }),
+      { kind: 'versions' },
+      {
+        fetchImpl,
+        resolvePublishRuntime: async () => ({
+          baseUrl: 'https://host.example.com',
+          accessToken: 'token_3',
+          publishPath: '/api/v1/connectors/publish',
+          listPath: '/api/v1/connectors/versions',
+        }),
+      },
+    );
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'https://host.example.com/api/v1/connectors/versions?connector_id=examples%2Fdemo-connector',
+      expect.objectContaining({
+        method: 'GET',
+        headers: expect.objectContaining({
+          Authorization: 'Bearer token_3',
+        }),
+      }),
+    );
+    expect(result).toEqual([{ version: '42de82a8' }]);
+  });
+
   it('runs connection operations against injected connection runtime', async () => {
     const fetchImpl = vi
       .fn()

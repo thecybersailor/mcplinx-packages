@@ -20,7 +20,6 @@ function createFacade(): RemoteTaskManagementFacade {
     listPackageInstances: vi.fn(async () => []),
     listInstances: vi.fn(async () => [{ id: 7, name: 'Tenant Slack', status: 'pending_review', pkg_id: PACKAGE_UUID } as never]),
     createInstance: vi.fn(async () => ({ id: 9 })),
-    createConnectionForInstance: vi.fn(async () => ({ id: 'conn_1', connector_id: '7' })),
     getInstance: vi.fn(async () => ({ id: 7 })),
     updateInstance: vi.fn(async () => ({ id: 7 })),
     reviewInstance: vi.fn(async () => ({})),
@@ -52,6 +51,7 @@ const RuntimeProvider = defineComponent({
       facade: props.facade,
       scope: props.scope,
       routePrefix: 'tenant-remote-task',
+      sharedConnectionRoutePrefix: 'tenant-shared-connections',
       t: defaultTranslate,
     })
     return () => h(RouterView, { key: route.fullPath })
@@ -121,6 +121,41 @@ describe('InstancesPage', () => {
 
     await flushPromises()
     expect(wrapper.find('[data-test-id="remote-task-management.instances.open-connections"]').exists()).toBe(true)
+  })
+
+  it('offers per-instance connect action when shared connections are enabled', async () => {
+    const facade = createFacade()
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        {
+          path: '/instances',
+          component: RuntimeProvider,
+          props: { facade, scope: 'tenant' },
+          children: [{ path: '', component: InstancesPage }],
+        },
+        {
+          path: '/shared-connections/connections/new',
+          name: 'tenant-shared-connections-create',
+          component: defineComponent({ template: '<div data-test-id="shared-connections-create" />' }),
+        },
+      ],
+    })
+
+    await router.push('/instances')
+    await router.isReady()
+
+    const wrapper = mount(defineComponent(() => () => h(RouterView)), {
+      global: {
+        plugins: [router],
+      },
+    })
+
+    await flushPromises()
+    await wrapper.get('[data-test-id="remote-task-management.instances.connect.7"]').trigger('click')
+    await flushPromises()
+    expect(router.currentRoute.value.name).toBe('tenant-shared-connections-create')
+    expect(router.currentRoute.value.query.connector_id).toBe('7')
   })
 
   it('hides moderation actions for team scope instance detail', async () => {

@@ -44,6 +44,11 @@ async function mountAt(path: string, facade: RemoteTaskSharedConnectionFacade) {
     basePath: 'shared-connections',
     routePrefix: 'shared-connections',
     facade,
+    authTaskFacade: {
+      getTask: vi.fn(),
+      submitTask: vi.fn(),
+      completeCallback: vi.fn(),
+    },
   }) as unknown as RouteRecordRaw[]
 
   const router = createRouter({

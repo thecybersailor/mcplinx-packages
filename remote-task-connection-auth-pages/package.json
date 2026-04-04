@@ -1,5 +1,5 @@
 {
-  "name": "@mcplinx/remote-task-user-pages",
+  "name": "@mcplinx/remote-task-connection-auth-pages",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -16,8 +16,6 @@
     "test": "vitest run src/__tests__/*.spec.ts --environment jsdom"
   },
   "dependencies": {
-    "@mcplinx/api-client-user": "*",
-    "@mcplinx/remote-task-connection-auth-pages": "*",
     "@mcplinx/ui-vue": "*"
   },
   "peerDependencies": {

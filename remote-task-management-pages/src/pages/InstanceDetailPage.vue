@@ -28,10 +28,8 @@ const error = ref('')
 const reviewReason = ref('')
 const instance = ref<Awaited<ReturnType<typeof runtime.facade.getInstance>> | null>(null)
 const savingConfig = ref(false)
-const connecting = ref(false)
 const instanceId = computed(() => String(route.params.instanceId ?? ''))
 const canModerate = computed(() => runtime.scope !== 'team' && typeof runtime.facade.reviewInstance === 'function')
-const canConnect = computed(() => runtime.scope === 'team' && typeof runtime.facade.createConnectionForInstance === 'function')
 const envVars = ref<EnvVarRow[]>([])
 const secretVars = ref<SecretVarRow[]>([])
 let configRowId = 0
@@ -126,28 +124,6 @@ async function saveConfig() {
   }
 }
 
-async function connectInstance() {
-  if (!instance.value || !runtime.facade.createConnectionForInstance) return
-  connecting.value = true
-  error.value = ''
-  try {
-    const response = await runtime.facade.createConnectionForInstance(String(instance.value.id))
-    if (response.url && typeof window !== 'undefined') {
-      window.location.href = response.url
-      return
-    }
-    if (response.id) {
-      await router.push({ name: `${runtime.routePrefix}-connection-detail`, params: { id: response.id } })
-      return
-    }
-    error.value = runtime.t('remoteTaskManagement.instances.connectFailed', 'Failed to create connection.')
-  } catch (err) {
-    error.value = err instanceof Error ? err.message : runtime.t('remoteTaskManagement.instances.connectFailed', 'Failed to create connection.')
-  } finally {
-    connecting.value = false
-  }
-}
-
 onMounted(load)
 </script>
 
@@ -170,14 +146,6 @@ onMounted(load)
             <h2 class="text-base font-semibold text-foreground">{{ runtime.t('remoteTaskManagement.instances.activeDeployment', 'Active Deployment') }}</h2>
             <p class="mt-1 text-sm text-muted-foreground">{{ runtime.t('remoteTaskManagement.instances.activeDeploymentDesc', 'Active deployment shows the version that is currently serving traffic.') }}</p>
           </div>
-          <Button
-            v-if="canConnect"
-            data-test-id="remote-task-management.instance-detail.connect"
-            :disabled="connecting"
-            @click="connectInstance"
-          >
-            {{ connecting ? runtime.t('remoteTaskManagement.instances.connecting', 'Connecting...') : runtime.t('remoteTaskManagement.instances.connect', 'Create Connection') }}
-          </Button>
         </div>
         <div class="overflow-hidden rounded-2xl border border-border bg-muted/30">
           <div class="flex items-center justify-between border-b border-border px-4 py-3 text-xs text-muted-foreground">
