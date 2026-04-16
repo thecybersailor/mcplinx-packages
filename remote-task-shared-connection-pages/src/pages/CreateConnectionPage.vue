@@ -37,12 +37,25 @@ async function submit() {
   manualAuthUrl.value = ''
   try {
     const created = await runtime.facade.createAuthTask(currentRequest())
+    const taskId = String(created.task_id ?? '').trim()
     if (created.auth_url && typeof window !== 'undefined') {
+      if (taskId) {
+        try {
+          const detail = await runtime.authTaskFacade.getTask(taskId)
+          const authType = String(detail.auth_type ?? '').trim().toLowerCase()
+          if (authType === 'api_key' || authType === 'session' || authType === 'basic') {
+            window.location.assign(created.auth_url)
+            return
+          }
+        } catch (err) {
+          console.warn('failed to preload auth task detail', err)
+        }
+      }
       waitingForAuth.value = true
       authController?.cleanup()
       authController = openAuthTaskWindow({
         authUrl: created.auth_url,
-        taskId: created.task_id,
+        taskId,
         authTaskFacade: runtime.authTaskFacade,
         onTerminal: async () => {
           waitingForAuth.value = false
@@ -121,7 +134,9 @@ onUnmounted(() => {
           {{ error }}
         </div>
         <button class="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90" :disabled="saving" data-test-id="shared-connections.create.continue">
-          {{ saving ? runtime.t('sharedConnections.authorizing', 'Authorizing...') : runtime.t('sharedConnections.continue', 'Continue') }}
+          <span data-test-id="shared-connections.create.start-auth">
+            {{ saving ? runtime.t('sharedConnections.authorizing', 'Authorizing...') : runtime.t('sharedConnections.continue', 'Continue') }}
+          </span>
         </button>
       </form>
     </BundlePanel>

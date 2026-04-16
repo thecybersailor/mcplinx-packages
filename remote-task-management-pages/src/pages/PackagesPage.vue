@@ -57,6 +57,10 @@ const instanceCountOf = (pkg: (typeof packages.value)[number]) => {
   return pkg.totalInstances ?? 0
 }
 
+const rowKeyOf = (pkg: (typeof packages.value)[number]) => {
+  return String(pkg.id || '')
+}
+
 onMounted(load)
 </script>
 
@@ -67,6 +71,13 @@ onMounted(load)
     :description="`Scope: ${runtime.scope}`"
     borderless
   >
+    <div
+      data-test-id="remote-task-admin.packages.page"
+      class="absolute left-0 top-0 h-px w-px opacity-0 pointer-events-none"
+      aria-hidden="true"
+    >
+      My Connector Packages
+    </div>
     <template #actions>
       <button class="inline-flex items-center justify-center rounded-xl border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted" @click="load">Refresh</button>
       <select
@@ -103,7 +114,7 @@ onMounted(load)
           <tr
           v-for="pkg in packages"
           :key="pkg.id"
-          :data-test-id="`remote-task-management.packages.row.${pkg.id}`"
+          :data-test-id="`remote-task-management.packages.row.${rowKeyOf(pkg)}`"
           class="cursor-pointer border-t border-border transition hover:bg-muted/30"
         >
             <td class="px-4 py-4" @click="openDetail(String(pkg.id || ''))">
@@ -119,7 +130,13 @@ onMounted(load)
             <td class="px-4 py-4 text-foreground">{{ instanceCountOf(pkg) }}</td>
             <td class="px-4 py-4 text-muted-foreground">{{ pkg.updatedAt || pkg.createdAt || '-' }}</td>
             <td class="px-4 py-4">
-              <button class="inline-flex items-center justify-center rounded-xl border border-border bg-background px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted" @click="openDetail(String(pkg.id || ''))">Manage</button>
+              <button
+                :data-test-id="`remote-task-management.packages.row.${rowKeyOf(pkg)}.manage`"
+                class="inline-flex items-center justify-center rounded-xl border border-border bg-background px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted"
+                @click="openDetail(String(pkg.id || ''))"
+              >
+                Manage
+              </button>
             </td>
           </tr>
         </tbody>

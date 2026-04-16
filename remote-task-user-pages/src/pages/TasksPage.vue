@@ -113,7 +113,7 @@ onMounted(() => {
       <span>{{ error }}</span>
     </div>
 
-    <div v-else-if="tasks.length === 0" class="rounded-lg border-2 border-dashed border-border bg-muted/20 py-12 text-center">
+    <div v-else-if="(tasks?.length ?? 0) === 0" class="rounded-lg border-2 border-dashed border-border bg-muted/20 py-12 text-center">
       <p class="text-muted-foreground">{{ runtime.t('remoteTaskUser.tasks.empty', 'No tasks yet.') }}</p>
     </div>
 

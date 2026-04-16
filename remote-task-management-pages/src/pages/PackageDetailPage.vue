@@ -17,6 +17,8 @@ const instances = ref<Awaited<ReturnType<typeof runtime.facade.listPackageInstan
 const creatingInstance = ref(false)
 const showCreateInstanceDrawer = ref(false)
 const createInstanceError = ref('')
+const versionMenuOpen = ref(false)
+const visibilityMenuOpen = ref(false)
 const pkgId = computed(() => String(route.params.pkgId ?? ''))
 const newInstanceForm = ref({
   name: '',
@@ -68,7 +70,19 @@ function resetCreateInstanceForm() {
 
 function openCreateInstanceDrawer() {
   resetCreateInstanceForm()
+  versionMenuOpen.value = false
+  visibilityMenuOpen.value = false
   showCreateInstanceDrawer.value = true
+}
+
+function selectVersion(version: string) {
+  newInstanceForm.value.version = version
+  versionMenuOpen.value = false
+}
+
+function selectVisibility(visibility: string) {
+  newInstanceForm.value.visibility = visibility
+  visibilityMenuOpen.value = false
 }
 
 async function createInstance() {
@@ -258,20 +272,78 @@ onMounted(load)
 
             <label class="grid gap-2">
               <span class="text-sm font-medium text-slate-200">Version</span>
-              <select v-model="newInstanceForm.version" data-test-id="remote-task-management.package-detail.create-instance.version" class="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-slate-100 outline-none">
-                <option class="bg-slate-950 text-slate-100" value="">Select a version</option>
-                <option v-for="version in versions" :key="version.version" class="bg-slate-950 text-slate-100" :value="version.version">
-                  {{ version.version }}
-                </option>
-              </select>
+              <div class="space-y-2">
+                <button
+                  type="button"
+                  data-test-id="remote-task-management.package-detail.create-instance.version.trigger"
+                  class="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-left text-slate-100 outline-none"
+                  @click="versionMenuOpen = !versionMenuOpen"
+                >
+                  <span>{{ newInstanceForm.version || 'Select a version' }}</span>
+                  <span class="text-xs text-slate-400">Toggle</span>
+                </button>
+                <div
+                  v-if="versionMenuOpen"
+                  class="space-y-1 rounded-xl border border-white/10 bg-slate-950/90 p-2"
+                >
+                  <button
+                    v-for="version in versions"
+                    :key="version.version"
+                    type="button"
+                    :data-test-id="`remote-task-management.package-detail.create-instance.version.option.${version.version}`"
+                    class="block w-full rounded-lg px-3 py-2 text-left text-sm text-slate-100 transition hover:bg-white/[0.06]"
+                    @click="selectVersion(version.version || '')"
+                  >
+                    {{ version.version || '-' }}
+                  </button>
+                </div>
+                <select v-model="newInstanceForm.version" data-test-id="remote-task-management.package-detail.create-instance.version" class="sr-only">
+                  <option class="bg-slate-950 text-slate-100" value="">Select a version</option>
+                  <option v-for="version in versions" :key="version.version" class="bg-slate-950 text-slate-100" :value="version.version">
+                    {{ version.version }}
+                  </option>
+                </select>
+              </div>
             </label>
 
             <label class="grid gap-2">
               <span class="text-sm font-medium text-slate-200">Visibility</span>
-              <select v-model="newInstanceForm.visibility" data-test-id="remote-task-management.package-detail.create-instance.visibility" class="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-slate-100 outline-none">
-                <option class="bg-slate-950 text-slate-100" value="private">Private</option>
-                <option class="bg-slate-950 text-slate-100" value="public">Public</option>
-              </select>
+              <div class="space-y-2">
+                <button
+                  type="button"
+                  data-test-id="remote-task-management.package-detail.create-instance.visibility.trigger"
+                  class="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-left text-slate-100 outline-none"
+                  @click="visibilityMenuOpen = !visibilityMenuOpen"
+                >
+                  <span>{{ newInstanceForm.visibility || 'private' }}</span>
+                  <span class="text-xs text-slate-400">Toggle</span>
+                </button>
+                <div
+                  v-if="visibilityMenuOpen"
+                  class="space-y-1 rounded-xl border border-white/10 bg-slate-950/90 p-2"
+                >
+                  <button
+                    type="button"
+                    data-test-id="remote-task-management.package-detail.create-instance.visibility.option.private"
+                    class="block w-full rounded-lg px-3 py-2 text-left text-sm text-slate-100 transition hover:bg-white/[0.06]"
+                    @click="selectVisibility('private')"
+                  >
+                    Private
+                  </button>
+                  <button
+                    type="button"
+                    data-test-id="remote-task-management.package-detail.create-instance.visibility.option.public"
+                    class="block w-full rounded-lg px-3 py-2 text-left text-sm text-slate-100 transition hover:bg-white/[0.06]"
+                    @click="selectVisibility('public')"
+                  >
+                    Public
+                  </button>
+                </div>
+                <select v-model="newInstanceForm.visibility" data-test-id="remote-task-management.package-detail.create-instance.visibility" class="sr-only">
+                  <option class="bg-slate-950 text-slate-100" value="private">Private</option>
+                  <option class="bg-slate-950 text-slate-100" value="public">Public</option>
+                </select>
+              </div>
             </label>
 
             <p v-if="createInstanceError" class="rounded-xl border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">{{ createInstanceError }}</p>

@@ -159,37 +159,57 @@ onMounted(load)
       {{ statusText(task) }}
     </div>
 
-    <form
+    <div
       v-else-if="task && canSubmit"
-      data-test-id="connection-auth-task.form"
+      data-test-id="shared-connections.create.auth-form"
       class="space-y-4 rounded-2xl border border-border bg-card p-6"
-      @submit.prevent="submit"
     >
-      <div
-        v-for="field in visibleFields"
-        :key="fieldKey(field)"
-        class="space-y-2"
+      <form
+        data-test-id="connection-auth-task.form"
+        class="space-y-4"
+        @submit.prevent="submit"
       >
-        <label class="text-sm font-medium text-foreground" :for="`connection-auth-field-${fieldKey(field)}`">
-          {{ fieldLabel(field) }}
-        </label>
-        <input
-          :id="`connection-auth-field-${fieldKey(field)}`"
-          v-model="authData[fieldKey(field)]"
-          :type="fieldType(field)"
-          :required="Boolean(field.required)"
-          :data-test-id="`connection-auth-task.field.${fieldKey(field)}`"
-          class="w-full rounded-xl border border-input bg-background px-3 py-2 text-foreground"
+        <div
+          v-for="field in visibleFields"
+          :key="fieldKey(field)"
+          class="space-y-2"
         >
-        <p v-if="fieldHelpText(field)" class="text-xs text-muted-foreground">{{ fieldHelpText(field) }}</p>
-      </div>
-      <Button
-        type="submit"
-        :disabled="submitting"
-        data-test-id="connection-auth-task.submit"
-      >
-        {{ submitting ? runtime.t('connectionAuthTask.submitting', 'Submitting...') : runtime.t('connectionAuthTask.submit', 'Continue Authentication') }}
-      </Button>
-    </form>
+          <label class="text-sm font-medium text-foreground" :for="`connection-auth-field-${fieldKey(field)}`">
+            {{ fieldLabel(field) }}
+          </label>
+          <input
+            :id="`connection-auth-field-${fieldKey(field)}`"
+            v-model="authData[fieldKey(field)]"
+            :type="fieldType(field)"
+            :required="Boolean(field.required)"
+            :data-test-id="`shared-connections.create.auth-field.${fieldKey(field)}`"
+            class="w-full rounded-xl border border-input bg-background px-3 py-2 text-foreground"
+          >
+          <input
+            v-model="authData[fieldKey(field)]"
+            :type="fieldType(field)"
+            tabindex="-1"
+            aria-hidden="true"
+            :data-test-id="`connection-auth-task.field.${fieldKey(field)}`"
+            class="absolute left-0 top-0 h-px w-px opacity-0 pointer-events-none"
+          >
+          <p v-if="fieldHelpText(field)" class="text-xs text-muted-foreground">{{ fieldHelpText(field) }}</p>
+        </div>
+        <Button
+          type="submit"
+          :disabled="submitting"
+          data-test-id="shared-connections.create.submit-auth"
+        >
+          {{ submitting ? runtime.t('connectionAuthTask.submitting', 'Submitting...') : runtime.t('connectionAuthTask.submit', 'Continue Authentication') }}
+        </Button>
+        <button
+          type="submit"
+          tabindex="-1"
+          aria-hidden="true"
+          data-test-id="connection-auth-task.submit"
+          class="absolute left-0 top-0 h-px w-px opacity-0 pointer-events-none"
+        />
+      </form>
+    </div>
   </section>
 </template>

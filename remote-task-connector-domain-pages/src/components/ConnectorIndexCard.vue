@@ -33,7 +33,15 @@ defineProps<{
         class="mt-auto w-fit"
       >
         <RouterLink :to="card.to" :data-test-id="`connector-index.card.${card.id}.action`">
-          {{ card.actionLabel }}
+          <span
+            v-if="card.actionTestId"
+            :data-test-id="card.actionTestId"
+          >
+            {{ card.actionLabel }}
+          </span>
+          <template v-else>
+            {{ card.actionLabel }}
+          </template>
         </RouterLink>
       </Button>
     </CardContent>
