@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import BundlePage from '../components/BundlePage.vue'
 import BundleState from '../components/BundleState.vue'
 import { useRemoteTaskManagementRuntime } from '../facade'
