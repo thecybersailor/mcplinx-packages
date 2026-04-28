@@ -14,7 +14,7 @@ import {
 import { cn } from '../../lib/utils'
 import { sheetVariants } from "."
 
-interface SheetContentProps extends DialogContentProps {
+interface SheetContentProps extends /* @vue-ignore */ DialogContentProps {
   class?: HTMLAttributes["class"]
   side?: SheetVariants["side"]
 }

@@ -5,7 +5,7 @@ import { AvatarRoot, useForwardProps } from "reka-ui"
 import { reactiveOmit } from "@vueuse/core"
 import { cn } from "../../lib/utils"
 
-interface AvatarProps extends AvatarRootProps {
+interface AvatarProps extends /* @vue-ignore */ AvatarRootProps {
   class?: HTMLAttributes["class"]
 }
 

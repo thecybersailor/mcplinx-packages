@@ -5,7 +5,7 @@ import { AvatarImage, useForwardProps } from "reka-ui"
 import { reactiveOmit } from "@vueuse/core"
 import { cn } from "../../lib/utils"
 
-interface Props extends AvatarImageProps {
+interface Props extends /* @vue-ignore */ AvatarImageProps {
   class?: HTMLAttributes["class"]
 }
 

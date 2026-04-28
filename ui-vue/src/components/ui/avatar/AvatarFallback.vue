@@ -5,7 +5,7 @@ import { AvatarFallback, useForwardProps } from "reka-ui"
 import { reactiveOmit } from "@vueuse/core"
 import { cn } from "../../lib/utils"
 
-interface Props extends AvatarFallbackProps {
+interface Props extends /* @vue-ignore */ AvatarFallbackProps {
   class?: HTMLAttributes["class"]
 }
 
